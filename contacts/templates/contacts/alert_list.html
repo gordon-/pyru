@@ -1,0 +1,11 @@
+{% extends 'contacts/base.html' %}
+
+{% block title %}Liste des alertes{% endblock %}
+
+{% block content %}
+{% for object in object_list %}
+    <div>{{ object }}</div>
+{% empty %}
+    <div>Aucun objet.</div>
+{% endfor %}
+{% endblock %}
