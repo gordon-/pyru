@@ -113,9 +113,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MESSAGE_TAGS = {
-    messages.SUCCESS: 'alert-success success',
-    messages.WARNING: 'alert-warning warning',
-    messages.ERROR: 'alert-danger error'
+    messages.SUCCESS: 'success success',
+    messages.WARNING: 'warning warning',
+    messages.ERROR: 'danger error'
 }
 
 LOGIN_URL = reverse_lazy('contacts:login')

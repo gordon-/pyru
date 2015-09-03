@@ -4,6 +4,7 @@ from django import forms
 from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 from .mixins import LoginRequiredMixin
 from .models import (
@@ -62,6 +63,9 @@ class CompanyCreation(LoginRequiredMixin, generic.CreateView):
         self.object = company
         try:
             company.save()
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Compagnie {} créée avec succès.'
+                                 .format(company))
         except IntegrityError:
             form.add_error('name', 'Une compagnie de ce nom existe déjà.')
             return super().form_invalid(form)
@@ -105,6 +109,9 @@ class ContactCreation(LoginRequiredMixin, generic.CreateView):
         self.object = contact
         try:
             contact.save()
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Contact {} créé avec succès.'
+                                 .format(contact))
         except IntegrityError:
             form.add_error('firstname', 'Un contact de ce nom existe déjà.')
             return super().form_invalid(form)

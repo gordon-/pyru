@@ -1,9 +1,11 @@
 {% load bootstrap3 %}
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 	<head>
         <meta charset="utf-8" />
         <title>{% block title %}Bienvenue{% endblock %} — Pyru</title>
+        <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
         {% bootstrap_css %}
         {% bootstrap_javascript %}
 	</head>
