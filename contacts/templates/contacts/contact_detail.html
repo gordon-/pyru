@@ -1,0 +1,20 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Détail du contact {{ object }}{% endblock %}
+
+{% block content %}
+    <div>{{ object }}</div>
+    <dl>
+    {% if object.company %}
+        <dt>Société</dt>
+        <dd><a href="{{ object.company.get_absolute_url }}">{{ object.company }}</a></dd>
+    {% endif %}
+    {% for prop_name, prop_value in object.properties.items %}
+        <dt>{{ prop_name }}</dt>
+        <dd>{{ prop_value }}</dd>
+    {% endfor %}
+    </dl>
+    <p><a href="{% url 'contacts:contact-list' %}" class="btn btn-info">Retour
+        à la liste des contacts</a></p>
+{% endblock %}

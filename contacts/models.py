@@ -113,14 +113,14 @@ class Contact(models.Model):
                                related_name='added_contacts')
 
     def __str__(self):
-        return self.name
+        return '{} {}'.format(self.firstname, self.lastname)
 
     def get_absolute_url(self):
         return reverse('contacts:contact-detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify('{} {}'.format(self.firstname, self.lastname))
         return super().save(*args, **kwargs)
 
     class Meta:

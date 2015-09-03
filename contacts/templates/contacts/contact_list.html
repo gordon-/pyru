@@ -1,0 +1,22 @@
+{% extends 'contacts/base.html' %}
+
+{% block title %}Liste des contacts{% endblock %}
+
+{% block content %}
+    <table class="table">
+        <tr><th>Nom</th>
+            <th>Groupe</th>
+            <th>Société</th>
+            <th>Type</th>
+        </tr>
+        {% for object in object_list %}
+        <tr><td><a href="{{ object.get_absolute_url }}">{{ object }}</a></td>
+            <td>{{ object.group }}</td>
+            <td>{{ object.company }}</td>
+            <td>{{ object.type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div><a href="{% url 'contacts:contact-create' %}" class="btn btn-info">Ajouter</a></div>
+{% endblock %}
+

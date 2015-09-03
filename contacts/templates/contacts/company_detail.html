@@ -1,0 +1,18 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Détail de la compagnie {{ object }}{% endblock %}
+
+{% block content %}
+    <div>{{ object }}</div>
+    <dl>
+    {% for prop_name, prop_value in object.properties.items %}
+        <dt>{{ prop_name }}</dt>
+        <dd>{{ prop_value }}</dd>
+    {% endfor %}
+    </dl>
+    <p><a href="{% url 'contacts:contact-create' company=object.slug %}"
+        class="btn btn-info">
+        {% bootstrap_icon 'plus' %} Ajouter un contact</a></p>
+    <p><a href="{% url 'contacts:company-list' %}" class="btn btn-info">Retour à la liste des compagnies</a></p>
+{% endblock %}
