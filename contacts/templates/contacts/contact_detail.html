@@ -4,6 +4,7 @@
 {% block title %}Détail du contact {{ object }}{% endblock %}
 
 {% block content %}
+<h2>Détail du contact {{ object }}</h2>
     <div>{{ object }}</div>
     <dl>
     {% if object.company %}
@@ -15,6 +16,10 @@
         <dd>{{ prop_value }}</dd>
     {% endfor %}
     </dl>
+    <p><a href="{% url 'contacts:contact-update' slug=object.slug %}"
+        class="btn btn-info">Modifier le contact</a></p>
+    <p><a href="{% url 'contacts:contact-delete' slug=object.slug %}"
+        class="btn btn-danger">Supprimer le contact</a></p>
     <p><a href="{% url 'contacts:contact-list' %}" class="btn btn-info">Retour
         à la liste des contacts</a></p>
 {% endblock %}

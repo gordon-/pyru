@@ -1,15 +1,16 @@
 {% extends 'contacts/base.html' %}
 {% load bootstrap3 %}
 
-{% block title %}Création d’une compagnie{% endblock %}
+{% block title %}{{ verb.0 }} d’une société{% endblock %}
 
 {% block content %}
+<h2>{{ verb.0 }} d’une société</h2>
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
     <button type="submit" class="btn btn-primary">
-      {% bootstrap_icon "star" %} Créer
+        {% bootstrap_icon "star" %} {{ verb.1 }}
     </button>
     {% endbuttons %}
 </form>

@@ -4,17 +4,22 @@
 de la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
+<h2>Liste des contacts{% if company %}
+    de la société {{ company }}{% endif %}</h2>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
             <th>Société</th>
             <th>Type</th>
+            <th>Actions</th>
         </tr>
         {% for object in object_list %}
         <tr><td><a href="{{ object.get_absolute_url }}">{{ object }}</a></td>
             <td>{{ object.group }}</td>
             <td>{{ object.company }}</td>
             <td>{{ object.type }}</td>
+            <td><a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>
+                <a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>
         </tr>
         {% endfor %}
     </table>

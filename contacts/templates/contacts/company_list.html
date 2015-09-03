@@ -1,19 +1,25 @@
 {% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
 
-{% block title %}Liste des compagnies{% endblock %}
+{% block title %}Liste des sociétés{% endblock %}
 
 {% block content %}
+<h2>Liste des sociétés</h2>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
             <th>Type</th>
             <th>Contacts</th>
+            <th>Actions</th>
         </tr>
         {% for object in object_list %}
         <tr><td><a href="{{ object.get_absolute_url }}">{{ object }}</a></td>
             <td>{{ object.group }}</td>
             <td>{{ object.type }}</td>
-            <td>{{ object.contacts.count }}</td></tr>
+            <td>{{ object.contacts.count }}</td>
+            <td><a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>
+                <a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>
+        </tr>
         {% endfor %}
     </table>
     <div><a href="{% url 'contacts:company-create' %}" class="btn btn-info">Ajouter</a></div>

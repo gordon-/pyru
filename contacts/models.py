@@ -71,7 +71,7 @@ class Company(models.Model):
                               related_name='companies')
     type = models.ForeignKey(ContactType, verbose_name='type', null=True,
                              related_name='companies')
-    comments = models.TextField('commentaires')
+    comments = models.TextField('commentaires', blank=True)
     properties = fields.HStoreField('propriétés', default={})
     creation_date = models.DateTimeField('date de création', auto_now_add=True)
     update_date = models.DateTimeField('date de mise à jour', auto_now=True)
@@ -104,7 +104,7 @@ class Contact(models.Model):
                               related_name='contacts')
     type = models.ForeignKey(ContactType, verbose_name='type', null=True,
                              related_name='contacts')
-    comments = models.TextField('commentaires')
+    comments = models.TextField('commentaires', blank=True)
     properties = fields.HStoreField('propriétés', default={})
     creation_date = models.DateTimeField('date de création', auto_now_add=True)
     update_date = models.DateTimeField('date de mise à jour', auto_now=True)
@@ -144,7 +144,7 @@ class Meeting(models.Model):
                                 related_name='meetings')
     type = models.ForeignKey(MeetingType, verbose_name='type')
     date = models.DateTimeField('date et heure', default=timezone.now)
-    comments = models.TextField('commentaires')
+    comments = models.TextField('commentaires', blank=True)
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='added_meetings')
 
