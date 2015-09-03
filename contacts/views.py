@@ -122,11 +122,18 @@ class ContactList(LoginRequiredMixin, generic.ListView):
             .order_by('firstname')
 
         if 'company' in self.kwargs:
-            company = get_object_or_404(Company, slug=self.kwargs['company'],
-                                        group__in=self.request.user.groups
-                                        .all())
-            qs = qs.filter(company=company)
+            self.company = get_object_or_404(Company,
+                                             slug=self.kwargs['company'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            qs = qs.filter(company=self.company)
         return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        return context
 
 
 class ContactDetail(LoginRequiredMixin, generic.DetailView):
@@ -137,9 +144,16 @@ class ContactDetail(LoginRequiredMixin, generic.DetailView):
         filters = {'slug': self.kwargs['slug'],
                    'group__in': self.request.user.groups.all()}
         if 'company' in self.kwargs:
-            company = get_object_or_404(Company, slug=self.kwargs['company'],
-                                        group__in=self.request.user.groups
-                                        .all())
-            filters['company'] = company
+            self.company = get_object_or_404(Company,
+                                             slug=self.kwargs['company'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            filters['company'] = self.company
         obj = get_object_or_404(Contact, **filters)
         return obj
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        return context

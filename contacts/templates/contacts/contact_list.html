@@ -1,6 +1,7 @@
 {% extends 'contacts/base.html' %}
 
-{% block title %}Liste des contacts{% endblock %}
+{% block title %}Liste des contacts{% if company %}
+de la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
     <table class="table">

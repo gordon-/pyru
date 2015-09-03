@@ -11,6 +11,18 @@
         <dd>{{ prop_value }}</dd>
     {% endfor %}
     </dl>
+    <table class="table">
+        <tr><th>Nom</th>
+            <th>Groupe</th>
+            <th>Type</th>
+        </tr>
+        {% for contact in object.contacts.all %}
+        <tr><td><a href="{{ contact.get_absolute_url }}">{{ contact }}</a></td>
+            <td>{{ contact.group }}</td>
+            <td>{{ contact.type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
     <p><a href="{% url 'contacts:contact-create' company=object.slug %}"
         class="btn btn-info">
         {% bootstrap_icon 'plus' %} Ajouter un contact</a></p>
