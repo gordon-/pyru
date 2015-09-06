@@ -122,6 +122,10 @@ LOGIN_URL = reverse_lazy('contacts:login')
 LOGIN_REDIRECT_URL = reverse_lazy('contacts:home')
 LOGOUT_URL = reverse_lazy('contacts:logout')
 
+AUTHENTICATION_BACKENDS = (
+    'contacts.authentication.RowLevelPermissionBackend',
+)
+
 DAB_FIELD_RENDERER = \
     'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
 

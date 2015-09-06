@@ -1,51 +1,31 @@
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse_lazy
-from django.views import generic
 from django import forms
 from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 
-from .mixins import LoginRequiredMixin
+from . import generic
 from .models import (
     Properties, Alert, ContactType, Company, Contact, MeetingType, Meeting
 )
 
 
-class Home(LoginRequiredMixin, generic.ListView):
-
+class Home(generic.ListView):
     model = Alert
 
-    def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)\
-            .order_by('-date')
+
+class CompaniesList(generic.ListView):
+    model = Company
 
 
-class CompaniesList(LoginRequiredMixin, generic.ListView):
+class CompanyDetail(generic.DetailView):
 
     model = Company
 
-    def get_queryset(self):
-        # todo: add filtering/ordering support
-        return self.model\
-            .objects.filter(group__in=self.request.user.groups.all())\
-            .order_by('name')
 
-
-class CompanyDetail(LoginRequiredMixin, generic.DetailView):
-
-    model = Company
-
-    def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
-        obj = get_object_or_404(self.model, **filters)
-        return obj
-
-
-class CompanyCreation(LoginRequiredMixin, generic.CreateView):
-
+class CompanyCreation(generic.CreateView):
     model = Company
     fields = ('name', 'group', 'type', 'comments', 'active', )
 
@@ -84,16 +64,9 @@ class CompanyCreation(LoginRequiredMixin, generic.CreateView):
         return context
 
 
-class CompanyUpdate(LoginRequiredMixin, generic.UpdateView):
-
+class CompanyUpdate(generic.UpdateView):
     model = Company
     fields = ('name', 'group', 'type', 'comments', 'active', )
-
-    def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
-        obj = get_object_or_404(self.model, **filters)
-        return obj
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
@@ -134,16 +107,9 @@ class CompanyUpdate(LoginRequiredMixin, generic.UpdateView):
         return context
 
 
-class CompanyDelete(LoginRequiredMixin, generic.DeleteView):
-
+class CompanyDelete(generic.DeleteView):
     model = Company
     success_url = reverse_lazy('contacts:company-list')
-
-    def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
-        obj = get_object_or_404(self.model, **filters)
-        return obj
 
     def delete(self, *args, **kwargs):
         messages.add_message(self.request, messages.SUCCESS,
@@ -152,8 +118,7 @@ class CompanyDelete(LoginRequiredMixin, generic.DeleteView):
         return super().delete(*args, **kwargs)
 
 
-class ContactCreation(LoginRequiredMixin, generic.CreateView):
-
+class ContactCreation(generic.CreateView):
     model = Contact
     fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
               'active', )
@@ -203,15 +168,12 @@ class ContactCreation(LoginRequiredMixin, generic.CreateView):
         return context
 
 
-class ContactList(LoginRequiredMixin, generic.ListView):
-
+class ContactList(generic.ListView):
     model = Contact
 
     def get_queryset(self):
         # todo: add filtering/ordering support
-        qs = self.model\
-            .objects.filter(group__in=self.request.user.groups.all())\
-            .order_by('firstname')
+        qs = super().get_queryset()
 
         if 'company' in self.kwargs:
             self.company = get_object_or_404(Company,
@@ -228,21 +190,18 @@ class ContactList(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class ContactDetail(LoginRequiredMixin, generic.DetailView):
-
+class ContactDetail(generic.DetailView):
     model = Contact
 
     def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
+        filters = {}
         if 'company' in self.kwargs:
             self.company = get_object_or_404(Company,
                                              slug=self.kwargs['company'],
                                              group__in=self.request.user.groups
                                              .all())
             filters['company'] = self.company
-        obj = get_object_or_404(self.model, **filters)
-        return obj
+        return super().get_object(**filters)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -251,17 +210,10 @@ class ContactDetail(LoginRequiredMixin, generic.DetailView):
         return context
 
 
-class ContactUpdate(LoginRequiredMixin, generic.UpdateView):
-
+class ContactUpdate(generic.UpdateView):
     model = Contact
     fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
               'active', )
-
-    def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
-        obj = get_object_or_404(self.model, **filters)
-        return obj
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
@@ -302,16 +254,9 @@ class ContactUpdate(LoginRequiredMixin, generic.UpdateView):
         return context
 
 
-class ContactDelete(LoginRequiredMixin, generic.DeleteView):
-
+class ContactDelete(generic.DeleteView):
     model = Contact
     success_url = reverse_lazy('contacts:contact-list')
-
-    def get_object(self):
-        filters = {'slug': self.kwargs['slug'],
-                   'group__in': self.request.user.groups.all()}
-        obj = get_object_or_404(self.model, **filters)
-        return obj
 
     def delete(self, *args, **kwargs):
         messages.add_message(self.request, messages.SUCCESS,

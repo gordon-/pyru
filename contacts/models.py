@@ -29,6 +29,8 @@ class Properties(models.Model):
     class Meta:
         verbose_name = 'propriété'
         unique_together = (('name', 'type'), )
+        ordering = ['order']
+        permissions = (('property_view', 'Can view a property'), )
 
 
 class Alert(models.Model):
@@ -48,8 +50,18 @@ class Alert(models.Model):
     def get_absolute_url(self):
         return reverse('contacts:alert-detail', kwargs={'pk': self.pk})
 
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(user=user)
+
+    def is_owned(self, user, perm=None):
+        return self.user == user
+
     class Meta:
         verbose_name = 'alerte'
+        get_latest_by = 'date'
+        ordering = ['-date']
+        permissions = (('alert_view', 'Can view an alert'), )
 
 
 class ContactType(models.Model):
@@ -62,6 +74,8 @@ class ContactType(models.Model):
     class Meta:
         verbose_name = 'type de contact'
         verbose_name_plural = 'types de contact'
+        ordering = ['name']
+        permissions = (('contacttype_view', 'Can view a contact type'), )
 
 
 class Company(models.Model):
@@ -90,8 +104,18 @@ class Company(models.Model):
             self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(group__in=user.groups.all())
+
+    def is_owned(self, user, perm=None):
+        return self.group in user.groups.all()
+
     class Meta:
         verbose_name = 'société'
+        get_latest_by = 'update_date'
+        ordering = ['name']
+        permissions = (('company_view', 'Can view a company'), )
 
 
 class Contact(models.Model):
@@ -123,8 +147,18 @@ class Contact(models.Model):
             self.slug = slugify('{} {}'.format(self.firstname, self.lastname))
         return super().save(*args, **kwargs)
 
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(group__in=user.groups.all())
+
+    def is_owned(self, user, perm=None):
+        return self.group in user.groups.all()
+
     class Meta:
         verbose_name = 'contact'
+        get_latest_by = 'update_date'
+        ordering = ['firstname', 'lastname']
+        permissions = (('contact_view', 'Can view a contact'), )
 
 
 class MeetingType(models.Model):
@@ -137,6 +171,8 @@ class MeetingType(models.Model):
     class Meta:
         verbose_name = 'type de rencontre'
         verbose_name_plural = 'types de rencontre'
+        ordering = ['name']
+        permissions = (('meetingtype_view', 'Can view a meeting type'), )
 
 
 class Meeting(models.Model):
@@ -151,5 +187,15 @@ class Meeting(models.Model):
     def __str__(self):
         return 'Rencontre avec {contact}'.format(contact=self.contact)
 
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(contact__group__in=user.groups.all())
+
+    def is_owned(self, user, perm=None):
+        return self.contact.group in user.groups.all()
+
     class Meta:
         verbose_name = 'rencontre'
+        get_latest_by = 'date'
+        ordering = ['-date']
+        permissions = (('meeting_view', 'Can view a meeting'), )
