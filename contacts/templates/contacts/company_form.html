@@ -4,7 +4,7 @@
 {% block title %}{{ verb.0 }} d’une société{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_form 'briefcase' %} {{ verb.0 }} d’une société</h2>
+<h2>{% bootstrap_icon 'briefcase' %} {{ verb.0 }} d’une société</h2>
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
