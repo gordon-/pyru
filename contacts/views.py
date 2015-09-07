@@ -132,6 +132,7 @@ class MeetingCreation(generic.CreateView):
             )
             form.fields['contact'].queryset = form.fields['contact'].queryset\
                 .filter(company=company)
+            self.company = company
 
         if 'contact' in self.kwargs:
             contact = get_object_or_404(
@@ -212,7 +213,7 @@ class MeetingUpdate(generic.UpdateView):
         messages.add_message(self.request, messages.SUCCESS,
                              'Rencontre {} modifiée avec succès.'
                              .format(self.object))
-        return super(ModelFormMixin, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

@@ -5,6 +5,7 @@
 
 {% block content %}
 <h2>Liste des sociétés</h2>
+    {% if perms.contacts.add_company %}<div><a href="{% url 'contacts:company-create' %}" class="btn btn-info">{% bootstrap_icon 'plus' %} Ajouter</a></div>{% endif %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -17,11 +18,10 @@
             <td>{{ object.group }}</td>
             <td>{{ object.type }}</td>
             <td>{{ object.contacts.count }}</td>
-            <td><a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_company %}<a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_company %}<a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
-    <div><a href="{% url 'contacts:company-create' %}" class="btn btn-info">Ajouter</a></div>
 {% endblock %}
 

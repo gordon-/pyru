@@ -17,10 +17,15 @@
         <dd>{{ object.date }}</dd>
     </dl>
     <p>{{ object.comments }}</p>
-    <p><a href="{% url 'contacts:meeting-update' pk=object.pk %}"
+
+    <div>
+    {% if perms.contacts.change_meeting %}
+    <a href="{% url 'contacts:meeting-update' pk=object.pk %}"
         class="btn btn-info">Modifier la rencontre</a></p>
-    <p><a href="{% url 'contacts:meeting-delete' pk=object.pk %}"
-        class="btn btn-danger">Supprimer la rencontre</a></p>
-    <p><a href="{% url 'contacts:meeting-list' %}" class="btn btn-info">Retour
-        à la liste des rencontres</a></p>
+    {% endif %}
+    {% if perms.contacts.delete_meeting %}
+    <a href="{% url 'contacts:meeting-delete' pk=object.pk %}"
+        class="btn btn-danger">Supprimer la rencontre</a>
+    {% endif %}
+    </div>
 {% endblock %}

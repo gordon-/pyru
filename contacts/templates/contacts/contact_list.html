@@ -7,6 +7,13 @@ de la société {{ company }}{% endif %}{% endblock %}
 {% block content %}
 <h2>Liste des contacts{% if company %}
     de la société <a href="{{ company.get_absolute_url }}">{{ company }}</a>{% endif %}</h2>
+    {% if perms.contacts.add_contact %}
+        {% if company %}
+        <div><a href="{% url 'contacts:contact-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
+        {% else %}
+        <div><a href="{% url 'contacts:contact-create' %}" class="btn btn-info">Ajouter</a></div>
+        {% endif %}
+    {% endif %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -19,15 +26,10 @@ de la société {{ company }}{% endif %}{% endblock %}
             <td>{{ object.group }}</td>
             <td>{{ object.company }}</td>
             <td>{{ object.type }}</td>
-            <td><a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
-    {% if company %}
-    <div><a href="{% url 'contacts:contact-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
-    {% else %}
-    <div><a href="{% url 'contacts:contact-create' %}" class="btn btn-info">Ajouter</a></div>
-    {% endif %}
 {% endblock %}
 

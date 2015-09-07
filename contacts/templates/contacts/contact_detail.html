@@ -16,6 +16,12 @@
         <dd>{{ prop_value }}</dd>
     {% endfor %}
     </dl>
+    {% if perms.contacts.view_meeting %}
+    <h3>Rencontres</h3>
+    {% if perms.contacts.add_meeting %}
+    <div><a href="{% url 'contacts:meeting-create' contact=object.slug %}"
+          class="btn btn-info">{% bootstrap_icon 'plus' %} ajouter une rencontre</a></div>
+    {% endif %}
     <table class="table">
         <tr><th>Date</th>
             <th>Type</th>
@@ -28,17 +34,21 @@
             <td>{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
             <td>{{ meeting.comments }}</td>
-            <td><a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
-    <p><a href="{% url 'contacts:meeting-create' contact=object.slug %}"
-          class="btn btn-info">ajouter une rencontre</a></p>
-    <p><a href="{% url 'contacts:contact-update' slug=object.slug %}"
-        class="btn btn-info">modifier le contact</a></p>
-    <p><a href="{% url 'contacts:contact-delete' slug=object.slug %}"
-        class="btn btn-danger">Supprimer le contact</a></p>
-    <p><a href="{% url 'contacts:contact-list' %}" class="btn btn-info">Retour
-        à la liste des contacts</a></p>
+    {% endif %}
+
+    <div>
+    {% if perms.contacts.change_contact %}
+    <a href="{% url 'contacts:contact-update' slug=object.slug %}"
+        class="btn btn-info">modifier le contact</a>
+    {% endif %}
+    {% if perms.contacts.delete_contact %}
+    <a href="{% url 'contacts:contact-delete' slug=object.slug %}"
+        class="btn btn-danger">Supprimer le contact</a>
+    {% endif %}
+    </div>
 {% endblock %}

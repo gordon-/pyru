@@ -16,16 +16,16 @@
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li{% ifactive 'contacts:home' %} class="active"{% endifactive %}><a href="{% url 'contacts:home' %}">Accueil</a></li>
-        <li{% ifstartswith 'contacts:company' %} class="active"{% endifstartswith %}><a href="{% url 'contacts:company-list' %}">Sociétés</a></li>
-        <li{% ifstartswith 'contacts:contact' %} class="active"{% endifstartswith %}><a href="{% url 'contacts:contact-list' %}">Contacts</a></li>
-        <li class="dropdown">
+        {% if perms.contacts.view_alert %}<li{% ifactive 'contacts:home' %} class="active"{% endifactive %}><a href="{% url 'contacts:home' %}">Accueil</a></li>{% endif %}
+        {% if perms.contacts.view_company %}<li{% ifstartswith 'contacts:company' %} class="active"{% endifstartswith %}><a href="{% url 'contacts:company-list' %}">Sociétés</a></li>{% endif %}
+        {% if perms.contacts.view_contact %}<li{% ifstartswith 'contacts:contact' %} class="active"{% endifstartswith %}><a href="{% url 'contacts:contact-list' %}">Contacts</a></li>{% endif %}
+        {% if perms.contacts.view_meeting %}<li class="dropdown">
           <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Rencontres <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="{% url 'contacts:meeting-list' %}">Liste</a></li>
-            <li><a href="{% url 'contacts:meeting-create' %}">Ajouter</a></li>
+            {% if perms.contacts.add_meeting %}<li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
           </ul>
-        </li>
+        </li>{% endif %}
       </ul>
     </div><!--/.nav-collapse -->
   </div>

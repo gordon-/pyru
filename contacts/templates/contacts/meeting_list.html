@@ -13,6 +13,15 @@
     {% elif contact %}
     du contact <a href="{{ contact.get_absolute_url }}">{{ contact }}</a>
     {% endif %}</h2>
+    {% if perms.contacts.add_meeting %}
+        {% if company %}
+        <div><a href="{% url 'contacts:meeting-create' company=company.slug %}" class="btn btn-info">{% bootstrap_icon 'plus' %} Ajouter</a></div>
+        {% elif contact %}
+        <div><a href="{% url 'contacts:meeting-create' contact=contact.slug %}" class="btn btn-info">{% bootstrap_icon 'plus' %} Ajouter</a></div>
+        {% else %}
+        <div><a href="{% url 'contacts:meeting-create' %}" class="btn btn-info">{% bootstrap_icon 'plus' %} Ajouter</a></div>
+        {% endif %}
+    {% endif %}
     <table class="table">
         <tr>{% if not company %}<th>Société</th>{% endif %}
             {% if not contact %}<th>Contact</th>{% endif %}
@@ -30,17 +39,10 @@
             <td>{{ object.type }}</td>
             <td>{{ object.author }}</td>
             <td>{{ object.comments }}</td>
-            <td><a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
-    {% if company %}
-    <div><a href="{% url 'contacts:meeting-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
-    {% elif contact %}
-    <div><a href="{% url 'contacts:meeting-create' contact=contact.slug %}" class="btn btn-info">Ajouter</a></div>
-    {% else %}
-    <div><a href="{% url 'contacts:meeting-create' %}" class="btn btn-info">Ajouter</a></div>
-    {% endif %}
 {% endblock %}
 

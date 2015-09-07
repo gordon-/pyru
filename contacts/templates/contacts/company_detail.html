@@ -12,6 +12,12 @@
         <dd>{{ prop_value }}</dd>
     {% endfor %}
     </dl>
+    {% if perms.contacts.view_contact %}
+    <h3>Contacts</h3>
+    {% if perms.contacts.add_contact %}
+    <div><a href="{% url 'contacts:contact-create' company=object.slug %}" class="btn btn-info">
+        {% bootstrap_icon 'plus' %} Ajouter un contact</a></div>
+    {% endif %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -22,12 +28,19 @@
         <tr><td><a href="{{ contact.get_absolute_url }}">{{ contact }}</a></td>
             <td>{{ contact.group }}</td>
             <td>{{ contact.type }}</td>
-            <td><a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:contact-delete' slug=contact.slug %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=contact.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
 
+    {% if perms.contacts.view_meeting %}
+    <h3>Rencontres</h3>
+    {% if perms.contacts.add_meeting %}
+    <div><a href="{% url 'contacts:meeting-create' company=object.slug %}" class="btn btn-info">
+        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></div>
+    {% endif %}
     <table class="table">
         <tr><th>Contact</th>
             <th>Date</th>
@@ -37,25 +50,26 @@
             <th>Actions</th>
         </tr>
         {% for meeting in object.meetings %}
-        <tr><td><a href="{{ contact.get_absolute_url }}">{{ meeting.contact }}</a></td>
+        <tr><td><a href="{{ meeting.contact.get_absolute_url }}">{{ meeting.contact }}</a></td>
             <td>{{ meeting.date }}</td>
             <td>{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
             <td>{{ meeting.comments }}</td>
-            <td><a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>
-                <a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>
+            <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% endfor %}
     </table>
-    <p><a href="{% url 'contacts:contact-create' company=object.slug %}"
-        class="btn btn-info">
-        {% bootstrap_icon 'plus' %} Ajouter un contact</a></p>
-    <p><a href="{% url 'contacts:meeting-create' company=object.slug %}"
-        class="btn btn-info">
-        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></p>
-    <p><a href="{% url 'contacts:company-update' slug=object.slug %}"
-        class="btn btn-info">Modifier la société</a></p>
-    <p><a href="{% url 'contacts:company-delete' slug=object.slug %}"
-        class="btn btn-danger">Supprimer la société</a></p>
-    <p><a href="{% url 'contacts:company-list' %}" class="btn btn-info">Retour à la liste des sociétés</a></p>
+    {% endif %}
+
+    <div>
+    {% if perms.contacts.change_company %}
+    <a href="{% url 'contacts:company-update' slug=object.slug %}"
+        class="btn btn-info">{% bootstrap_icon 'pencil' %} Modifier la société</a>
+    {% endif %}
+    {% if perms.contacts.delete_company %}
+    <a href="{% url 'contacts:company-delete' slug=object.slug %}"
+        class="btn btn-danger">{% bootstrap_icon 'trash' %} Supprimer la société</a>
+    {% endif %}
+    </div>
 {% endblock %}
