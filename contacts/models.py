@@ -30,7 +30,7 @@ class Properties(models.Model):
         verbose_name = 'propriété'
         unique_together = (('name', 'type'), )
         ordering = ['order']
-        permissions = (('property_view', 'Can view a property'), )
+        permissions = (('view_property', 'Can view a property'), )
 
 
 class Alert(models.Model):
@@ -61,7 +61,7 @@ class Alert(models.Model):
         verbose_name = 'alerte'
         get_latest_by = 'date'
         ordering = ['-date']
-        permissions = (('alert_view', 'Can view an alert'), )
+        permissions = (('view_alert', 'Can view an alert'), )
 
 
 class ContactType(models.Model):
@@ -75,7 +75,7 @@ class ContactType(models.Model):
         verbose_name = 'type de contact'
         verbose_name_plural = 'types de contact'
         ordering = ['name']
-        permissions = (('contacttype_view', 'Can view a contact type'), )
+        permissions = (('view_contacttype', 'Can view a contact type'), )
 
 
 class Company(models.Model):
@@ -115,7 +115,7 @@ class Company(models.Model):
         verbose_name = 'société'
         get_latest_by = 'update_date'
         ordering = ['name']
-        permissions = (('company_view', 'Can view a company'), )
+        permissions = (('view_company', 'Can view a company'), )
 
 
 class Contact(models.Model):
@@ -158,7 +158,7 @@ class Contact(models.Model):
         verbose_name = 'contact'
         get_latest_by = 'update_date'
         ordering = ['firstname', 'lastname']
-        permissions = (('contact_view', 'Can view a contact'), )
+        permissions = (('view_contact', 'Can view a contact'), )
 
 
 class MeetingType(models.Model):
@@ -172,7 +172,7 @@ class MeetingType(models.Model):
         verbose_name = 'type de rencontre'
         verbose_name_plural = 'types de rencontre'
         ordering = ['name']
-        permissions = (('meetingtype_view', 'Can view a meeting type'), )
+        permissions = (('view_meetingtype', 'Can view a meeting type'), )
 
 
 class Meeting(models.Model):
@@ -198,4 +198,4 @@ class Meeting(models.Model):
         verbose_name = 'rencontre'
         get_latest_by = 'date'
         ordering = ['-date']
-        permissions = (('meeting_view', 'Can view a meeting'), )
+        permissions = (('view_meeting', 'Can view a meeting'), )
