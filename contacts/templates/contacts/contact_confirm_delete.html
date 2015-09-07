@@ -1,0 +1,15 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Suppression du contact {{ object }}{% endblock %}
+
+{% block content %}
+<h2>Suppression du contact {{ object }}</h2>
+<form action="" method="post">
+    {% csrf_token %}
+        <p>Voulez-vous réellement supprimer le contact « {{ object }} » ?</p>
+        <button type="submit" class="btn btn-danger">
+            {% bootstrap_icon "trash" %} Supprimer
+        </button>
+</form>
+{% endblock %}

@@ -118,6 +118,113 @@ class CompanyDelete(generic.DeleteView):
         return super().delete(*args, **kwargs)
 
 
+class MeetingCreation(generic.CreateView):
+    model = Meeting
+    fields = ('contact', 'type', 'date', 'comments', )
+
+    def get_form(self, form_class):
+        form = super().get_form(form_class)
+
+        if 'company' in self.kwargs:
+            company = get_object_or_404(
+                Company, slug=self.kwargs['company'],
+                group__in=self.request.user.groups.all()
+            )
+            form.fields['contact'].queryset = form.fields['contact'].queryset\
+                .filter(company=company)
+
+        return form
+
+    def form_valid(self, form):
+        meeting = form.save(commit=False)
+        meeting.author = self.request.user
+        self.object = meeting
+        try:
+            meeting.save()
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Rencontre {} créée avec succès.'
+                                 .format(meeting))
+        except IntegrityError:
+            form.add_error('firstname', 'Une rencontre de ce nom existe déjà.')
+            return super().form_invalid(form)
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Création', 'Créer')
+        return context
+
+
+class MeetingList(generic.ListView):
+    model = Meeting
+
+    def get_queryset(self):
+        # todo: add filtering/ordering support
+        qs = super().get_queryset()
+
+        if 'company' in self.kwargs:
+            self.company = get_object_or_404(Company,
+                                             slug=self.kwargs['company'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            qs = qs.filter(contact__company=self.company)
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        return context
+
+
+class MeetingDetail(generic.DetailView):
+    model = Meeting
+
+    def get_object(self):
+        filters = {}
+        if 'company' in self.kwargs:
+            self.company = get_object_or_404(Company,
+                                             slug=self.kwargs['company'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            filters['contact__company'] = self.company
+        return super().get_object(**filters)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        return context
+
+
+class MeetingUpdate(generic.UpdateView):
+    model = Meeting
+    fields = ('contact', 'type', 'date', 'comments', )
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Rencontre {} modifiée avec succès.'
+                             .format(self.object))
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Modification', 'Modifier')
+        context['object'] = self.object
+        return context
+
+
+class MeetingDelete(generic.DeleteView):
+    model = Meeting
+    success_url = reverse_lazy('contacts:meeting-list')
+
+    def delete(self, *args, **kwargs):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'La rencontre {} a été supprimée.'
+                             .format(self.get_object()))
+        return super().delete(*args, **kwargs)
+
+
 class ContactCreation(generic.CreateView):
     model = Contact
     fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
@@ -233,17 +340,17 @@ class ContactUpdate(generic.UpdateView):
         return form
 
     def form_valid(self, form):
-        company = form.save(commit=False)
-        company.properties = {p.name: form.cleaned_data[p.name] for p in
+        contact = form.save(commit=False)
+        contact.properties = {p.name: form.cleaned_data[p.name] for p in
                               self.properties}
-        self.object = company
+        self.object = contact
         try:
-            company.save()
+            contact.save()
             messages.add_message(self.request, messages.SUCCESS,
-                                 'Compagnie {} modifiée avec succès.'
-                                 .format(company))
+                                 'Contact {} modifié avec succès.'
+                                 .format(contact))
         except IntegrityError:
-            form.add_error('name', 'Une société de ce nom existe déjà.')
+            form.add_error('name', 'Un contact de ce nom existe déjà.')
             return super().form_invalid(form)
         return super(ModelFormMixin, self).form_valid(form)
 

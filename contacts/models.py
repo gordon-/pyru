@@ -96,6 +96,9 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    def meetings(self):
+        return Meeting.objects.filter(contact__company=self)
+
     def get_absolute_url(self):
         return reverse('contacts:company-detail', kwargs={'slug': self.slug})
 
@@ -186,6 +189,9 @@ class Meeting(models.Model):
 
     def __str__(self):
         return 'Rencontre avec {contact}'.format(contact=self.contact)
+
+    def get_absolute_url(self):
+        return reverse('contacts:meeting-detail', kwargs={'pk': self.pk})
 
     @classmethod
     def get_queryset(cls, user):

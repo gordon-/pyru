@@ -1,0 +1,34 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Liste des rencontres{% if company %}
+de la société {{ company }}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>Liste des rencontres{% if company %}
+    de la société {{ company }}{% endif %}</h2>
+    <table class="table">
+        <tr>{% if company %}<th>Société</th>{% endif %}
+            <th>Contact</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Auteur</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
+        {% for object in object_list %}
+        <tr>{% if company %}<td><a href="{{ object.contact.company.get_absolute_url }}">
+            {{ object.contact.company }}</a></td>{% endif %}
+            <td><a href="{{ contact.get_absolute_url }}">{{ object.contact }}</a></td>
+            <td>{{ object.date }}</td>
+            <td>{{ object.type }}</td>
+            <td>{{ object.author }}</td>
+            <td>{{ object.comments }}</td>
+            <td><a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>
+                <a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div><a href="{% url 'contacts:meeting-create' %}" class="btn btn-info">Ajouter</a></div>
+{% endblock %}
+

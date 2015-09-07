@@ -1,0 +1,26 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Détail de la rencontre {{ object }}{% endblock %}
+
+{% block content %}
+<h2>Détail de la rencontre {{ object }}</h2>
+    <div>Rencontre du {{ object.date }}</div>
+    <dl>
+        <dt>Contact</dt>
+        <dd><a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a></dd>
+    {% if object.company %}
+        <dt>Société</dt>
+        <dd><a href="{{ object.company.get_absolute_url }}">{{ object.company }}</a></dd>
+    {% endif %}
+        <dt>Date</dt>
+        <dd>{{ object.date }}</dd>
+    </dl>
+    <p>{{ object.comments }}</p>
+    <p><a href="{% url 'contacts:meeting-update' pk=object.pk %}"
+        class="btn btn-info">Modifier la rencontre</a></p>
+    <p><a href="{% url 'contacts:meeting-delete' pk=object.pk %}"
+        class="btn btn-danger">Supprimer la rencontre</a></p>
+    <p><a href="{% url 'contacts:meeting-list' %}" class="btn btn-info">Retour
+        à la liste des rencontres</a></p>
+{% endblock %}
