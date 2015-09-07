@@ -6,7 +6,7 @@ dans la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
 <h2>{{ verb.0 }} d’un contact{% if company %}
-    dans la société {{ company }}{% endif %}</h2>
+    dans la société <a href="{{ company.get_absolute_url }}">{{ company }}</a>{% endif %}</h2>
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form %}

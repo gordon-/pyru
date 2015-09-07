@@ -133,11 +133,21 @@ class MeetingCreation(generic.CreateView):
             form.fields['contact'].queryset = form.fields['contact'].queryset\
                 .filter(company=company)
 
+        if 'contact' in self.kwargs:
+            contact = get_object_or_404(
+                Contact, slug=self.kwargs['contact'],
+                group__in=self.request.user.groups.all()
+            )
+            self.contact = contact
+            del(form.fields['contact'])
+
         return form
 
     def form_valid(self, form):
         meeting = form.save(commit=False)
         meeting.author = self.request.user
+        if hasattr(self, 'contact'):
+            meeting.contact = self.contact
         self.object = meeting
         try:
             meeting.save()
@@ -152,6 +162,10 @@ class MeetingCreation(generic.CreateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['verb'] = ('Création', 'Créer')
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        if hasattr(self, 'contact'):
+            context['contact'] = self.contact
         return context
 
 
@@ -168,33 +182,26 @@ class MeetingList(generic.ListView):
                                              group__in=self.request.user.groups
                                              .all())
             qs = qs.filter(contact__company=self.company)
+
+        if 'contact' in self.kwargs:
+            self.contact = get_object_or_404(Contact,
+                                             slug=self.kwargs['contact'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            qs = qs.filter(contact=self.contact)
         return qs
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         if hasattr(self, 'company'):
             context['company'] = self.company
+        if hasattr(self, 'contact'):
+            context['contact'] = self.contact
         return context
 
 
 class MeetingDetail(generic.DetailView):
     model = Meeting
-
-    def get_object(self):
-        filters = {}
-        if 'company' in self.kwargs:
-            self.company = get_object_or_404(Company,
-                                             slug=self.kwargs['company'],
-                                             group__in=self.request.user.groups
-                                             .all())
-            filters['contact__company'] = self.company
-        return super().get_object(**filters)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        if hasattr(self, 'company'):
-            context['company'] = self.company
-        return context
 
 
 class MeetingUpdate(generic.UpdateView):
@@ -272,6 +279,8 @@ class ContactCreation(generic.CreateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['verb'] = ('Création', 'Créer')
+        if hasattr(self, 'company'):
+            context['company'] = self.company
         return context
 
 
@@ -299,22 +308,6 @@ class ContactList(generic.ListView):
 
 class ContactDetail(generic.DetailView):
     model = Contact
-
-    def get_object(self):
-        filters = {}
-        if 'company' in self.kwargs:
-            self.company = get_object_or_404(Company,
-                                             slug=self.kwargs['company'],
-                                             group__in=self.request.user.groups
-                                             .all())
-            filters['company'] = self.company
-        return super().get_object(**filters)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        if hasattr(self, 'company'):
-            context['company'] = self.company
-        return context
 
 
 class ContactUpdate(generic.UpdateView):

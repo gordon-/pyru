@@ -1,15 +1,21 @@
 {% extends 'contacts/base.html' %}
 {% load bootstrap3 %}
 
-{% block title %}Liste des rencontres{% if company %}
-de la société {{ company }}{% endif %}{% endblock %}
+{% block title %}Liste des rencontres
+{% if company %} de la société {{ company }}
+{% elif contact %} du contact {{ contact }}{% endif %}
+{% endblock %}
 
 {% block content %}
-<h2>Liste des rencontres{% if company %}
-    de la société {{ company }}{% endif %}</h2>
+<h2>Liste des rencontres
+    {% if company %}
+    de la société <a href="{{ company.get_absolute_url }}">{{ company }}</a>
+    {% elif contact %}
+    du contact <a href="{{ contact.get_absolute_url }}">{{ contact }}</a>
+    {% endif %}</h2>
     <table class="table">
-        <tr>{% if company %}<th>Société</th>{% endif %}
-            <th>Contact</th>
+        <tr>{% if not company %}<th>Société</th>{% endif %}
+            {% if not contact %}<th>Contact</th>{% endif %}
             <th>Date</th>
             <th>Type</th>
             <th>Auteur</th>
@@ -17,9 +23,9 @@ de la société {{ company }}{% endif %}{% endblock %}
             <th>Actions</th>
         </tr>
         {% for object in object_list %}
-        <tr>{% if company %}<td><a href="{{ object.contact.company.get_absolute_url }}">
+        <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}">
             {{ object.contact.company }}</a></td>{% endif %}
-            <td><a href="{{ contact.get_absolute_url }}">{{ object.contact }}</a></td>
+            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a></td>{% endif %}
             <td>{{ object.date }}</td>
             <td>{{ object.type }}</td>
             <td>{{ object.author }}</td>
@@ -29,6 +35,12 @@ de la société {{ company }}{% endif %}{% endblock %}
         </tr>
         {% endfor %}
     </table>
+    {% if company %}
+    <div><a href="{% url 'contacts:meeting-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
+    {% elif contact %}
+    <div><a href="{% url 'contacts:meeting-create' contact=contact.slug %}" class="btn btn-info">Ajouter</a></div>
+    {% else %}
     <div><a href="{% url 'contacts:meeting-create' %}" class="btn btn-info">Ajouter</a></div>
+    {% endif %}
 {% endblock %}
 

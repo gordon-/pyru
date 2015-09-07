@@ -6,7 +6,7 @@ de la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
 <h2>Liste des contacts{% if company %}
-    de la société {{ company }}{% endif %}</h2>
+    de la société <a href="{{ company.get_absolute_url }}">{{ company }}</a>{% endif %}</h2>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -24,6 +24,10 @@ de la société {{ company }}{% endif %}{% endblock %}
         </tr>
         {% endfor %}
     </table>
+    {% if company %}
+    <div><a href="{% url 'contacts:contact-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
+    {% else %}
     <div><a href="{% url 'contacts:contact-create' %}" class="btn btn-info">Ajouter</a></div>
+    {% endif %}
 {% endblock %}
 
