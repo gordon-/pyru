@@ -3,6 +3,7 @@ from django.views import generic
 from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.shortcuts import resolve_url
+from django.forms import ModelChoiceField
 
 
 class ForceResponse(Exception):
@@ -82,6 +83,18 @@ class PermissionMixin():
         return qs
 
 
+class FormMixin():
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        for field in form.fields.values():
+            if isinstance(field, ModelChoiceField):
+                if hasattr(field.queryset.model, 'get_queryset'):
+                    field.queryset = field.queryset.model\
+                        .get_queryset(self.request.user)
+        return form
+
+
 class ListView(LoginRequiredMixin, PermissionMixin, generic.ListView):
     permission_suffix = 'view'
 
@@ -90,7 +103,8 @@ class DetailView(LoginRequiredMixin, PermissionMixin, generic.DetailView):
     permission_suffix = 'view'
 
 
-class CreateView(LoginRequiredMixin, PermissionMixin, generic.CreateView):
+class CreateView(LoginRequiredMixin, PermissionMixin, FormMixin,
+                 generic.CreateView):
     permission_suffix = 'add'
 
 
