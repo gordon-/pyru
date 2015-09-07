@@ -37,6 +37,8 @@
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="5">Ce contact ne possède pour l’instant aucune rencontre.</td></tr>
         {% endfor %}
     </table>
     {% endif %}

@@ -42,6 +42,8 @@
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="7">Il n’y a aucune rencontre.</td></tr>
         {% endfor %}
     </table>
 {% endblock %}

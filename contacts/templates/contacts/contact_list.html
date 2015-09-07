@@ -29,6 +29,8 @@ de la société {{ company }}{% endif %}{% endblock %}
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="5">Il n’y a aucun contact.</td></tr>
         {% endfor %}
     </table>
 {% endblock %}

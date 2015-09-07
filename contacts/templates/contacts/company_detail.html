@@ -31,6 +31,8 @@
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=contact.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="4">Cette société ne possède pour l’instant aucun contact.</td></tr>
         {% endfor %}
     </table>
     {% endif %}
@@ -58,6 +60,8 @@
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="6">Cette société ne possède pour l’instant aucune rencontre.</td></tr>
         {% endfor %}
     </table>
     {% endif %}

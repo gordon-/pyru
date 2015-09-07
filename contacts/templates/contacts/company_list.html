@@ -21,6 +21,8 @@
             <td>{% if perms.contacts.change_company %}<a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_company %}<a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
+        {% empty %}
+        <tr><td colspan="4">Il n’y a pour l’instant aucune société.</td></tr>
         {% endfor %}
     </table>
 {% endblock %}
