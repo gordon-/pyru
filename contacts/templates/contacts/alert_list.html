@@ -4,7 +4,7 @@
 {% block title %}Liste des alertes{% endblock %}
 
 {% block content %}
-<h2>Liste des alertes</h2>
+<h2>{% bootstrap_icon 'bell' %} Liste des alertes</h2>
 {% for object in object_list %}
     <div>{{ object }}</div>
 {% empty %}

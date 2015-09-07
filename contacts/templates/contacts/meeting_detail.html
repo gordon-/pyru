@@ -4,14 +4,14 @@
 {% block title %}Détail de la rencontre {{ object }}{% endblock %}
 
 {% block content %}
-<h2>Détail de la rencontre {{ object }}</h2>
+<h2>{% bootstrap_icon 'comment' %} Détail de la rencontre avec <a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></h2>
     <div>Rencontre du {{ object.date }}</div>
     <dl>
         <dt>Contact</dt>
-        <dd><a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a></dd>
-    {% if object.company %}
+        <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
+    {% if object.contact.company %}
         <dt>Société</dt>
-        <dd><a href="{{ object.company.get_absolute_url }}">{{ object.company }}</a></dd>
+        <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
     {% endif %}
         <dt>Date</dt>
         <dd>{{ object.date }}</dd>

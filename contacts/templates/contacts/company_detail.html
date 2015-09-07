@@ -4,7 +4,7 @@
 {% block title %}Détail de la société {{ object }}{% endblock %}
 
 {% block content %}
-<h2>Détail de la société {{ object }}</h2>
+<h2>{% bootstrap_icon 'briefcase' %} Détail de la société {{ object }}</h2>
     <div>{{ object }}</div>
     <dl>
     {% for prop_name, prop_value in object.properties.items %}
@@ -13,7 +13,7 @@
     {% endfor %}
     </dl>
     {% if perms.contacts.view_contact %}
-    <h3>Contacts</h3>
+    <h3>{% bootstrap_icon 'user' %} Contacts</h3>
     {% if perms.contacts.add_contact %}
     <div><a href="{% url 'contacts:contact-create' company=object.slug %}" class="btn btn-info">
         {% bootstrap_icon 'plus' %} Ajouter un contact</a></div>
@@ -25,7 +25,7 @@
             <th>Actions</th>
         </tr>
         {% for contact in object.contacts.all %}
-        <tr><td><a href="{{ contact.get_absolute_url }}">{{ contact }}</a></td>
+        <tr><td><a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a></td>
             <td>{{ contact.group }}</td>
             <td>{{ contact.type }}</td>
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
@@ -38,7 +38,7 @@
     {% endif %}
 
     {% if perms.contacts.view_meeting %}
-    <h3>Rencontres</h3>
+    <h3>{% bootstrap_icon 'comment' %} Rencontres</h3>
     {% if perms.contacts.add_meeting %}
     <div><a href="{% url 'contacts:meeting-create' company=object.slug %}" class="btn btn-info">
         {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></div>
@@ -52,8 +52,8 @@
             <th>Actions</th>
         </tr>
         {% for meeting in object.meetings %}
-        <tr><td><a href="{{ meeting.contact.get_absolute_url }}">{{ meeting.contact }}</a></td>
-            <td>{{ meeting.date }}</td>
+        <tr><td><a href="{{ meeting.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ meeting.contact }}</a></td>
+            <td><a href="{{ meeting.get_absolute_url }}">{{ meeting.date }}</a></td>
             <td>{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
             <td>{{ meeting.comments }}</td>

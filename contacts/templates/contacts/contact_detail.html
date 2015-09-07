@@ -4,12 +4,12 @@
 {% block title %}Détail du contact {{ object }}{% endblock %}
 
 {% block content %}
-<h2>Détail du contact {{ object }}</h2>
+<h2>{% bootstrap_icon 'user' %} Détail du contact {{ object }}</h2>
     <div>{{ object }}</div>
     <dl>
     {% if object.company %}
         <dt>Société</dt>
-        <dd><a href="{{ object.company.get_absolute_url }}">{{ object.company }}</a></dd>
+        <dd><a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a></dd>
     {% endif %}
     {% for prop_name, prop_value in object.properties.items %}
         <dt>{{ prop_name }}</dt>
@@ -17,7 +17,7 @@
     {% endfor %}
     </dl>
     {% if perms.contacts.view_meeting %}
-    <h3>Rencontres</h3>
+    <h3>{% bootstrap_icon 'comment' %} Rencontres</h3>
     {% if perms.contacts.add_meeting %}
     <div><a href="{% url 'contacts:meeting-create' contact=object.slug %}"
           class="btn btn-info">{% bootstrap_icon 'plus' %} ajouter une rencontre</a></div>
@@ -30,7 +30,7 @@
             <th>Actions</th>
         </tr>
         {% for meeting in object.meetings.all %}
-        <tr><td>{{ meeting.date }}</td>
+        <tr><td><a href="{{ meeting.get_absolute_url }}">{{ meeting.date }}</a></td>
             <td>{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
             <td>{{ meeting.comments }}</td>

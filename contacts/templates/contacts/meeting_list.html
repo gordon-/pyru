@@ -7,11 +7,11 @@
 {% endblock %}
 
 {% block content %}
-<h2>Liste des rencontres
+<h2>{% bootstrap_icon 'comment' %} Liste des rencontres
     {% if company %}
-    de la société <a href="{{ company.get_absolute_url }}">{{ company }}</a>
+    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
     {% elif contact %}
-    du contact <a href="{{ contact.get_absolute_url }}">{{ contact }}</a>
+    du contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>
     {% endif %}</h2>
     {% if perms.contacts.add_meeting %}
         {% if company %}
@@ -32,10 +32,10 @@
             <th>Actions</th>
         </tr>
         {% for object in object_list %}
-        <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}">
+        <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}"> {% bootstrap_icon 'briefcase' %}
             {{ object.contact.company }}</a></td>{% endif %}
-            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a></td>{% endif %}
-            <td>{{ object.date }}</td>
+            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
+            <td><a href="{{ object.get_absolute_url }}">{{ object.date }}</a></td>
             <td>{{ object.type }}</td>
             <td>{{ object.author }}</td>
             <td>{{ object.comments }}</td>
