@@ -18,14 +18,14 @@
     </dl>
     <p>{{ object.comments }}</p>
 
-    <div>
+    <p>
     {% if perms.contacts.change_meeting %}
     <a href="{% url 'contacts:meeting-update' pk=object.pk %}"
-        class="btn btn-info">Modifier la rencontre</a></p>
+        class="btn btn-primary btn-xs">Modifier la rencontre</a>
     {% endif %}
     {% if perms.contacts.delete_meeting %}
     <a href="{% url 'contacts:meeting-delete' pk=object.pk %}"
-        class="btn btn-danger">Supprimer la rencontre</a>
+        class="btn btn-danger btn-xs">Supprimer la rencontre</a>
     {% endif %}
-    </div>
+    </p>
 {% endblock %}

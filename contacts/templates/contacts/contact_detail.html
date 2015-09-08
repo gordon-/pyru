@@ -19,8 +19,9 @@
     {% if perms.contacts.view_meeting %}
     <h3>{% bootstrap_icon 'comment' %} Rencontres</h3>
     {% if perms.contacts.add_meeting %}
-    <div><a href="{% url 'contacts:meeting-create' contact=object.slug %}"
-          class="btn btn-info">{% bootstrap_icon 'plus' %} ajouter une rencontre</a></div>
+    <p><a href="{% url 'contacts:meeting-create' contact=object.slug %}"
+          class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} ajouter une
+          rencontre</a></p>
     {% endif %}
     <table class="table">
         <tr><th>Date</th>
@@ -43,14 +44,14 @@
     </table>
     {% endif %}
 
-    <div>
+    <p>
     {% if perms.contacts.change_contact %}
     <a href="{% url 'contacts:contact-update' slug=object.slug %}"
-        class="btn btn-info">modifier le contact</a>
+        class="btn btn-primary btn-xs">modifier le contact</a>
     {% endif %}
     {% if perms.contacts.delete_contact %}
     <a href="{% url 'contacts:contact-delete' slug=object.slug %}"
-        class="btn btn-danger">Supprimer le contact</a>
+        class="btn btn-danger btn-xs">Supprimer le contact</a>
     {% endif %}
-    </div>
+    </p>
 {% endblock %}

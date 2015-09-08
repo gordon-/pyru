@@ -9,9 +9,11 @@ de la société {{ company }}{% endif %}{% endblock %}
     de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}</h2>
     {% if perms.contacts.add_contact %}
         {% if company %}
-        <div><a href="{% url 'contacts:contact-create' company=company.slug %}" class="btn btn-info">Ajouter</a></div>
+        <p><a href="{% url 'contacts:contact-create' company=company.slug %}"
+            class="btn btn-primary btn-xs">Ajouter</a></p>
         {% else %}
-        <div><a href="{% url 'contacts:contact-create' %}" class="btn btn-info">Ajouter</a></div>
+        <p><a href="{% url 'contacts:contact-create' %}" class="btn
+            btn-primary btn-xs">Ajouter</a></p>
         {% endif %}
     {% endif %}
     <table class="table">

@@ -5,7 +5,7 @@
 
 {% block content %}
 <h2>{% bootstrap_icon 'briefcase' %} Liste des sociétés</h2>
-    {% if perms.contacts.add_company %}<div><a href="{% url 'contacts:company-create' %}" class="btn btn-info">{% bootstrap_icon 'plus' %} Ajouter</a></div>{% endif %}
+    {% if perms.contacts.add_company %}<p><a href="{% url 'contacts:company-create' %}" class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} Ajouter</a></p>{% endif %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>

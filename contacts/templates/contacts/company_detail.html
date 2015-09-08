@@ -15,8 +15,9 @@
     {% if perms.contacts.view_contact %}
     <h3>{% bootstrap_icon 'user' %} Contacts</h3>
     {% if perms.contacts.add_contact %}
-    <div><a href="{% url 'contacts:contact-create' company=object.slug %}" class="btn btn-info">
-        {% bootstrap_icon 'plus' %} Ajouter un contact</a></div>
+    <p><a href="{% url 'contacts:contact-create' company=object.slug %}"
+            class="btn btn-primary btn-xs">
+        {% bootstrap_icon 'plus' %} Ajouter un contact</a></p>
     {% endif %}
     <table class="table">
         <tr><th>Nom</th>
@@ -40,8 +41,9 @@
     {% if perms.contacts.view_meeting %}
     <h3>{% bootstrap_icon 'comment' %} Rencontres</h3>
     {% if perms.contacts.add_meeting %}
-    <div><a href="{% url 'contacts:meeting-create' company=object.slug %}" class="btn btn-info">
-        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></div>
+    <p><a href="{% url 'contacts:meeting-create' company=object.slug %}"
+            class="btn btn-primary btn-xs">
+        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></p>
     {% endif %}
     <table class="table">
         <tr><th>Contact</th>
@@ -66,14 +68,14 @@
     </table>
     {% endif %}
 
-    <div>
+    <p>
     {% if perms.contacts.change_company %}
     <a href="{% url 'contacts:company-update' slug=object.slug %}"
-        class="btn btn-info">{% bootstrap_icon 'pencil' %} Modifier la société</a>
+        class="btn btn-primary btn-xs">{% bootstrap_icon 'pencil' %} Modifier la société</a>
     {% endif %}
     {% if perms.contacts.delete_company %}
     <a href="{% url 'contacts:company-delete' slug=object.slug %}"
-        class="btn btn-danger">{% bootstrap_icon 'trash' %} Supprimer la société</a>
+        class="btn btn-danger btn-xs">{% bootstrap_icon 'trash' %} Supprimer la société</a>
     {% endif %}
-    </div>
+    </p>
 {% endblock %}

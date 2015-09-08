@@ -60,7 +60,7 @@ class CompanyCreation(generic.CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Création', 'Créer')
+        context['verb'] = ('Création', 'Créer', 'plus')
         return context
 
 
@@ -102,7 +102,7 @@ class CompanyUpdate(generic.UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Modification', 'Modifier')
+        context['verb'] = ('Modification', 'Modifier', 'pencil')
         context['object'] = self.object
         return context
 
@@ -162,7 +162,7 @@ class MeetingCreation(generic.CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Création', 'Créer')
+        context['verb'] = ('Création', 'Créer', 'plus')
         if hasattr(self, 'company'):
             context['company'] = self.company
         if hasattr(self, 'contact'):
@@ -217,7 +217,7 @@ class MeetingUpdate(generic.UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Modification', 'Modifier')
+        context['verb'] = ('Modification', 'Modifier', 'pencil')
         context['object'] = self.object
         return context
 
@@ -279,7 +279,7 @@ class ContactCreation(generic.CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Création', 'Créer')
+        context['verb'] = ('Création', 'Créer', 'plus')
         if hasattr(self, 'company'):
             context['company'] = self.company
         return context
@@ -350,7 +350,7 @@ class ContactUpdate(generic.UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['verb'] = ('Modification', 'Modifier')
+        context['verb'] = ('Modification', 'Modifier', 'pencil')
         context['object'] = self.object
         return context
 
