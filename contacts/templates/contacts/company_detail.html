@@ -13,12 +13,13 @@
     {% endfor %}
     </dl>
     {% if perms.contacts.view_contact %}
-    <h3>{% bootstrap_icon 'user' %} Contacts</h3>
+    <h3>{% bootstrap_icon 'user' %} Contacts
     {% if perms.contacts.add_contact %}
-    <p><a href="{% url 'contacts:contact-create' company=object.slug %}"
+    <a href="{% url 'contacts:contact-create' company=object.slug %}"
             class="btn btn-primary btn-xs">
-        {% bootstrap_icon 'plus' %} Ajouter un contact</a></p>
+        {% bootstrap_icon 'plus' %} Ajouter</a>
     {% endif %}
+    </h3>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -39,12 +40,13 @@
     {% endif %}
 
     {% if perms.contacts.view_meeting %}
-    <h3>{% bootstrap_icon 'comment' %} Rencontres</h3>
+    <h3>{% bootstrap_icon 'comment' %} Rencontres
     {% if perms.contacts.add_meeting %}
-    <p><a href="{% url 'contacts:meeting-create' company=object.slug %}"
+    <a href="{% url 'contacts:meeting-create' company=object.slug %}"
             class="btn btn-primary btn-xs">
-        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a></p>
+        {% bootstrap_icon 'plus' %} Ajouter une rencontre</a>
     {% endif %}
+    </h3>
     <table class="table">
         <tr><th>Contact</th>
             <th>Date</th>

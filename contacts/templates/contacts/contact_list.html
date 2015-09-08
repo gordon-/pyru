@@ -6,16 +6,17 @@ de la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
 <h2>{% bootstrap_icon 'user' %} Liste des contacts{% if company %}
-    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}</h2>
+    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}
     {% if perms.contacts.add_contact %}
         {% if company %}
-        <p><a href="{% url 'contacts:contact-create' company=company.slug %}"
-            class="btn btn-primary btn-xs">Ajouter</a></p>
+        <a href="{% url 'contacts:contact-create' company=company.slug %}"
+            class="btn btn-primary btn-xs">Ajouter</a>
         {% else %}
-        <p><a href="{% url 'contacts:contact-create' %}" class="btn
-            btn-primary btn-xs">Ajouter</a></p>
+        <a href="{% url 'contacts:contact-create' %}" class="btn
+            btn-primary btn-xs">Ajouter</a>
         {% endif %}
     {% endif %}
+    </h2>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
