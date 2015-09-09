@@ -38,11 +38,14 @@ class Alert(models.Model):
                              related_name='alerts')
     contact = models.ForeignKey('Contact', verbose_name='contact', null=True,
                                 related_name='alerts')
-    priority = models.CharField('priorité', max_length=1, choices=PRIORITIES)
+    priority = models.CharField('priorité', max_length=1, choices=PRIORITIES,
+                                default=PRIORITIES[0][0])
     date = models.DateTimeField('date', default=timezone.now)
     title = models.CharField('titre', max_length=100)
     comments = models.TextField('commentaires', blank=True)
     done = models.BooleanField('achevé', default=False, db_index=True)
+    author = models.ForeignKey(User, verbose_name='créateur',
+                               related_name='added_alerts')
 
     def __str__(self):
         return self.title
@@ -55,7 +58,7 @@ class Alert(models.Model):
         return cls.objects.filter(user=user)
 
     def is_owned(self, user, perm=None):
-        return self.user == user
+        return self.user == user or self.author == user
 
     class Meta:
         verbose_name = 'alerte'
@@ -98,6 +101,13 @@ class Company(models.Model):
 
     def meetings(self):
         return Meeting.objects.filter(contact__company=self)
+
+    def last_meetings(self):
+        return Meeting.objects.filter(contact__company=self)[:5]
+
+    def active_alerts(self):
+        return Alert.objects.filter(contact__company=self, done=False,
+                                    date__gt=timezone.now())
 
     def get_absolute_url(self):
         return reverse('contacts:company-detail', kwargs={'slug': self.slug})

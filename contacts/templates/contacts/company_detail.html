@@ -1,5 +1,6 @@
 {% extends 'contacts/base.html' %}
 {% load bootstrap3 %}
+{% load humanize %}
 
 {% block title %}Détail de la société {{ object }}{% endblock %}
 
@@ -55,7 +56,7 @@
             <th>Commentaire</th>
             <th>Actions</th>
         </tr>
-        {% for meeting in object.meetings %}
+        {% for meeting in object.last_meetings %}
         <tr><td><a href="{{ meeting.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ meeting.contact }}</a></td>
             <td><a href="{{ meeting.get_absolute_url }}">{{ meeting.date }}</a></td>
             <td>{{ meeting.type }}</td>
@@ -66,6 +67,34 @@
         </tr>
         {% empty %}
         <tr><td colspan="6">Cette société ne possède pour l’instant aucune rencontre.</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if perms.contacts.view_alert %}
+    <h3>{% bootstrap_icon 'bell' %} Alertes
+    {% if perms.contacts.add_alert %}
+    <a href="{% url 'contacts:alert-create' company=object.slug %}"
+            class="btn btn-primary btn-xs">
+        {% bootstrap_icon 'plus' %} Ajouter une alerte</a>
+    {% endif %}
+    </h3>
+    <table class="table">
+        <tr><th>Contact</th>
+            <th>Date</th>
+            <th>Titre</th>
+            <th>Actions</th>
+        </tr>
+        {% for alert in object.active_alerts %}
+        <tr>
+            <td><a href="{{ alert.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ alert.contact }}</a></td>
+            <td><span title="{{ alert.date }}">{{ alert.date | naturaltime }}</span></td>
+            <td><a href="{{ alert.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ alert }}</a></td>
+            <td>{% if perms.contacts.change_alert %}<a href="{% url 'contacts:alert-update' pk=alert.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_alert %}<a href="{% url 'contacts:alert-delete' pk=alert.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Cette société ne possède pour l’instant aucune alerte.</td></tr>
         {% endfor %}
     </table>
     {% endif %}

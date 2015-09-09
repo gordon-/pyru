@@ -1,13 +1,42 @@
 {% extends 'contacts/base.html' %}
 {% load bootstrap3 %}
+{% load humanize %}
 
-{% block title %}Liste des alertes{% endblock %}
+{% block title %}Liste des alertes{% if company %}
+de la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'bell' %} Liste des alertes</h2>
-{% for object in object_list %}
-    <div>{{ object }}</div>
-{% empty %}
-    <div>Aucun objet.</div>
-{% endfor %}
+<h2>{% bootstrap_icon 'bell' %} Liste des alertes{% if company %}
+    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}
+    {% if perms.contacts.add_alert %}
+        {% if company %}
+        <a href="{% url 'contacts:alert-create' company=company.slug %}"
+            class="btn btn-primary btn-xs">Ajouter</a>
+        {% else %}
+        <a href="{% url 'contacts:alert-create' %}" class="btn
+            btn-primary btn-xs">Ajouter</a>
+        {% endif %}
+    {% endif %}
+    </h2>
+    <table class="table">
+        <tr><th>Contact</th>
+            {% if not company %}<th>Société</th>{% endif %}
+            <th>Date</th>
+            <th>Titre</th>
+            <th>Actions</th>
+        </tr>
+        {% for object in object_list %}
+        <tr>
+            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
+            {% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></td>{% endif %}
+            <td><span title="{{ object.date }}">{{ object.date | naturaltime }}</span></td>
+            <td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ object }}</a></td>
+            <td>{% if perms.contacts.change_alert %}<a href="{% url 'contacts:alert-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_alert %}<a href="{% url 'contacts:alert-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Il n’y a aucune alerte.</td></tr>
+        {% endfor %}
+    </table>
 {% endblock %}
+

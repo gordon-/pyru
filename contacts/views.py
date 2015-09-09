@@ -3,12 +3,12 @@ from django.core.urlresolvers import reverse_lazy
 from django import forms
 from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
-from django.core.exceptions import ValidationError
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 from . import generic
 from .models import (
-    Properties, Alert, ContactType, Company, Contact, MeetingType, Meeting
+    Properties, Alert, Company, Contact, Meeting
 )
 
 
@@ -362,5 +362,122 @@ class ContactDelete(generic.DeleteView):
     def delete(self, *args, **kwargs):
         messages.add_message(self.request, messages.SUCCESS,
                              'Le contact {} a été supprimé.'
+                             .format(self.get_object()))
+        return super().delete(*args, **kwargs)
+
+
+class AlertCreation(generic.CreateView):
+    model = Alert
+    fields = ('user', 'contact', 'priority', 'date', 'title', 'comments',
+              'done', )
+
+    def get_form(self, form_class):
+        form = super().get_form(form_class)
+
+        form.fields['user'].queryset = User.objects.filter(
+            groups__in=self.request.user.groups.all()
+        ).distinct()
+        form.fields['user'].initial = self.request.user
+
+        if 'company' in self.kwargs:
+            company = get_object_or_404(
+                Company, slug=self.kwargs['company'],
+                group__in=self.request.user.groups.all()
+            )
+            form.fields['contact'].queryset = form.fields['contact'].queryset\
+                .filter(company=company)
+            self.company = company
+
+        if 'contact' in self.kwargs:
+            contact = get_object_or_404(
+                Contact, slug=self.kwargs['contact'],
+                group__in=self.request.user.groups.all()
+            )
+            self.contact = contact
+            del(form.fields['contact'])
+
+        return form
+
+    def form_valid(self, form):
+        alert = form.save(commit=False)
+        alert.author = self.request.user
+        if hasattr(self, 'contact'):
+            alert.contact = self.contact
+        self.object = alert
+        alert.save()
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Rencontre {} créée avec succès.'
+                             .format(alert))
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Création', 'Créer', 'plus')
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        if hasattr(self, 'contact'):
+            context['contact'] = self.contact
+        return context
+
+
+class AlertList(generic.ListView):
+    model = Alert
+
+    def get_queryset(self):
+        # todo: add filtering/ordering support
+        qs = super().get_queryset()
+
+        if 'company' in self.kwargs:
+            self.company = get_object_or_404(Company,
+                                             slug=self.kwargs['company'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            qs = qs.filter(contact__company=self.company)
+
+        if 'contact' in self.kwargs:
+            self.contact = get_object_or_404(Contact,
+                                             slug=self.kwargs['contact'],
+                                             group__in=self.request.user.groups
+                                             .all())
+            qs = qs.filter(contact=self.contact)
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if hasattr(self, 'company'):
+            context['company'] = self.company
+        if hasattr(self, 'contact'):
+            context['contact'] = self.contact
+        return context
+
+
+class AlertDetail(generic.DetailView):
+    model = Alert
+
+
+class AlertUpdate(generic.UpdateView):
+    model = Alert
+    fields = ('contact', 'priority', 'date', 'title', 'comments', 'done', )
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Alerte {} modifiée avec succès.'
+                             .format(self.object))
+        return super().form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Modification', 'Modifier', 'pencil')
+        context['object'] = self.object
+        return context
+
+
+class AlertDelete(generic.DeleteView):
+    model = Alert
+    success_url = reverse_lazy('contacts:alert-list')
+
+    def delete(self, *args, **kwargs):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'L’alerte {} a été supprimée.'
                              .format(self.get_object()))
         return super().delete(*args, **kwargs)

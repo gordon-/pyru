@@ -1,0 +1,32 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}Détail de l’alerte {{ object }}{% endblock %}
+
+{% block content %}
+<h2>{% bootstrap_icon 'bell' %} Détail de l’alerte {{ object }}</h2>
+    <div>{{ object }}</div>
+    <dl>
+        <dt>Contact</dt>
+        <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
+    {% if object.contact.company %}
+        <dt>Société</dt>
+        <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
+    {% endif %}
+        <dt>Date</dt>
+        <dd>{{ object.date }} ({{ object.date | naturaltime }})</dd>
+    </dl>
+    <p>{{ object.comments }}</p>
+
+    <p>
+    {% if perms.contacts.change_alert %}
+    <a href="{% url 'contacts:alert-update' pk=object.pk %}"
+        class="btn btn-primary btn-xs">modifier l’alerte</a>
+    {% endif %}
+    {% if perms.contacts.delete_alert %}
+    <a href="{% url 'contacts:alert-delete' pk=object.pk %}"
+        class="btn btn-danger btn-xs">Supprimer l’alerte</a>
+    {% endif %}
+    </p>
+{% endblock %}
