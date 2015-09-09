@@ -70,9 +70,18 @@ class Alert(models.Model):
 class ContactType(models.Model):
     name = models.CharField('type', max_length=100, unique=True)
     active = models.BooleanField('actif', default=True, db_index=True)
+    group = models.ForeignKey(Group, verbose_name='groupe',
+                              related_name='contacttypes')
 
     def __str__(self):
         return self.name
+
+    def is_owned(self, user, perm=None):
+        return self.group in user.groups.all()
+
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'type de contact'
@@ -177,9 +186,18 @@ class Contact(models.Model):
 class MeetingType(models.Model):
     name = models.CharField('type', max_length=100, unique=True)
     active = models.BooleanField('actif', default=True, db_index=True),
+    group = models.ForeignKey(Group, verbose_name='groupe',
+                              related_name='meetingtypes')
 
     def __str__(self):
         return self.name
+
+    def is_owned(self, user, perm=None):
+        return self.group in user.groups.all()
+
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'type de rencontre'
