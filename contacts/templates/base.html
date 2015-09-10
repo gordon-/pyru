@@ -9,6 +9,7 @@
         <link href="{% static 'bootstrap/css/bootstrap-paper.min.css' %}" rel="stylesheet">
         {% bootstrap_javascript %}
         <link href="{% static 'css/main.css' %}" rel="stylesheet">
+        {% if form %}{{ form.media }}{% endif %}
 	</head>
 	<body>
         {% block body %}{% endblock %}

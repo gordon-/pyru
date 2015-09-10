@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.postgres',
     'django.contrib.humanize',
     'bootstrap3',
+    'datetimewidget',
     'contacts',
 )
 

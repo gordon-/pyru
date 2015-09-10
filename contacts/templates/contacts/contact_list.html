@@ -29,7 +29,8 @@ de la société {{ company }}{% endif %}{% endblock %}
         <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object }}</a></td>
             <td>{{ object.group }}</td>
             {% if not company %}<td><a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a></td>{% endif %}
-            <td>{{ object.type }}</td>
+            <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</td>
             <td><a href="{% url 'contacts:meeting-list' contact=object.slug %}">{% bootstrap_icon 'comment' %} {{ object.meetings.count }}</a></td>
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}

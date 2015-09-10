@@ -72,6 +72,7 @@ class ContactType(models.Model):
     active = models.BooleanField('actif', default=True, db_index=True)
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='contacttypes')
+    icon = models.CharField('glyphicone', max_length=16, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -188,6 +189,7 @@ class MeetingType(models.Model):
     active = models.BooleanField('actif', default=True, db_index=True),
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='meetingtypes')
+    icon = models.CharField('glyphicone', max_length=16, blank=True, null=True)
 
     def __str__(self):
         return self.name

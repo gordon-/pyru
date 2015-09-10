@@ -8,6 +8,9 @@
 <h2>{% bootstrap_icon 'briefcase' %} Détail de la société {{ object }}</h2>
     <div>{{ object }}</div>
     <dl>
+        <dt>Type</dt>
+        <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</dd>
     {% for prop_name, prop_value in object.properties.items %}
         <dt>{{ prop_name }}</dt>
         <dd>{{ prop_value }}</dd>
@@ -30,7 +33,8 @@
         {% for contact in object.contacts.all %}
         <tr><td><a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a></td>
             <td>{{ contact.group }}</td>
-            <td>{{ contact.type }}</td>
+            <td>{% if contact.type.icon %}{% bootstrap_icon contact.type.icon %}
+                {% endif %}{{ contact.type }}</td>
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=contact.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
@@ -59,7 +63,8 @@
         {% for meeting in object.last_meetings %}
         <tr><td><a href="{{ meeting.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ meeting.contact }}</a></td>
             <td><a href="{{ meeting.get_absolute_url }}">{{ meeting.date }}</a></td>
-            <td>{{ meeting.type }}</td>
+            <td>{% if meeting.type.icon %}{% bootstrap_icon meeting.type.icon %}
+                {% endif %}{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
             <td>{{ meeting.comments }}</td>
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}

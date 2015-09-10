@@ -13,6 +13,9 @@
         <dt>Société</dt>
         <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
     {% endif %}
+        <dt>Type</dt>
+        <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</dd>
         <dt>Date</dt>
         <dd>{{ object.date }}</dd>
     </dl>

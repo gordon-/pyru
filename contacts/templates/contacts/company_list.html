@@ -20,7 +20,8 @@
         {% for object in object_list %}
         <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object }}</a></td>
             <td>{{ object.group }}</td>
-            <td>{{ object.type }}</td>
+            <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</td>
             <td><a href="{% url 'contacts:contact-list' company=object.slug %}">{% bootstrap_icon 'user' %} {{ object.contacts.count }}</a></td>
             <td><a href="{% url 'contacts:meeting-list' company=object.slug %}">{% bootstrap_icon 'comment' %} {{ object.meetings.count }}</a></td>
             <td>{% if perms.contacts.change_company %}<a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}

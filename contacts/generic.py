@@ -3,7 +3,8 @@ from django.views import generic
 from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.shortcuts import resolve_url
-from django.forms import ModelChoiceField
+from django.forms import ModelChoiceField, DateTimeField, DateField
+from datetimewidget.widgets import DateTimeWidget, DateWidget
 
 
 class ForceResponse(Exception):
@@ -92,6 +93,12 @@ class FormMixin():
                 if hasattr(field.queryset.model, 'get_queryset'):
                     field.queryset = field.queryset.model\
                         .get_queryset(self.request.user)
+            elif isinstance(field, DateTimeField):
+                field.widget = DateTimeWidget(usel10n=True,
+                                              bootstrap_version=3)
+            elif isinstance(field, DateField):
+                field.widget = DateWidget(usel10n=True,
+                                          bootstrap_version=3)
         return form
 
 
@@ -108,7 +115,8 @@ class CreateView(LoginRequiredMixin, PermissionMixin, FormMixin,
     permission_suffix = 'add'
 
 
-class UpdateView(LoginRequiredMixin, PermissionMixin, generic.UpdateView):
+class UpdateView(LoginRequiredMixin, PermissionMixin, FormMixin,
+                 generic.UpdateView):
     permission_suffix = 'change'
 
 
