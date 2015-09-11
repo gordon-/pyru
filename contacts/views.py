@@ -35,8 +35,8 @@ class CompanyCreation(generic.CreateView):
         form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
-        self.properties = Properties.objects.filter(type='company')\
-            .order_by('order')
+        self.properties = Properties.get_queryset(self.request.user)\
+            .filter(type='company')
         for prop in self.properties:
             form.fields[prop.name] = forms.CharField(required=False,
                                                      label=prop.name.title())
@@ -74,8 +74,8 @@ class CompanyUpdate(generic.UpdateView):
         form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
-        self.properties = Properties.objects.filter(type='company')\
-            .order_by('order')
+        self.properties = Properties.get_queryset(self.request.user)\
+            .filter(type='company')
         props = self.object.properties
         for prop in self.properties:
             form.fields[prop.name] = forms.CharField(
@@ -252,8 +252,8 @@ class ContactCreation(generic.CreateView):
             del(form.fields['company'])
 
         # properties fetching
-        self.properties = Properties.objects.filter(type='contact')\
-            .order_by('order')
+        self.properties = Properties.get_queryset(self.request.user)\
+            .filter(type='contact')
         for prop in self.properties:
             form.fields[prop.name] = forms.CharField(required=False,
                                                      label=prop.name.title())
@@ -322,8 +322,8 @@ class ContactUpdate(generic.UpdateView):
         form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
-        self.properties = Properties.objects.filter(type='contact')\
-            .order_by('order')
+        self.properties = Properties.get_queryset(self.request.user)\
+            .filter(type='contact')
         props = self.object.properties
         for prop in self.properties:
             form.fields[prop.name] = forms.CharField(

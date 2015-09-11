@@ -22,9 +22,18 @@ class Properties(models.Model):
     order = models.PositiveIntegerField('ordre', default=1)
     active = models.BooleanField('actif', default=True, db_index=True)
     type = models.CharField('type', max_length=16, choices=PROP_CHOICES)
+    group = models.ForeignKey(Group, verbose_name='groupe',
+                              related_name='properties')
 
     def __str__(self):
         return self.name
+
+    def is_owned(self, user, perm=None):
+        return self.contact.group in user.groups.all()
+
+    @classmethod
+    def get_queryset(cls, user):
+        return cls.objects.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'propriété'
