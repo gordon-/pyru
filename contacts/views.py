@@ -5,11 +5,13 @@ from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth.models import User
+import autocomplete_light
 
 from . import generic
 from .models import (
     Properties, Alert, Company, Contact, Meeting
 )
+from .forms import ContactForm
 
 
 class Home(generic.ListView):
@@ -237,6 +239,7 @@ class ContactCreation(generic.CreateView):
     model = Contact
     fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
               'active', )
+    # form_class = ContactForm
 
     def get_form(self, form_class):
         form = super().get_form(form_class)

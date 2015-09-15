@@ -20,5 +20,6 @@ import contacts.urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^autocomplete/', include('autocomplete_light.urls')),
     url(r'^', include(contacts.urls, namespace='contacts'))
 ]

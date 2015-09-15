@@ -97,4 +97,5 @@ urlpatterns = [
         name='password_reset_confirm'),
     url(r'^password-reset/done?$', password_reset_done,
         name='password_reset_done'),
+
 ]

@@ -2,6 +2,7 @@ Django==1.8.4
 decorator==4.0.2
 django-activelink==0.4
 django-admin-bootstrapped==2.5.4
+django-autocomplete-light==2.2.6
 django-bootstrap3==6.2.2
 django-datetime-widget==0.9.3
 django-polymorphic==0.7.1
@@ -14,4 +15,5 @@ pickleshare==0.5
 psycopg2==2.6.1
 pytz==2015.4
 simplegeneric==0.8.1
+six==1.9.0
 traitlets==4.0.0

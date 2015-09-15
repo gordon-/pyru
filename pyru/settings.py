@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'datetimewidget',
     'contacts',
+    'autocomplete_light',
 )
 
 MIDDLEWARE_CLASSES = (

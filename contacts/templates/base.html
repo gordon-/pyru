@@ -6,6 +6,7 @@
         <meta charset="utf-8" />
         <title>{% block title %}Bienvenue{% endblock %} — Pyru</title>
         <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+        {% include 'autocomplete_light/static.html' %}
         <link href="{% static 'bootstrap/css/bootstrap-paper.min.css' %}" rel="stylesheet">
         {% bootstrap_javascript %}
         <link href="{% static 'css/main.css' %}" rel="stylesheet">
