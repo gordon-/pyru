@@ -32,8 +32,10 @@ class Properties(models.Model):
         return self.contact.group in user.groups.all()
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'propriété'
@@ -63,8 +65,10 @@ class Alert(models.Model):
         return reverse('contacts:alert-detail', kwargs={'pk': self.pk})
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(user=user)
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(user=user)
 
     def is_owned(self, user, perm=None):
         return self.user == user or self.author == user
@@ -90,8 +94,10 @@ class ContactType(models.Model):
         return self.group in user.groups.all()
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'type de contact'
@@ -137,8 +143,10 @@ class Company(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
 
     def is_owned(self, user, perm=None):
         return self.group in user.groups.all()
@@ -180,8 +188,10 @@ class Contact(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
 
     def is_owned(self, user, perm=None):
         return self.group in user.groups.all()
@@ -207,8 +217,10 @@ class MeetingType(models.Model):
         return self.group in user.groups.all()
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
 
     class Meta:
         verbose_name = 'type de rencontre'
@@ -233,8 +245,10 @@ class Meeting(models.Model):
         return reverse('contacts:meeting-detail', kwargs={'pk': self.pk})
 
     @classmethod
-    def get_queryset(cls, user):
-        return cls.objects.filter(contact__group__in=user.groups.all())
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(contact__group__in=user.groups.all())
 
     def is_owned(self, user, perm=None):
         return self.contact.group in user.groups.all()
