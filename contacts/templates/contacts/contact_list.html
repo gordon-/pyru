@@ -17,6 +17,15 @@ de la société {{ company }}{% endif %}{% endblock %}
         {% endif %}
     {% endif %}
     </h2>
+    <div class="well bs-component">
+    <form method="post" class="form-horizontal">
+        <fielset>
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' size='small' bound_css_class='' %}
+        <input type="submit" class="btn btn-primary" value="Rechercher" />
+        </fieldset>
+    </form>
+    </div>
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>

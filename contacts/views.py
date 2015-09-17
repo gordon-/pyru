@@ -5,13 +5,12 @@ from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth.models import User
-import autocomplete_light
 
 from . import generic
 from .models import (
     Properties, Alert, Company, Contact, Meeting
 )
-from .forms import ContactForm
+from .forms import ContactSearchForm
 
 
 class Home(generic.ListView):
@@ -239,7 +238,6 @@ class ContactCreation(generic.CreateView):
     model = Contact
     fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
               'active', )
-    # form_class = ContactForm
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
@@ -288,12 +286,15 @@ class ContactCreation(generic.CreateView):
         return context
 
 
-class ContactList(generic.ListView):
+class ContactList(generic.ListView, generic.SearchFormMixin):
     model = Contact
+    form_class = ContactSearchForm
 
     def get_queryset(self):
         # todo: add filtering/ordering support
         qs = super().get_queryset()
+
+        qs = self.get_form().search(qs)
 
         if 'company' in self.kwargs:
             self.company = get_object_or_404(Company,
