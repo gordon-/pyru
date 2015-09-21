@@ -12,6 +12,30 @@ from .models import ContactType, Properties
 
 class SearchForm(forms.Form):
 
+    def _process_multiple_targets(self, field_name, field_value, mapping):
+        queries = []
+        split_mode = False
+        if 'split' in mapping and mapping['split'] and ' ' in field_value:
+            split_mode = True
+            field_value = field_value.split(' ')
+        else:
+            field_value = [field_value]
+        for value in field_value:
+            subqueries = []
+            for target in mapping['target']:
+                filters = self._apply_filter(target, value)
+                subqueries.append(Q(**filters))
+
+                subquery = reduce(operator.or_, subqueries)
+            queries.append(subquery)
+        if 'operator' in mapping \
+                and mapping['operator'] == 'and' \
+                and split_mode:
+            query = reduce(operator.and_, queries)
+        else:
+            query = reduce(operator.or_, queries)
+        return query
+
     def _apply_filter(self, field_name, field_value):
         filters = {}
         if field_name.endswith('_less'):
@@ -24,7 +48,8 @@ class SearchForm(forms.Form):
             field_name = field_name[1:]
             filters['{}__iequals'.format(field_name)] = field_value
         else:
-            if isinstance(self.fields[field_name], ModelChoiceField):
+            if hasattr(self.fields, field_name) \
+                    and isinstance(self.fields[field_name], ModelChoiceField):
                 filters[field_name] = field_value
             else:
                 filters['{}__icontains'.format(field_name)] = field_value
@@ -48,12 +73,8 @@ class SearchForm(forms.Form):
                         mapping = mappings[field_name]
                         field_name = mapping['target']
                         if isinstance(mapping['target'], list):
-                            queries = []
-                            for target in mapping['target']:
-                                    filters = self._apply_filter(target,
-                                                                 field_value)
-                                    queries.append(Q(**filters))
-                            qs = qs.filter(reduce(operator.or_, queries))
+                            qs = qs.filter(self._process_multiple_targets(
+                                field_name, field_value, mapping))
                         else:
                             filters.update(self._apply_filter(field_name,
                                                               field_value))
@@ -102,7 +123,8 @@ class ContactSearchForm(SearchForm):
 
     class Meta:
         mappings = {'name': {'target': ['firstname', 'lastname'],
-                             'split': True},
+                    'split': True, 'operator': 'and'},
+                    'company': {'target': ['company__name']},
                     }
 
     def __init__(self, *args, **kwargs):
@@ -120,36 +142,3 @@ class ContactSearchForm(SearchForm):
                 self.base_fields['properties__{}'.format(prop.name)] = \
                     forms.CharField(required=False, label=prop.name.title())
         super().__init__(*args, **kwargs)
-
-    # def search(self, qs):
-    #     self.full_clean()
-    #     if hasattr(self, 'cleaned_data'):
-    #         search = self.cleaned_data
-    #         if 'name' in search and search['name'] != '':
-    #             qs = qs.filter(Q(firstname__icontains=search['name']) |
-    #                            Q(lastname__icontains=search['name']))
-
-    #         if 'added_before' in search and search['added_before'] is not None:
-    #             qs = qs.filter(creation_date__lt=search['added_before'])
-
-    #         if 'added_after' in search and search['added_after'] is not None:
-    #             qs = qs.filter(creation_date__gt=search['added_after'])
-
-    #         if 'updated_before' in search and \
-    #                 search['updated_before'] is not None:
-    #             qs = qs.filter(update_date__lt=search['updated_before'])
-
-    #         if 'updated_after' in search and \
-    #                 search['updated_after'] is not None:
-    #             qs = qs.filter(update_date__gt=search['updated_after'])
-
-    #         if 'contact_type' in search and search['contact_type'] is not None:
-    #             qs = qs.filter(type=search['contact_type'])
-
-    #         for prop in self.properties:
-    #             if prop.name in search and search[prop.name] != '':
-    #                 kwargs = {'properties__{}__icontains'.format(prop.name):
-    #                           search[prop.name]}
-    #                 qs = qs.filter(**kwargs)
-
-    #     return qs
