@@ -49,7 +49,7 @@ class SearchForm(forms.Form):
             field_name = field_name[1:]
             filters['{}__iequals'.format(field_name)] = field_value
         else:
-            if hasattr(self.fields, field_name) \
+            if field_name in self.fields \
                     and isinstance(self.fields[field_name], ModelChoiceField):
                 filters[field_name] = field_value
             else:
