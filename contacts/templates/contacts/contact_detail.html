@@ -18,6 +18,10 @@
         <dt>{{ prop_name }}</dt>
         <dd>{{ prop_value }}</dd>
     {% endfor %}
+        <dt>Date de création</dt>
+        <dd>{{ object.creation_date }}</dd>
+        <dt>Date de dernière modification</dt>
+        <dd>{{ object.update_date }}</dd>
     </dl>
     {% if perms.contacts.view_meeting %}
     <h3>{% bootstrap_icon 'comment' %} Rencontres
