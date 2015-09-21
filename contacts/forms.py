@@ -11,6 +11,7 @@ from .models import ContactType, Properties
 
 
 class SearchForm(forms.Form):
+    bound_css_class = ''  # for django-bootstrap3 enhancement
 
     def _process_multiple_targets(self, field_name, field_value, mapping):
         queries = []

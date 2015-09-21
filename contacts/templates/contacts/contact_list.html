@@ -21,7 +21,7 @@ de la société {{ company }}{% endif %}{% endblock %}
     <form method="post" class="form-horizontal">
         <fielset>
         {% csrf_token %}
-        {% bootstrap_form form layout='horizontal' size='small' bound_css_class='' %}
+        {% bootstrap_form form layout='horizontal' size='small'%}
         <input type="submit" class="btn btn-primary" value="Rechercher" />
         <a class="btn btn-default" href="{% url 'contacts:contact-list' %}">Voir tous</a>
         </fieldset>
