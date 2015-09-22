@@ -10,15 +10,20 @@ from . import generic
 from .models import (
     Properties, Alert, Company, Contact, Meeting
 )
-from .forms import ContactSearchForm
+from .forms import (
+    ContactSearchForm, CompanySearchForm, MeetingSearchForm, AlertSearchForm
+)
 
 
 class Home(generic.ListView):
     model = Alert
+    template_name = 'contacts/home.html'
 
 
-class CompaniesList(generic.ListView):
+class CompaniesList(generic.SearchFormMixin, generic.ListView):
     model = Company
+    form_class = CompanySearchForm
+    paginate_by = 10
 
 
 class CompanyDetail(generic.DetailView):
@@ -171,11 +176,13 @@ class MeetingCreation(generic.CreateView):
         return context
 
 
-class MeetingList(generic.ListView):
+class MeetingList(generic.SearchFormMixin, generic.ListView):
     model = Meeting
+    paginate_by = 10
+    form_class = MeetingSearchForm
 
     def get_queryset(self):
-        # todo: add filtering/ordering support
+        # todo: add ordering support
         qs = super().get_queryset()
 
         if 'company' in self.kwargs:
@@ -286,15 +293,14 @@ class ContactCreation(generic.CreateView):
         return context
 
 
-class ContactList(generic.ListView, generic.SearchFormMixin):
+class ContactList(generic.SearchFormMixin, generic.ListView):
     model = Contact
     form_class = ContactSearchForm
+    paginate_by = 10
 
     def get_queryset(self):
-        # todo: add filtering/ordering support
+        # todo: add ordering support
         qs = super().get_queryset()
-
-        qs = self.get_form().search(qs)
 
         if 'company' in self.kwargs:
             self.company = get_object_or_404(Company,
@@ -424,8 +430,10 @@ class AlertCreation(generic.CreateView):
         return context
 
 
-class AlertList(generic.ListView):
+class AlertList(generic.SearchFormMixin, generic.ListView):
     model = Alert
+    paginate_by = 10
+    form_class = AlertSearchForm
 
     def get_queryset(self):
         # todo: add filtering/ordering support

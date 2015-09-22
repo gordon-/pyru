@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.forms import ModelChoiceField
 from datetimewidget.widgets import DateWidget
 
-from .models import ContactType, Properties
+from .models import ContactType, Properties, MeetingType
 
 
 class SearchForm(forms.Form):
@@ -86,6 +86,9 @@ class SearchForm(forms.Form):
                         qs = qs.filter(**filters)
         return qs
 
+    def is_submitted(self):
+        return len(self.changed_data) != 0
+
 
 class ContactSearchForm(SearchForm):
     name = forms.CharField(label='nom', required=False)
@@ -142,4 +145,160 @@ class ContactSearchForm(SearchForm):
             for prop in self.properties:
                 self.base_fields['properties__{}'.format(prop.name)] = \
                     forms.CharField(required=False, label=prop.name.title())
+        super().__init__(*args, **kwargs)
+
+
+class CompanySearchForm(SearchForm):
+    name = forms.CharField(label='nom', required=False)
+    creation_date_less = forms.DateTimeField(
+        label='ajouté avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    creation_date_more = forms.DateTimeField(
+        label='ajouté après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+
+    update_date_less = forms.DateTimeField(
+        label='modifié avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    update_date_more = forms.DateTimeField(
+        label='modifié après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    type = forms.ModelChoiceField(
+        label='type',
+        queryset=ContactType.objects.all(),
+        required=False,
+        )
+    group = forms.ModelChoiceField(
+        label='groupe',
+        queryset=Group.objects.all(),
+        required=False,
+        )
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs.pop('request')
+            self.base_fields['type'].queryset = \
+                ContactType.get_queryset(self.request.user)
+
+            self.base_fields['group'].queryset = \
+                self.request.user.groups.all()
+
+            self.properties = Properties.get_queryset(self.request.user)\
+                .filter(type='contact')
+            for prop in self.properties:
+                self.base_fields['properties__{}'.format(prop.name)] = \
+                    forms.CharField(required=False, label=prop.name.title())
+        super().__init__(*args, **kwargs)
+
+
+class MeetingSearchForm(SearchForm):
+    contact = forms.CharField(label='nom du contact', required=False)
+    company = forms.CharField(label='société', required=False)
+    date_less = forms.DateTimeField(
+        label='avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    date_more = forms.DateTimeField(
+        label='après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    creation_date_less = forms.DateTimeField(
+        label='ajouté avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    creation_date_more = forms.DateTimeField(
+        label='ajouté après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+
+    update_date_less = forms.DateTimeField(
+        label='modifié avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    update_date_more = forms.DateTimeField(
+        label='modifié après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    type = forms.ModelChoiceField(
+        label='type',
+        queryset=MeetingType.objects.all(),
+        required=False,
+        )
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs.pop('request')
+            self.base_fields['type'].queryset = \
+                MeetingType.get_queryset(self.request.user)
+
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        mappings = {'contact': {'target': ['contact__firstname',
+                                           'contact__lastname'],
+                                'split': True, 'operator': 'and'},
+                    'company': {'target': 'contact__company__name'},
+                    }
+
+
+class AlertSearchForm(SearchForm):
+    contact = forms.CharField(label='nom du contact', required=False)
+    company = forms.CharField(label='société', required=False)
+    date_less = forms.DateTimeField(
+        label='avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    date_more = forms.DateTimeField(
+        label='après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    creation_date_less = forms.DateTimeField(
+        label='ajouté avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    creation_date_more = forms.DateTimeField(
+        label='ajouté après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+
+    update_date_less = forms.DateTimeField(
+        label='modifié avant le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+    update_date_more = forms.DateTimeField(
+        label='modifié après le',
+        widget=DateWidget(usel10n=True, bootstrap_version=3),
+        required=False,
+    )
+
+    class Meta:
+        mappings = {'contact': {'target': ['contact__firstname',
+                                           'contact__lastname'],
+                                'split': True, 'operator': 'and'},
+                    'company': {'target': 'contact__company__name'},
+                    }
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs.pop('request')
+
         super().__init__(*args, **kwargs)

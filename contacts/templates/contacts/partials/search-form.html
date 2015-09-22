@@ -1,0 +1,20 @@
+{% load bootstrap3 %}
+<p class="bs-component">
+    <button class="btn btn-default btn-s" type="button" data-toggle="collapse"
+    data-target="#search-panel" aria-expanded="false"
+                                   aria-controls="collapseExample">
+        Recherche {% bootstrap_icon 'menu-down' %}
+    </button>
+</p>
+<div class="collapse{% if form.is_submitted %} in{% endif %}" id="search-panel">
+    <div class="panel well bs-component">
+    <form class="form-horizontal search-form">
+        <fieldset class="panel-body">
+        {% bootstrap_form form layout='horizontal' size='small'%}
+        <button class="btn btn-primary">{% bootstrap_icon 'search' %}
+            Rechercher</button>
+        <a class="btn btn-default" href="{% url return_url %}">Voir tous</a>
+        </fieldset>
+    </form>
+    </div>
+</div>

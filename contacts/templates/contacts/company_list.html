@@ -9,6 +9,11 @@
     <a href="{% url 'contacts:company-create' %}" class="btn btn-primary btn-xs">
         {% bootstrap_icon 'plus' %} Ajouter</a>
     {% endif %}</h2>
+    {% include 'contacts/partials/search-form.html' with return_url='contacts:company-list' %}
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    société{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -31,5 +36,6 @@
         <tr><td colspan="4">Il n’y a pour l’instant aucune société.</td></tr>
         {% endfor %}
     </table>
+    {% include 'contacts/partials/paginator.html' %}
 {% endblock %}
 

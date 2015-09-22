@@ -17,15 +17,11 @@ de la société {{ company }}{% endif %}{% endblock %}
         {% endif %}
     {% endif %}
     </h2>
-    <div class="well bs-component">
-    <form class="form-horizontal search-form">
-        <fielset>
-        {% bootstrap_form form layout='horizontal' size='small'%}
-        <input type="submit" class="btn btn-primary" value="Rechercher" />
-        <a class="btn btn-default" href="{% url 'contacts:contact-list' %}">Voir tous</a>
-        </fieldset>
-    </form>
-    </div>
+    {% include 'contacts/partials/search-form.html' with return_url='contacts:contact-list' %}
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    contact{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
     <table class="table">
         <tr><th>Nom</th>
             <th>Groupe</th>
@@ -48,5 +44,6 @@ de la société {{ company }}{% endif %}{% endblock %}
         <tr><td colspan="5">Il n’y a aucun contact.</td></tr>
         {% endfor %}
     </table>
+    {% include 'contacts/partials/paginator.html' %}
 {% endblock %}
 

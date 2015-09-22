@@ -156,6 +156,11 @@ class SearchFormMixin(generic.edit.FormMixin):
 
         return kwargs
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = self.get_form().search(qs)
+        return qs
+
     def get(self, request, *args, **kwargs):
         # From ProcessFormMixin
         form_class = self.get_form_class()
@@ -173,12 +178,8 @@ class SearchFormMixin(generic.edit.FormMixin):
                                         form=self.form)
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['form'] = self.get_form(self.get_form_class())
         return context
 
 

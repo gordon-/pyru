@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'bootstrap3',
     'datetimewidget',
+    'debug_toolbar',
     'contacts',
     'autocomplete_light',
 )
@@ -136,6 +137,8 @@ BOOTSTRAP3 = {
     'jquery_url': STATIC_URL + 'js/jquery.min.js',
     'base_url': STATIC_URL + 'bootstrap/',
 }
+
+DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': STATIC_URL + 'js/jquery.min.js'}
 
 try:
     from .localsettings import *

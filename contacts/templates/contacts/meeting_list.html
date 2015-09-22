@@ -26,6 +26,11 @@
         {% endif %}
     {% endif %}
     </h2>
+    {% include 'contacts/partials/search-form.html' with return_url='contacts:meeting-list' %}
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    rencontre{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
     <table class="table">
         <tr>{% if not company %}<th>Société</th>{% endif %}
             {% if not contact %}<th>Contact</th>{% endif %}
@@ -51,5 +56,6 @@
         <tr><td colspan="7">Il n’y a aucune rencontre.</td></tr>
         {% endfor %}
     </table>
+    {% include 'contacts/partials/paginator.html' %}
 {% endblock %}
 

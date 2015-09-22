@@ -2,27 +2,11 @@
 {% load bootstrap3 %}
 {% load humanize %}
 
-{% block title %}Liste des alertes{% if company %}
-de la société {{ company }}{% endif %}{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'bell' %} Liste des alertes{% if company %}
-    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}
-    {% if perms.contacts.add_alert %}
-        {% if company %}
-        <a href="{% url 'contacts:alert-create' company=company.slug %}"
-            class="btn btn-primary btn-xs">Ajouter</a>
-        {% else %}
-        <a href="{% url 'contacts:alert-create' %}" class="btn
-            btn-primary btn-xs">Ajouter</a>
-        {% endif %}
-    {% endif %}
+<h2>{% bootstrap_icon 'bell' %} Accueil
     </h2>
-    {% include 'contacts/partials/search-form.html' with return_url='contacts:alert-list' %}
-    {% with objects_count=object_list|length %}
-    <p>Affichage de {{ objects_count }}
-    alerte{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
-    {% endwith %}
     <table class="table">
         <tr><th>Contact</th>
             {% if not company %}<th>Société</th>{% endif %}
@@ -43,6 +27,5 @@ de la société {{ company }}{% endif %}{% endblock %}
         <tr><td colspan="5">Il n’y a aucune alerte.</td></tr>
         {% endfor %}
     </table>
-    {% include 'contacts/partials/paginator.html' %}
 {% endblock %}
 
