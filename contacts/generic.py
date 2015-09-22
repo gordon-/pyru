@@ -144,8 +144,16 @@ class FormMixin():
 class SearchFormMixin(generic.edit.FormMixin):
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
+        """
+        Returns the keyword arguments for instantiating the form.
+        """
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+            'request': self.request,
+            'data': self.request.GET
+        }
+
         return kwargs
 
     def get(self, request, *args, **kwargs):

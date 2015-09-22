@@ -18,9 +18,8 @@ de la société {{ company }}{% endif %}{% endblock %}
     {% endif %}
     </h2>
     <div class="well bs-component">
-    <form method="post" class="form-horizontal">
+    <form class="form-horizontal search-form">
         <fielset>
-        {% csrf_token %}
         {% bootstrap_form form layout='horizontal' size='small'%}
         <input type="submit" class="btn btn-primary" value="Rechercher" />
         <a class="btn btn-default" href="{% url 'contacts:contact-list' %}">Voir tous</a>
