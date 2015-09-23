@@ -26,6 +26,7 @@
             {% if perms.contacts.add_meeting %}<li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
           </ul>
         </li>{% endif %}
+        {% if perms.contacts.view_alert %}<li{% ifstartswith 'contacts:alert' %} class="active"{% endifstartswith %}><a href="{% url 'contacts:alert-list' %}">{% bootstrap_icon 'bell' %} Alertes</a></li>{% endif %}
       </ul>
       {% if user.is_authenticated %}
       <ul class="nav navbar-nav navbar-right">

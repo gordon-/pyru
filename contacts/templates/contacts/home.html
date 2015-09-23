@@ -7,25 +7,25 @@
 {% block content %}
 <h2>{% bootstrap_icon 'bell' %} Accueil
     </h2>
-    <table class="table">
-        <tr><th>Contact</th>
-            {% if not company %}<th>Société</th>{% endif %}
-            <th>Date</th>
-            <th>Titre</th>
-            <th>Actions</th>
-        </tr>
         {% for object in object_list %}
-        <tr>
-            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
-            {% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></td>{% endif %}
-            <td><span title="{{ object.date }}">{{ object.date | naturaltime }}</span></td>
-            <td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ object }}</a></td>
-            <td>{% if perms.contacts.change_alert %}<a href="{% url 'contacts:alert-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
-                {% if perms.contacts.delete_alert %}<a href="{% url 'contacts:alert-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
-        </tr>
+        <div class="panel panel-{% if object.priority == 0 %}default
+        {% elif object.priority == '1' %}success
+        {% elif object.priority == '2' %}info
+        {% elif object.priority == '3' %}warning{% endif %}">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    {{ object }}
+                </h3>
+            </div>
+            <div class="panel-body">
+            <p><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></p>
+            <p><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></p>
+            <p><span{% if object.is_near %} class="label label-danger"{% endif %} title="{{ object.date }}">{{ object.date | naturaltime }}</span></p>
+            <p><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ object }}</a></p>
+            <p>{{ object.comments }}</p>
+            </div>
+        </div>
         {% empty %}
-        <tr><td colspan="5">Il n’y a aucune alerte.</td></tr>
+        <p>Il n’y a aucune alerte.</p>
         {% endfor %}
-    </table>
 {% endblock %}
-

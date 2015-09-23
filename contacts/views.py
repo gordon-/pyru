@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse_lazy
 from django import forms
@@ -18,6 +19,11 @@ from .forms import (
 class Home(generic.ListView):
     model = Alert
     template_name = 'contacts/home.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(date__gt=timezone.now(), done=False)
+        return qs.order_by('date')
 
 
 class CompaniesList(generic.SearchFormMixin, generic.ListView):
