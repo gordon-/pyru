@@ -89,7 +89,8 @@ urlpatterns = [
         name='alert-detail'),
 
     url(r'^login/?$', login, name='login'),
-    url(r'^logout/?$', logout, name='logout'),
+    url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},
+        name='logout'),
     url(r'^password-reset/?$', password_reset, name='password_reset'),
     url(r'^password-reset/complete?$', password_reset_complete,
         name='password_reset_complete'),
