@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Properties, Alert, ContactType, Company, Contact, MeetingType, Meeting
+    Properties, Alert, ContactType, Company, Contact, MeetingType, Meeting,
+    SavedSearch
 )
 
 
@@ -37,4 +38,9 @@ class MeetingTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(SavedSearch)
+class SavedSearchAdmin(admin.ModelAdmin):
     pass

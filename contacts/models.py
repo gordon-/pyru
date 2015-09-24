@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.postgres import fields
 
 
-PROP_CHOICES = (('company', 'compagnie'),
+PROP_CHOICES = (('company', 'société'),
                 ('contact', 'contact'),
                 )
 
@@ -15,6 +15,12 @@ PRIORITIES = (('0', 'basse'),
               ('2', 'haute'),
               ('3', 'urgente'),
               )
+
+SEARCH_CHOICES = (('Contact', 'contact'),
+                  ('Company', 'société'),
+                  ('Meeting', 'rencontre'),
+                  ('Alert', 'alerte'),
+                  )
 
 
 class Properties(models.Model):
@@ -262,3 +268,46 @@ class Meeting(models.Model):
         get_latest_by = 'date'
         ordering = ['-date']
         permissions = (('view_meeting', 'Can view a meeting'), )
+
+
+class SavedSearch(models.Model):
+    group = models.ForeignKey(Group, verbose_name='groupe',
+                              related_name='searches')
+    name = models.CharField('nom', max_length=32)
+    slug = models.SlugField(unique=True)
+    type = models.CharField('type', max_length=32, choices=SEARCH_CHOICES)
+    data = fields.HStoreField('données de recherche', default={})
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('contacts:{}-search-detail'.format(self.type.lower()),
+                       kwargs={'slug': self.slug})
+
+    def get_search_model(self):
+        import ipdb
+        ipdb.set_trace()
+
+    def get_queryset(self, user):
+        from . import forms
+        model = self.get_search_model()
+        if hasattr(model, 'get_queryset'):
+            qs = model.get_queryset(user)
+        else:
+            qs = model.objects.all()
+        form_class = getattr(forms, '{}SearchForm'.format(self.type))
+        form = form_class(data=self.data)
+        qs = form.search(qs)
+        return qs
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'recherche sauvegardée'
+        verbose_name_plural = 'recherches sauvegardées'
+        ordering = ['name']
+        permissions = (('view_savedsearch', 'Can view a saved search'), )
