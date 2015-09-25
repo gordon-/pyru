@@ -25,6 +25,60 @@ class Home(generic.ListView):
         qs = qs.filter(date__gt=timezone.now(), done=False)
         return qs.order_by('date')
 
+    def get_context_data(self):
+        context = super().get_context_data()
+        last_updated = []
+
+        def creation_or_update(object):
+            if int(object.creation_date.timestamp()) ==\
+                    int(object.update_date.timestamp()):
+                return 'creation'
+            else:
+                return 'update'
+
+        if self.request.user.has_perm('contacts.view_contact'):
+            last_updated += [{'date': contact.update_date, 'object': contact,
+                              'type': creation_or_update(contact)}
+                             for contact in Contact.get_queryset(
+                                 self.request.user)
+                             .order_by('-update_date')[:5]
+                             ]
+
+        if self.request.user.has_perm('contacts.view_company'):
+            last_updated += [{'date': company.update_date, 'object': company,
+                              'type': creation_or_update(company)}
+                             for company in Company.get_queryset(
+                                 self.request.user)
+                             .order_by('-update_date')[:5]
+                             ]
+
+        if self.request.user.has_perm('contacts.view_meeting'):
+            last_updated += [{'date': meeting.update_date, 'object': meeting,
+                              'type': creation_or_update(meeting)}
+                             for meeting in Meeting.get_queryset(
+                                 self.request.user)
+                             .order_by('-update_date')[:5]
+                             ]
+
+            last_updated += [{'date': meeting.date, 'object': meeting,
+                              'type': 'meeting'}
+                             for meeting in
+                             Meeting.get_queryset(self.request.user).filter(
+                                 date__lt=timezone.now()).order_by('-date')[:5]
+                             ]
+
+        if self.request.user.has_perm('contacts.view_alert'):
+            last_updated += [{'date': alert.update_date, 'object': alert,
+                              'type': creation_or_update(alert)}
+                             for alert in Alert.get_queryset(self.request.user)
+                             .order_by('-update_date')[:5]
+                             ]
+
+        last_updated.sort(key=lambda i: i['date'], reverse=True)
+        context['notifications'] = last_updated
+
+        return context
+
 
 class CompaniesList(generic.SearchFormMixin, generic.ListView):
     model = Company

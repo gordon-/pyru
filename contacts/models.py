@@ -63,9 +63,14 @@ class Alert(models.Model):
     done = models.BooleanField('achevé', default=False, db_index=True)
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='added_alerts')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
         return self.title
+
+    def get_glyphicon(self):
+        return 'bell'
 
     def get_absolute_url(self):
         return reverse('contacts:alert-detail', kwargs={'pk': self.pk})
@@ -134,6 +139,9 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    def get_glyphicon(self):
+        return 'briefcase'
+
     def meetings(self):
         return Meeting.objects.filter(contact__company=self)
 
@@ -188,6 +196,9 @@ class Contact(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.firstname, self.lastname)
+
+    def get_glyphicon(self):
+        return 'user'
 
     def get_absolute_url(self):
         return reverse('contacts:contact-detail', kwargs={'slug': self.slug})
@@ -247,9 +258,14 @@ class Meeting(models.Model):
     comments = models.TextField('commentaires', blank=True)
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='added_meetings')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
-        return 'Rencontre avec {contact}'.format(contact=self.contact)
+        return str(self.contact)
+
+    def get_glyphicon(self):
+        return self.type.icon
 
     def get_absolute_url(self):
         return reverse('contacts:meeting-detail', kwargs={'pk': self.pk})

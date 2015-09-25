@@ -5,8 +5,8 @@
 {% block title %}Accueil{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'bell' %} Accueil
-    </h2>
+<h2>{% bootstrap_icon 'home' %} Accueil</h2>
+<h3>{% bootstrap_icon 'bell' %} Prochaines alertes</h3>
         {% for object in object_list %}
         <div class="panel panel-{% if object.priority == 0 %}default
         {% elif object.priority == '1' %}success
@@ -20,11 +20,27 @@
             <div class="panel-body">
             <p><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></p>
             <p><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></p>
-            <p><span{% if object.is_near %} class="label label-danger"{% endif %} title="{{ object.date }}">{{ object.date | naturaltime }}</span></p>
+            <p><span{% if object.is_near %} class="label label-danger"{% endif %} data-toggle="tooltip" data-placement="top" title="{{ object.date }}" data-original-title="{{ object.date }}" rel="tooltip">{{ object.date | naturaltime }}</span></p>
             <p>{{ object.comments }}</p>
             </div>
         </div>
         {% empty %}
         <p>Il n’y a aucune alerte.</p>
         {% endfor %}
+        <h3>{% bootstrap_icon 'fire' %} Activités</h3>
+        <ul>
+            {% for notif in notifications %}
+            <li><em data-toggle="tooltip" data-placement="top" title="{{
+                    notif.date }}" data-original-title="{{ notif.date }}">{{ notif.date | naturaltime }}</em> :
+                {% if notif.object.author == user %}Vous avez {% else %}
+                {{ notif.object.author }} a {% endif %}
+                {% if notif.type == 'creation' %}créé{% elif notif.type == 'update' %}
+                modifié{% elif notif.type == 'meeting' %}
+                rencontré{% endif %}
+                <a href="{{ notif.object.get_absolute_url }}"> {% bootstrap_icon notif.object.get_glyphicon %} {{ notif.object }}</a>.
+            </li>
+            {% empty %}
+            <li>Rien ne s’est passé récemment.</li>
+            {% endfor %}
+        </ul>
 {% endblock %}
