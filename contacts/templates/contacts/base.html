@@ -33,6 +33,9 @@
           <li class="dropdown"><a href="#" class="dropdown-toggle {% ifstartswith 'contacts:account' %} active {% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'menu-hamburger' %} Bienvenue, {{ user }} <span class="caret"></span></a>
           <ul class="dropdown-menu">
             {# <li><a href="{% url 'contacts:account-detail' %}">{% bootstrap_icon 'wrench' %} Gestion du compte</a></li> #}
+            {% if user.is_staff %}<li><a href="{% url 'admin:index' %}">
+                    {% bootstrap_icon 'cog' %} Administration</a></li>
+            {% endif %}
             <li><a href="{% url 'contacts:logout' %}">Déconnexion</a></li>
           </ul>
         </li>
