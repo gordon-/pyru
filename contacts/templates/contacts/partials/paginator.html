@@ -1,7 +1,7 @@
 {% if is_paginated %}
     <ul class="pagination">
         <li{% if not page_obj.has_previous %} class="disabled"{% endif %}>
-            <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" aria-label="Précédent">
+            <a href="{% if page_obj.has_previous %}?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" aria-label="Précédent">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -9,11 +9,11 @@
             {% if page == page_obj.number %}
             <li class="active"><a href="#">{{ page }}</a></li>
             {% else %}
-            <li><a href="?page={{ page }}">{{ page }}</a></li>
+            <li><a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page }}">{{ page }}</a></li>
             {% endif %}
         {% endfor %}
         <li{% if not page_obj.has_next %} class="disabled"{% endif %}>
-            <a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" aria-label="Précédent">
+            <a href="{% if page_obj.has_next %}?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page_obj.next_page_number }}{% else %}#{% endif %}" aria-label="Précédent">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

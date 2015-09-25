@@ -356,7 +356,7 @@ class ContactCreation(generic.CreateView):
 class ContactList(generic.SearchFormMixin, generic.ListView):
     model = Contact
     form_class = ContactSearchForm
-    paginate_by = 10
+    paginate_by = 1
 
     def get_queryset(self):
         # todo: add ordering support

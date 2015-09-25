@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
@@ -180,6 +181,11 @@ class SearchFormMixin(generic.edit.FormMixin):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        self.form.full_clean()
+        search_params = {k: v for k, v in self.form.cleaned_data.items()
+                         if v not in [None, '']}
+        if len(search_params):
+            context['querystring'] = urlencode(search_params)
         return context
 
 
