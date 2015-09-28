@@ -28,9 +28,9 @@
         <p>Il n’y a aucune alerte.</p>
         {% endfor %}
         <h3>{% bootstrap_icon 'fire' %} Activités</h3>
-        <ul>
+        <ul class="list-group">
             {% for notif in notifications %}
-            <li><span class="label label-default" data-toggle="tooltip" data-placement="top"
+            <li class="list-group-item"><span class="label label-default" data-toggle="tooltip" data-placement="top"
                     data-original-title="{{ notif.date }}">{{ notif.date | naturaltime }}</span> :
                 {% if notif.object.author == user %}Vous avez {% else %}
                 {{ notif.object.author }} a {% endif %}

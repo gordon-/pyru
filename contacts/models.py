@@ -293,6 +293,10 @@ class SavedSearch(models.Model):
     slug = models.SlugField(unique=True)
     type = models.CharField('type', max_length=32, choices=SEARCH_CHOICES)
     data = fields.HStoreField('données de recherche', default={})
+    author = models.ForeignKey(User, verbose_name='créateur',
+                               related_name='saved_searches')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
         return self.name

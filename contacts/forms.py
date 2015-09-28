@@ -118,11 +118,13 @@ class ContactSearchForm(SearchForm):
         label='type',
         queryset=ContactType.objects.all(),
         required=False,
+        to_field_name='name',
         )
     group = forms.ModelChoiceField(
         label='groupe',
         queryset=Group.objects.all(),
         required=False,
+        to_field_name='name',
         )
 
     class Meta:
@@ -175,11 +177,13 @@ class CompanySearchForm(SearchForm):
         label='type',
         queryset=ContactType.objects.all(),
         required=False,
+        to_field_name='name',
         )
     group = forms.ModelChoiceField(
         label='groupe',
         queryset=Group.objects.all(),
         required=False,
+        to_field_name='name',
         )
 
     def __init__(self, *args, **kwargs):
@@ -237,6 +241,7 @@ class MeetingSearchForm(SearchForm):
         label='type',
         queryset=MeetingType.objects.all(),
         required=False,
+        to_field_name='name'
         )
 
     def __init__(self, *args, **kwargs):
