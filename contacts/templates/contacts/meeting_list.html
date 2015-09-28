@@ -1,4 +1,5 @@
 {% extends 'contacts/base.html' %}
+{% load humanize %}
 {% load bootstrap3 %}
 
 {% block title %}Liste des rencontres
@@ -44,7 +45,7 @@
         <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}"> {% bootstrap_icon 'briefcase' %}
             {{ object.contact.company }}</a></td>{% endif %}
             {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
-            <td><a href="{{ object.get_absolute_url }}">{{ object.date }}</a></td>
+            <td><a class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}" href="{{ object.get_absolute_url }}">{{ object.date | naturaltime }}</a></td>
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</td>
             <td>{{ object.author }}</td>

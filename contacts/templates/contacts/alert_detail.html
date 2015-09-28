@@ -15,7 +15,8 @@
         <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
     {% endif %}
         <dt>Date</dt>
-        <dd>{{ object.date }} ({{ object.date | naturaltime }})</dd>
+        <dd><span class="label{% if object.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top"
+                    data-original-title="{{ object.date }}">{{ object.date | naturaltime}}</span></dd>
     </dl>
     <p>{{ object.comments }}</p>
 
