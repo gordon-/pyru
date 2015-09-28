@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.forms import ModelChoiceField
 from datetimewidget.widgets import DateWidget
 
-from .models import ContactType, Properties, MeetingType
+from .models import ContactType, Properties, MeetingType, PRIORITIES
 
 
 class SearchForm(forms.Form):
@@ -268,6 +268,11 @@ class AlertSearchForm(SearchForm):
         widget=DateWidget(usel10n=True, bootstrap_version=3),
         required=False,
     )
+    priority = forms.ChoiceField(
+        label='priorité',
+        choices=(('', '---------'), ) + PRIORITIES,
+        required=False,
+        )
     creation_date_less = forms.DateTimeField(
         label='ajouté avant le',
         widget=DateWidget(usel10n=True, bootstrap_version=3),
