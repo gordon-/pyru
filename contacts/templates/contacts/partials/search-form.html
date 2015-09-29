@@ -1,20 +1,33 @@
 {% load bootstrap3 %}
 <p class="bs-component">
     <button class="btn btn-default btn-s" type="button" data-toggle="collapse"
-    data-target="#search-panel" aria-expanded="false"
-                                   aria-controls="collapseExample">
+    data-target="#search-panel" aria-expanded="false">
         Recherche {% bootstrap_icon 'menu-down' %}
     </button>
 </p>
 <div class="collapse{% if form.is_submitted %} in{% endif %}" id="search-panel">
     <div class="panel well bs-component">
-    <form class="form-horizontal search-form">
-        <fieldset class="panel-body">
-        {% bootstrap_form form layout='horizontal' size='small'%}
-        <button class="btn btn-primary">{% bootstrap_icon 'search' %}
-            Rechercher</button>
-        <a class="btn btn-default" href="{% url return_url %}">Voir tous</a>
-        </fieldset>
-    </form>
+        <form class="form-horizontal search-form">
+            <fieldset class="panel-body">
+            {% bootstrap_form form layout='horizontal' size='small'%}
+            <button class="btn btn-primary">{% bootstrap_icon 'search' %}
+                Rechercher</button>
+            <a class="btn btn-default" href="{% url return_url %}">Voir tous</a>
+            </fieldset>
+        </form>
+        {% if perms.contacts.add_savedsearch and form.is_submitted %}
+        <form method="post" class="form-horizontal add-search-form" action="{{ saved_search_url }}">
+            <fieldset class="panel-body">
+            {% csrf_token %}
+            <a class="add_savedsearch btn btn-primary" data-toggle="collapse"
+                data-target="#add-search-panel" aria-expanded="false">
+                {% bootstrap_icon 'plus' %} Sauvegarder la recherche {% bootstrap_icon 'menu-down' %}</a>
+            <div class="collapse" id="add-search-panel" class="panel well bs-component">
+                    {% bootstrap_form add_search_form layout='horizontal' size='small' %}
+                    <button class="btn btn-primary">{% bootstrap_icon 'plus' %} Sauvegarder</button>
+            </div>
+            {% endif %}
+            </fieldset>
+        </form>
     </div>
 </div>

@@ -1,3 +1,5 @@
+import sys
+
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -292,6 +294,8 @@ class SavedSearch(models.Model):
     name = models.CharField('nom', max_length=32)
     slug = models.SlugField(unique=True)
     type = models.CharField('type', max_length=32, choices=SEARCH_CHOICES)
+    display_in_menu = models.BooleanField('affichage dans le menu',
+                                          default=True)
     data = fields.HStoreField('données de recherche', default={})
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='saved_searches')
@@ -302,14 +306,22 @@ class SavedSearch(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('contacts:{}-search-detail'.format(self.type.lower()),
+        return reverse('contacts:search-detail',
                        kwargs={'slug': self.slug})
 
     def get_search_model(self):
-        import ipdb
-        ipdb.set_trace()
+        return getattr(sys.modules[__name__], self.type)
 
-    def get_queryset(self, user):
+    @classmethod
+    def get_queryset(cls, user, qs=None):
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(group__in=user.groups.all())
+
+    def is_owned(self, user, perm=None):
+        return self.group in user.groups.all()
+
+    def get_search_queryset(self, user):
         from . import forms
         model = self.get_search_model()
         if hasattr(model, 'get_queryset'):

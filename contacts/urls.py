@@ -88,6 +88,11 @@ urlpatterns = [
         views.AlertDetail.as_view(),
         name='alert-detail'),
 
+    url(r'^search/(?P<type>\w+)/save/?$', views.SavedSearchCreation.as_view(),
+        name='search-save'),
+    url(r'^search/(?P<slug>[-\w]+)/?$', views.SavedSearchDetail.as_view(),
+        name='search-detail'),
+
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},
         name='logout'),

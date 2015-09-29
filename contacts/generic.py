@@ -12,6 +12,8 @@ from django.forms import ModelChoiceField, DateTimeField, DateField
 from datetimewidget.widgets import DateTimeWidget, DateWidget
 from autocomplete_light.forms import ModelForm
 
+from .forms import SavedSearchForm
+
 
 class ForceResponse(Exception):
     def __init__(self, response):
@@ -187,6 +189,12 @@ class SearchFormMixin(generic.edit.FormMixin):
                          if v not in [None, '']}
         if len(search_params):
             context['querystring'] = urlencode(search_params)
+        if self.form.is_submitted():
+            context['add_search_form'] = SavedSearchForm()
+            context['saved_search_url'] = resolve_url(
+                'contacts:search-save',
+                type=self.model._meta.model_name,
+            ) + '?' + context['querystring']
         return context
 
 

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 from . import generic
 from .models import (
-    Properties, Alert, Company, Contact, Meeting
+    Properties, Alert, Company, Contact, Meeting, SavedSearch
 )
 from .forms import (
     ContactSearchForm, CompanySearchForm, MeetingSearchForm, AlertSearchForm
@@ -553,3 +553,57 @@ class AlertDelete(generic.DeleteView):
                              'L’alerte {} a été supprimée.'
                              .format(self.get_object()))
         return super().delete(*args, **kwargs)
+
+
+class SavedSearchCreation(generic.CreateView):
+    model = SavedSearch
+    fields = ('name', 'display_in_menu', 'group', 'type', 'data')
+
+    def get_form_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the form.
+        """
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST.copy(),
+                'files': self.request.FILES,
+            })
+            kwargs['data'].update({'data':
+                                   {k: v for k, v in self.request.GET.items()},
+                                   'type': self.kwargs['type'].title(),
+                                   })
+        return kwargs
+
+    def form_valid(self, form):
+        search = form.save(commit=False)
+        search.author = self.request.user
+        self.object = search
+        search.save()
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Recherche {} sauvegardée avec succès.'
+                             .format(search))
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Sauvegarde', 'sauvegarder', 'plus')
+        return context
+
+
+class SavedSearchDetail(generic.DetailView):
+    model = SavedSearch
+
+    def get_template_names(self):
+        return ['contacts/{}_search_detail.html'
+                .format(self.get_object().type.lower())]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['object_list'] = \
+            self.get_object().get_search_queryset(self.request.user)
+        return context

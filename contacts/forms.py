@@ -7,7 +7,9 @@ from django.contrib.auth.models import Group
 from django.forms import ModelChoiceField
 from datetimewidget.widgets import DateWidget
 
-from .models import ContactType, Properties, MeetingType, PRIORITIES
+from .models import (
+    ContactType, Properties, MeetingType, SavedSearch, PRIORITIES
+)
 
 
 class SearchForm(forms.Form):
@@ -312,3 +314,10 @@ class AlertSearchForm(SearchForm):
             self.request = kwargs.pop('request')
 
         super().__init__(*args, **kwargs)
+
+
+class SavedSearchForm(forms.ModelForm):
+
+    class Meta:
+        model = SavedSearch
+        fields = ('name', 'group', 'display_in_menu')
