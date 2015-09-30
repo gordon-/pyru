@@ -1,0 +1,36 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Recherche de sociétés : {{ object }}{% endblock %}
+
+{% block content %}
+<h2>{% bootstrap_icon 'briefcase' %} Recherche de sociétés : {{ object }}</h2>
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    société{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
+    <table class="table">
+        <tr><th>Nom</th>
+            <th>Groupe</th>
+            <th>Type</th>
+            <th>Contacts</th>
+            <th>Rencontres</th>
+            <th>Actions</th>
+        </tr>
+        {% for object in object_list %}
+        <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object }}</a></td>
+            <td>{{ object.group }}</td>
+            <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</td>
+            <td><a href="{% url 'contacts:contact-list' company=object.slug %}">{% bootstrap_icon 'user' %} {{ object.contacts.count }}</a></td>
+            <td><a href="{% url 'contacts:meeting-list' company=object.slug %}">{% bootstrap_icon 'comment' %} {{ object.meetings.count }}</a></td>
+            <td>{% if perms.contacts.change_company %}<a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_company %}<a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Il n’y a pour l’instant aucune société.</td></tr>
+        {% endfor %}
+    </table>
+    {% include 'contacts/partials/paginator.html' %}
+{% endblock %}
+
