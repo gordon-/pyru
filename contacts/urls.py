@@ -5,6 +5,9 @@ from django.contrib.auth.views import (
 )
 
 from . import views
+from .models import SEARCH_CHOICES
+
+saved_searches_types = '|'.join([c[0].lower() for c in SEARCH_CHOICES])
 
 
 urlpatterns = [
@@ -92,6 +95,18 @@ urlpatterns = [
         name='search-save'),
     url(r'^search/(?P<slug>[-\w]+)/?$', views.SavedSearchDetail.as_view(),
         name='search-detail'),
+    url(r'^searches/(?P<type>(' + saved_searches_types + '))/?$',
+        views.SavedSearchList.as_view(),
+        name='search-list'),
+    url(r'^searches/?$',
+        views.SavedSearchList.as_view(),
+        name='search-list'),
+    url(r'^search/(?P<slug>[-\w]+)/update/?$',
+        views.SavedSearchUpdate.as_view(),
+        name='search-update'),
+    url(r'^search/(?P<slug>[-\w]+)/delete/?$',
+        views.SavedSearchDelete.as_view(),
+        name='search-delete'),
 
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},

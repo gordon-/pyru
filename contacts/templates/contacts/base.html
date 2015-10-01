@@ -21,67 +21,47 @@
         </li>
 
         {% if perms.contacts.view_company %}
-        <li class="dropdown{% ifstartswith 'contacts:company' %} active{% endifstartswith %}{% if object.type == 'Company' %} active{% endif %}">
+        <li class="dropdown{% ifstartswith 'contacts:company' %} active{% endifstartswith %}{% if search_type == 'company' %} active{% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'briefcase' %} Sociétés <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:company-list' %}">Liste</a></li>
                 {% if perms.contacts.add_company %}<li><a href="{% url 'contacts:company-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
-                {% if companies_displayed_searches %}
-                    <li class="divider"></li>
-                    {% for search in companies_displayed_searches %}
-                        <li><a href="{% url 'contacts:search-detail' slug=search.slug %}" title="Consulter cette recherche">{% bootstrap_icon 'search' %} {{ search }}</a></li>
-                    {% endfor %}
-                {% endif %}
+                {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=companies_displayed_searches type='company' %}
             </ul>
         </li>
         {% endif %}
 
         {% if perms.contacts.view_contact %}
-        <li class="dropdown{% ifstartswith 'contacts:contact' %} active{% endifstartswith %}{% if object.type == 'Contact' %} active{% endif %}">
+        <li class="dropdown{% ifstartswith 'contacts:contact' %} active{% endifstartswith %}{% if search_type == 'contact' %} active{% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'user' %} Contacts <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:contact-list' %}">Liste</a></li>
                 {% if perms.contacts.add_contact %}<li><a href="{% url 'contacts:contact-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
-                {% if contacts_displayed_searches %}
-                    <li class="divider"></li>
-                    {% for search in contacts_displayed_searches %}
-                        <li><a href="{% url 'contacts:search-detail' slug=search.slug %}" title="Consulter cette recherche">{% bootstrap_icon 'search' %} {{ search }}</a></li>
-                    {% endfor %}
-                {% endif %}
+                {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=contacts_displayed_searches type='contact' %}
             </ul>
         </li>
         {% endif %}
 
         {% if perms.contacts.view_meeting %}
-        <li class="dropdown{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}{% if object.type == 'Meeting' %} active{% endif %}">
+        <li class="dropdown{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}{% if search_type == 'meeting' %} active{% endif %}">
             <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}"
                 data-toggle="dropdown" role="button" aria-haspopup="true"
             aria-expanded="false">{% bootstrap_icon 'comment' %} Échanges <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:meeting-list' %}">Liste</a></li>
                 {% if perms.contacts.add_meeting %}<li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
-                {% if meetings_displayed_searches %}
-                    <li class="divider"></li>
-                    {% for search in meetings_displayed_searches %}
-                        <li><a href="{% url 'contacts:search-detail' slug=search.slug %}" title="Consulter cette recherche">{% bootstrap_icon 'search' %} {{ search }}</a></li>
-                    {% endfor %}
-                {% endif %}
+                {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=meetings_displayed_searches type='meeting' %}
             </ul>
         </li>
         {% endif %}
 
         {% if perms.contacts.view_alert %}
-        <li class="dropdown{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}{% if object.type == 'Alert' %} active{% endif %}">
+        <li class="dropdown{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}{% if search_type == 'alert' %} active{% endif %}">
             <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'bell' %} Alertes <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:alert-list' %}">Liste</a></li>
                 {% if perms.contacts.add_alert %}<li><a href="{% url 'contacts:alert-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
-                {% if alerts_displayed_searches %}
-                    <li class="divider"></li>
-                    {% for search in alerts_displayed_searches %}
-                        <li><a href="{% url 'contacts:search-detail' slug=search.slug %}" title="Consulter cette recherche">{% bootstrap_icon 'search' %} {{ search }}</a></li>
-                    {% endfor %}
-                {% endif %}
+                {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=alerts_displayed_searches type='alert' %}
             </ul>
         </li>
         {% endif %}
@@ -94,7 +74,7 @@
             {% if user.is_staff %}<li><a href="{% url 'admin:index' %}">
                     {% bootstrap_icon 'cog' %} Administration</a></li>
             {% endif %}
-            <li><a href="{% url 'contacts:logout' %}">Déconnexion</a></li>
+            <li><a href="{% url 'contacts:logout' %}">{% bootstrap_icon 'off' %} Déconnexion</a></li>
           </ul>
         </li>
       </ul>

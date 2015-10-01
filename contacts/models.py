@@ -159,7 +159,7 @@ class Company(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify('{} {}'.format(self.group.pk, self.name))
         return super().save(*args, **kwargs)
 
     @classmethod
@@ -207,7 +207,9 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('{} {}'.format(self.firstname, self.lastname))
+            self.slug = slugify('{} {} {}'.format(self.group.pk,
+                                                  self.firstname,
+                                                  self.lastname))
         return super().save(*args, **kwargs)
 
     @classmethod
@@ -299,6 +301,7 @@ class SavedSearch(models.Model):
     data = fields.HStoreField('données de recherche', default={})
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='saved_searches')
+    results_count = models.PositiveIntegerField('nombre de résultats')
     creation_date = models.DateTimeField('date de création', auto_now_add=True)
     update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
@@ -331,11 +334,13 @@ class SavedSearch(models.Model):
         form_class = getattr(forms, '{}SearchForm'.format(self.type))
         form = form_class(data=self.data)
         qs = form.search(qs)
+        self.results_count = qs.count()
+        self.save()
         return qs
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify('{} {}'.format(self.group.pk, self.name))
         return super().save(*args, **kwargs)
 
     class Meta:

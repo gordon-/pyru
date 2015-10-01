@@ -1,0 +1,38 @@
+{% extends 'contacts/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Liste des recherches{% if search_type %} de {{ search_type_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h2>{% bootstrap_icon 'search' %} Liste des recherches{% if search_type %} de {{ search_type_name }}{% endif %}</h2>
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    recherche{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
+    <table class="table">
+        <tr><th>Nom</th>
+            <th>Groupe</th>
+            <th>Type</th>
+            <th>Affichage dans le menu</th>
+            <th>Résultats</th>
+            <th>Actions</th>
+        </tr>
+        {% for object in object_list %}
+        <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'search' %} {{ object }}</a></td>
+            <td>{{ object.group }}</td>
+            <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</td>
+            <td>{% if object.display_in_menu %}<span class="text-success" title="Affiché dans le menu">{% bootstrap_icon 'ok' %}</span>
+            {% else %}<span class="text-danger" title="Non affiché dans le menu">{% bootstrap_icon 'remove' %}</span>
+            {% endif %}</td>
+            <td>{{ object.results_count }}</td>
+            <td>{% if perms.contacts.change_savedsearch %}<a href="{% url 'contacts:search-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_savedsearch %}<a href="{% url 'contacts:search-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Il n’y a pour l’instant aucune recherche enregistrée.</td></tr>
+        {% endfor %}
+    </table>
+    {% include 'contacts/partials/paginator.html' %}
+{% endblock %}
+

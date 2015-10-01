@@ -10,7 +10,7 @@ from django.forms.widgets import HiddenInput
 
 from . import generic
 from .models import (
-    Properties, Alert, Company, Contact, Meeting, SavedSearch
+    Properties, Alert, Company, Contact, Meeting, SavedSearch, SEARCH_CHOICES
 )
 from .forms import (
     ContactSearchForm, CompanySearchForm, MeetingSearchForm, AlertSearchForm
@@ -613,5 +613,55 @@ class SavedSearchDetail(generic.DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['object_list'] = \
-            self.get_object().get_search_queryset(self.request.user)
+            context['object'].get_search_queryset(self.request.user)
+        context['search_type'] = context['object'].type.lower()
         return context
+
+
+class SavedSearchList(generic.ListView):
+    model = SavedSearch
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if 'type' in self.kwargs:
+            types = {c[0].lower(): c for c in SEARCH_CHOICES}
+            qs = qs.filter(type=types[self.kwargs['type']][0])
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if 'type' in self.kwargs:
+            types = {c[0].lower(): c for c in SEARCH_CHOICES}
+            context['search_type'] = types[self.kwargs['type']][0].lower()
+            context['search_type_name'] = types[self.kwargs['type']][1]
+        return context
+
+
+class SavedSearchUpdate(generic.UpdateView):
+    model = SavedSearch
+    fields = ('name', 'display_in_menu', 'group')
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Recherche {} modifiée avec succès.'
+                             .format(self.object))
+        return super().form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['verb'] = ('Modification', 'Modifier', 'pencil')
+        context['object'] = self.object
+        context['search_type'] = context['object'].type.lower()
+        return context
+
+
+class SavedSearchDelete(generic.DeleteView):
+    model = SavedSearch
+    success_url = reverse_lazy('contacts:search-list')
+
+    def delete(self, *args, **kwargs):
+        messages.add_message(self.request, messages.SUCCESS,
+                             'La recherche {} a été supprimée.'
+                             .format(self.get_object()))
+        return super().delete(*args, **kwargs)

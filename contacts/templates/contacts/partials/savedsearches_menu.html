@@ -1,0 +1,6 @@
+{% load bootstrap3 %}
+<li class="divider"></li>
+{% for search in displayed_searches %}
+    <li><a href="{% url 'contacts:search-detail' slug=search.slug %}" title="Consulter cette recherche">{% bootstrap_icon 'search' %} {{ search }} <span class="badge">{{ search.results_count }}</span></a></li>
+{% endfor %}
+<li><a href="{% url 'contacts:search-list' type=type %}" title="Voir toutes les recherches"><em>{% bootstrap_icon 'search' %} Liste des recherches</em></a></li>
