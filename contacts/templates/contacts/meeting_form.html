@@ -1,14 +1,14 @@
 {% extends 'contacts/base.html' %}
 {% load bootstrap3 %}
 
-{% block title %}{{ verb.0 }} d’une rencontre
-{% if company %} dans la société {{ company }}
-{% elif contact %} dans le contact {{ contact }}{% endif %}{% endblock %}
+{% block title %}{{ verb.0 }} d’un échange
+{% if company %} avec la société {{ company }}
+{% elif contact %} avec le contact {{ contact }}{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'comment' %} {{ verb.0 }} d’une rencontre
-    {% if company %} dans la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
-    {% elif contact %} dans le contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>{% endif %}</h2>
+<h2>{% bootstrap_icon 'comment' %} {{ verb.0 }} d’un échange
+    {% if company %} avec la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
+    {% elif contact %} avec le contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>{% endif %}</h2>
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form %}

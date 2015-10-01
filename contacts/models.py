@@ -20,7 +20,7 @@ PRIORITIES = (('0', 'basse'),
 
 SEARCH_CHOICES = (('Contact', 'contact'),
                   ('Company', 'société'),
-                  ('Meeting', 'rencontre'),
+                  ('Meeting', 'échange'),
                   ('Alert', 'alerte'),
                   )
 
@@ -246,8 +246,8 @@ class MeetingType(models.Model):
         return qs.filter(group__in=user.groups.all())
 
     class Meta:
-        verbose_name = 'type de rencontre'
-        verbose_name_plural = 'types de rencontre'
+        verbose_name = 'type d’échange'
+        verbose_name_plural = 'types d’échange'
         ordering = ['name']
         permissions = (('view_meetingtype', 'Can view a meeting type'), )
 
@@ -282,7 +282,7 @@ class Meeting(models.Model):
         return self.contact.group in user.groups.all()
 
     class Meta:
-        verbose_name = 'rencontre'
+        verbose_name = 'échange'
         get_latest_by = 'date'
         ordering = ['-date']
         permissions = (('view_meeting', 'Can view a meeting'), )

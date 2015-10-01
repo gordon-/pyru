@@ -25,11 +25,11 @@
         <dd>{{ object.update_date }}</dd>
     </dl>
     {% if perms.contacts.view_meeting %}
-    <h3>{% bootstrap_icon 'comment' %} Rencontres
+    <h3>{% bootstrap_icon 'comment' %} Échanges
     {% if perms.contacts.add_meeting %}
     <a href="{% url 'contacts:meeting-create' contact=object.slug %}"
-          class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} ajouter une
-          rencontre</a>
+          class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} ajouter un
+          échange</a>
     {% endif %}
     </h3>
     <table class="table">
@@ -50,7 +50,7 @@
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="5">Ce contact ne possède pour l’instant aucune rencontre.</td></tr>
+        <tr><td colspan="5">Ce contact ne possède pour l’instant aucun échange.</td></tr>
         {% endfor %}
     </table>
     {% endif %}

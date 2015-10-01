@@ -217,14 +217,10 @@ class MeetingCreation(generic.CreateView):
         if hasattr(self, 'contact'):
             meeting.contact = self.contact
         self.object = meeting
-        try:
-            meeting.save()
-            messages.add_message(self.request, messages.SUCCESS,
-                                 'Rencontre {} créée avec succès.'
-                                 .format(meeting))
-        except IntegrityError:
-            form.add_error('firstname', 'Une rencontre de ce nom existe déjà.')
-            return super().form_invalid(form)
+        meeting.save()
+        messages.add_message(self.request, messages.SUCCESS,
+                             'Échange avec {} créé avec succès.'
+                             .format(meeting))
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
@@ -280,7 +276,7 @@ class MeetingUpdate(generic.UpdateView):
 
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS,
-                             'Rencontre {} modifiée avec succès.'
+                             'Échange avec {} modifié avec succès.'
                              .format(self.object))
         return super().form_valid(form)
 
@@ -297,7 +293,7 @@ class MeetingDelete(generic.DeleteView):
 
     def delete(self, *args, **kwargs):
         messages.add_message(self.request, messages.SUCCESS,
-                             'La rencontre {} a été supprimée.'
+                             'L’échange avec {} a été supprimé.'
                              .format(self.get_object()))
         return super().delete(*args, **kwargs)
 
@@ -477,7 +473,7 @@ class AlertCreation(generic.CreateView):
         self.object = alert
         alert.save()
         messages.add_message(self.request, messages.SUCCESS,
-                             'Rencontre {} créée avec succès.'
+                             'Échange avec {} créé avec succès.'
                              .format(alert))
         return super(ModelFormMixin, self).form_valid(form)
 

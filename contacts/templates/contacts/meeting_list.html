@@ -2,17 +2,17 @@
 {% load humanize %}
 {% load bootstrap3 %}
 
-{% block title %}Liste des rencontres
-{% if company %} de la société {{ company }}
-{% elif contact %} du contact {{ contact }}{% endif %}
+{% block title %}Liste des échanges
+{% if company %} avec la société {{ company }}
+{% elif contact %} avec contact {{ contact }}{% endif %}
 {% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'comment' %} Liste des rencontres
+<h2>{% bootstrap_icon 'comment' %} Liste des échanges
     {% if company %}
-    de la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
+    avec la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
     {% elif contact %}
-    du contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>
+    avec contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>
     {% endif %}
     {% if perms.contacts.add_meeting %}
         {% if company %}
@@ -30,7 +30,7 @@
     {% include 'contacts/partials/search-form.html' with return_url='contacts:meeting-list' %}
     {% with objects_count=object_list|length %}
     <p>Affichage de {{ objects_count }}
-    rencontre{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    échange{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
     <table class="table">
         <tr>{% if not company %}<th>Société</th>{% endif %}
@@ -54,7 +54,7 @@
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="7">Il n’y a aucune rencontre.</td></tr>
+        <tr><td colspan="7">Il n’y a aucun échange.</td></tr>
         {% endfor %}
     </table>
     {% include 'contacts/partials/paginator.html' %}

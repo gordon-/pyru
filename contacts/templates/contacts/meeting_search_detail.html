@@ -2,13 +2,13 @@
 {% load humanize %}
 {% load bootstrap3 %}
 
-{% block title %}Recherche de rencontres : {{ object }}{% endblock %}
+{% block title %}Recherche d’échanges : {{ object }}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'comment' %} Recherche de rencontres : {{ object }}</h2>
+<h2>{% bootstrap_icon 'comment' %} Recherche d’échanges : {{ object }}</h2>
     {% with objects_count=object_list|length %}
     <p>Affichage de {{ objects_count }}
-    rencontre{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    échange{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
     <table class="table">
         <tr>{% if not company %}<th>Société</th>{% endif %}
@@ -32,7 +32,7 @@
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="7">Il n’y a aucune rencontre.</td></tr>
+        <tr><td colspan="7">Il n’y a aucun échange.</td></tr>
         {% endfor %}
     </table>
     {% include 'contacts/partials/paginator.html' %}

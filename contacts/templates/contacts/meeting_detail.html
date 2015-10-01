@@ -2,11 +2,11 @@
 {% load humanize %}
 {% load bootstrap3 %}
 
-{% block title %}Détail de la rencontre {{ object }}{% endblock %}
+{% block title %}Détail de l’échange avec {{ object }}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'comment' %} Détail de la rencontre avec <a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></h2>
-    <div>Rencontre du {{ object.date }}</div>
+<h2>{% bootstrap_icon 'comment' %} Détail de l’échange avec <a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object }}</a></h2>
+    <div>Échange du {{ object.date }}</div>
     <dl>
         <dt>Contact</dt>
         <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
@@ -25,11 +25,11 @@
     <p>
     {% if perms.contacts.change_meeting %}
     <a href="{% url 'contacts:meeting-update' pk=object.pk %}"
-        class="btn btn-primary btn-xs">Modifier la rencontre</a>
+        class="btn btn-primary btn-xs">Modifier l’échange</a>
     {% endif %}
     {% if perms.contacts.delete_meeting %}
     <a href="{% url 'contacts:meeting-delete' pk=object.pk %}"
-        class="btn btn-danger btn-xs">Supprimer la rencontre</a>
+        class="btn btn-danger btn-xs">Supprimer l’échange</a>
     {% endif %}
     </p>
 {% endblock %}

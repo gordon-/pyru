@@ -54,7 +54,9 @@
 
         {% if perms.contacts.view_meeting %}
         <li class="dropdown{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}{% if object.type == 'Meeting' %} active{% endif %}">
-            <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'comment' %} Rencontres <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}"
+                data-toggle="dropdown" role="button" aria-haspopup="true"
+            aria-expanded="false">{% bootstrap_icon 'comment' %} Échanges <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:meeting-list' %}">Liste</a></li>
                 {% if perms.contacts.add_meeting %}<li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
