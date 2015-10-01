@@ -25,7 +25,7 @@
             <td>{% if object.display_in_menu %}<span class="text-success" title="Affiché dans le menu">{% bootstrap_icon 'ok' %}</span>
             {% else %}<span class="text-danger" title="Non affiché dans le menu">{% bootstrap_icon 'remove' %}</span>
             {% endif %}</td>
-            <td>{{ object.results_count }}</td>
+            <td><span class="badge">{{ object.results_count }}</span></td>
             <td>{% if perms.contacts.change_savedsearch %}<a href="{% url 'contacts:search-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_savedsearch %}<a href="{% url 'contacts:search-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
