@@ -6,6 +6,7 @@ from django.views.generic.edit import ModelFormMixin
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.forms.widgets import HiddenInput
 
 from . import generic
 from .models import (
@@ -557,7 +558,7 @@ class AlertDelete(generic.DeleteView):
 
 class SavedSearchCreation(generic.CreateView):
     model = SavedSearch
-    fields = ('name', 'display_in_menu', 'group', 'type', 'data')
+    fields = ('name', 'group', 'display_in_menu', 'type', 'data')
 
     def get_form_kwargs(self):
         """
@@ -579,14 +580,25 @@ class SavedSearchCreation(generic.CreateView):
                                    })
         return kwargs
 
+    def get_form(self):
+        form = super().get_form()
+        form.fields['type'].widget = HiddenInput()
+        form.fields['data'].widget = HiddenInput()
+        return form
+
     def form_valid(self, form):
         search = form.save(commit=False)
         search.author = self.request.user
         self.object = search
-        search.save()
-        messages.add_message(self.request, messages.SUCCESS,
-                             'Recherche {} sauvegardée avec succès.'
-                             .format(search))
+        try:
+            search.save()
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Recherche {} sauvegardée avec succès.'
+                                 .format(search))
+            return super(ModelFormMixin, self).form_valid(form)
+        except IntegrityError:
+            form.add_error('name', 'Une recherche de ce nom existe déjà.')
+            return super().form_invalid(form)
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_context_data(self, *args, **kwargs):

@@ -1,0 +1,40 @@
+{% extends 'contacts/base.html' %}
+{% load humanize %}
+{% load bootstrap3 %}
+
+{% block title %}Recherche de rencontres : {{ object }}{% endblock %}
+
+{% block content %}
+<h2>{% bootstrap_icon 'comment' %} Recherche de rencontres : {{ object }}</h2>
+    {% with objects_count=object_list|length %}
+    <p>Affichage de {{ objects_count }}
+    rencontre{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
+    {% endwith %}
+    <table class="table">
+        <tr>{% if not company %}<th>Société</th>{% endif %}
+            {% if not contact %}<th>Contact</th>{% endif %}
+            <th>Date</th>
+            <th>Type</th>
+            <th>Auteur</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
+        {% for object in object_list %}
+        <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}"> {% bootstrap_icon 'briefcase' %}
+            {{ object.contact.company }}</a></td>{% endif %}
+            {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
+            <td><a class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}" href="{{ object.get_absolute_url }}">{{ object.date | naturaltime }}</a></td>
+            <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                {% endif %}{{ object.type }}</td>
+            <td>{{ object.author }}</td>
+            <td>{{ object.comments }}</td>
+            <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Il n’y a aucune rencontre.</td></tr>
+        {% endfor %}
+    </table>
+    {% include 'contacts/partials/paginator.html' %}
+{% endblock %}
+

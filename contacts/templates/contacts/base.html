@@ -21,7 +21,7 @@
         </li>
 
         {% if perms.contacts.view_company %}
-        <li class="dropdown{% ifstartswith 'contacts:company' %} active{% endifstartswith %}">
+        <li class="dropdown{% ifstartswith 'contacts:company' %} active{% endifstartswith %}{% if object.type == 'Company' %} active{% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'briefcase' %} Sociétés <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:company-list' %}">Liste</a></li>
@@ -37,7 +37,7 @@
         {% endif %}
 
         {% if perms.contacts.view_contact %}
-        <li class="dropdown{% ifstartswith 'contacts:contact' %} active{% endifstartswith %}">
+        <li class="dropdown{% ifstartswith 'contacts:contact' %} active{% endifstartswith %}{% if object.type == 'Contact' %} active{% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'user' %} Contacts <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:contact-list' %}">Liste</a></li>
@@ -53,7 +53,7 @@
         {% endif %}
 
         {% if perms.contacts.view_meeting %}
-        <li class="dropdown{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}">
+        <li class="dropdown{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}{% if object.type == 'Meeting' %} active{% endif %}">
             <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:meeting' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'comment' %} Rencontres <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:meeting-list' %}">Liste</a></li>
@@ -69,7 +69,7 @@
         {% endif %}
 
         {% if perms.contacts.view_alert %}
-        <li class="dropdown{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}">
+        <li class="dropdown{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}{% if object.type == 'Alert' %} active{% endif %}">
             <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'bell' %} Alertes <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:alert-list' %}">Liste</a></li>
