@@ -22,8 +22,8 @@
             <td>{{ object.group }}</td>
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</td>
-            <td>{% if object.display_in_menu %}<span class="text-success" title="Affiché dans le menu">{% bootstrap_icon 'ok' %}</span>
-            {% else %}<span class="text-danger" title="Non affiché dans le menu">{% bootstrap_icon 'remove' %}</span>
+            <td>{% if object.display_in_menu %}<span class="text-success" data-toggle="tooltip" data-placement="top" data-original-title="Affiché dans le menu">{% bootstrap_icon 'ok' %}</span>
+            {% else %}<span class="text-danger" data-toggle="tooltip" data-placement="top" data-original-title="Non affiché dans le menu">{% bootstrap_icon 'remove' %}</span>
             {% endif %}</td>
             <td><span class="badge">{{ object.results_count }}</span></td>
             <td>{% if perms.contacts.change_savedsearch %}<a href="{% url 'contacts:search-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
