@@ -326,7 +326,6 @@ class Contact(models.Model):
                 logger.error('Erreur inattendue ({}) : {}'
                              .format(e.__class__.__name__, e))
                 errors += 1
-                raise e
         return (imported_objects, errors)
 
     @classmethod
