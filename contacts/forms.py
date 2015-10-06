@@ -364,3 +364,12 @@ class ContactImportForm(ImportForm):
                                      initial='lastname')
     comments_field = forms.CharField(label='nom du champ « commentaires »',
                                      initial='comments')
+
+
+class CompanyImportForm(ImportForm):
+    type_field = forms.CharField(label='nom du champ « type »',
+                                 initial='type')
+    name_field = forms.CharField(label='nom du champ « nom »',
+                                 initial='name')
+    comments_field = forms.CharField(label='nom du champ « commentaires »',
+                                     initial='comments')

@@ -241,6 +241,59 @@ class Company(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
+    def import_data(cls, data, mapping, user, group):
+        logger = logging.getLogger('import.company')
+        logger.debug('Début de l’import de sociétés')
+        type_cache = ImportCache(ContactType, user, group, logger)
+        prop_cache = ImportCache(Properties, user, group, logger)
+        imported_objects = []
+        updated_objects = []
+        errors = 0
+        for row in data:
+            try:
+                with transaction.atomic():
+                    row = apply_mapping(row, mapping)
+                    args = {}
+                    args['type'] = type_cache.get(row.pop('type'))
+                    args['name'] = row.pop('name')
+                    args['comments'] = row.pop('comments')
+                    args['properties'] = {}
+                    args['author'] = user
+                    args['group'] = group
+                    for prop, prop_value in row.items():
+                        if prop is not None:
+                            prop_cache.get({'type': 'company', 'name': prop})
+                            args['properties'][prop] = prop_value
+                    # do we have to create an object, or is there an existing
+                    # one to update?
+                    try:
+                        contact = cls.get_queryset(user).get(name=args['name'])
+                        contact.properties.update(args['properties'])
+                        contact.type = args['type']
+                        contact.comments = args['comments']
+                        contact.save()
+                        updated_objects.append(contact)
+                        logger.info('Modification de société : {}'
+                                    .format(contact))
+                    except cls.DoesNotExist:
+                        contact = cls.objects.create(**args)
+                        logger.info('Création de société : {}'.format(contact))
+                    imported_objects.append(contact)
+            except ImportError as e:
+                logger.error('Erreur lors de l’import de la société : {}'
+                             .format(e))
+                errors += 1
+            except Exception as e:
+                logger.error('Erreur inattendue ({}) : {}'
+                             .format(e.__class__.__name__, e))
+                errors += 1
+        logger.debug('Fin de l’import de sociétés ({} créées, {} modifiées, '
+                     '{} erreurs)'
+                     .format(len(imported_objects), len(updated_objects),
+                             errors))
+        return (imported_objects, updated_objects, errors)
+
+    @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
@@ -322,10 +375,10 @@ class Contact(models.Model):
                     try:
                         contact = cls.get_queryset(user).get(
                             company=args['company'],
-                            type=args['type'],
                             firstname=args['firstname'],
                             lastname=args['lastname'])
                         contact.properties.update(args['properties'])
+                        contact.type = args['type']
                         contact.comments = args['comments']
                         contact.save()
                         updated_objects.append(contact)

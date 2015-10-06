@@ -727,10 +727,11 @@ class Import(FormView):
             for row in reader:
                 reencoded_row = {}
                 for key, value in row.items():
-                    if key is not None:
+                    if key is not None and value is not None:
                         det = chardet.detect(value.encode())
                         if det['encoding'] != detection['encoding']\
-                                and det['confidence'] > .5:
+                                and det['confidence'] > .5\
+                                and det['encoding'] != 'utf-8':
                             reencoded_row[key] = value.encode(
                                 detection['encoding']).decode(det['encoding'])
                         else:
