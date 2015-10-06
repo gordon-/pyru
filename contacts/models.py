@@ -293,10 +293,12 @@ class Contact(models.Model):
     @classmethod
     def import_data(cls, data, mapping, user, group):
         logger = logging.getLogger('import.contact')
+        logger.debug('Début de l’import de contacts')
         company_cache = ImportCache(Company, user, group, logger)
         type_cache = ImportCache(ContactType, user, group, logger)
         prop_cache = ImportCache(Properties, user, group, logger)
         imported_objects = []
+        updated_objects = []
         errors = 0
         for row in data:
             try:
@@ -315,8 +317,23 @@ class Contact(models.Model):
                         if prop is not None:
                             prop_cache.get({'type': 'contact', 'name': prop})
                             args['properties'][prop] = prop_value
-                    contact = cls.objects.create(**args)
-                    logger.info('Création de contact : {}'.format(contact))
+                    # do we have to create an object, or is there an existing
+                    # one to update?
+                    try:
+                        contact = cls.get_queryset(user).get(
+                            company=args['company'],
+                            type=args['type'],
+                            firstname=args['firstname'],
+                            lastname=args['lastname'])
+                        contact.properties.update(args['properties'])
+                        contact.comments = args['comments']
+                        contact.save()
+                        updated_objects.append(contact)
+                        logger.info('Modification de contact : {}'
+                                    .format(contact))
+                    except cls.DoesNotExist:
+                        contact = cls.objects.create(**args)
+                        logger.info('Création de contact : {}'.format(contact))
                     imported_objects.append(contact)
             except ImportError as e:
                 logger.error('Erreur lors de l’import du contact : {}'
@@ -326,7 +343,11 @@ class Contact(models.Model):
                 logger.error('Erreur inattendue ({}) : {}'
                              .format(e.__class__.__name__, e))
                 errors += 1
-        return (imported_objects, errors)
+        logger.debug('Fin de l’import de contacts ({} créés, {} modifiés, '
+                     '{} erreurs)'
+                     .format(len(imported_objects), len(updated_objects),
+                             errors))
+        return (imported_objects, updated_objects, errors)
 
     @classmethod
     def get_queryset(cls, user, qs=None):

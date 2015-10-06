@@ -704,7 +704,7 @@ class Import(FormView):
                 return self.form_invalid(form)
 
             # parsing the CSV
-            if 'file' in form.changed_data:
+            if 'file' in form.changed_data:  # upload
                 content = form.cleaned_data['file'].read()
                 detection = chardet.detect(content)
                 if detection['confidence'] < .5:
@@ -712,7 +712,9 @@ class Import(FormView):
                     return self.form_invalid(form)
                 content = content.decode(detection['encoding'])
             else:  # we parse the inline content
-                content = form.cleaned_data['content']
+                content = form.cleaned_data['content'].encode('latin-1')
+                detection = chardet.detect(content)
+                content = content.decode(detection['encoding'])
             dialect = csv.Sniffer().sniff(content)
             reader = csv.DictReader(StringIO(content), dialect=dialect)
 
@@ -729,16 +731,18 @@ class Import(FormView):
                         det = chardet.detect(value.encode())
                         if det['encoding'] != detection['encoding']\
                                 and det['confidence'] > .5:
-                            reencoded_row[key] = value.encode(detection['encoding'])\
-                                    .decode(det['encoding'])
+                            reencoded_row[key] = value.encode(
+                                detection['encoding']).decode(det['encoding'])
                         else:
                             reencoded_row[key] = value
                 data.append(reencoded_row)
-            inserted_objects, errors = self.get_model_class()\
+            inserted, updated, errors = self.get_model_class()\
                 .import_data(data, mapping,
                              self.request.user, form.cleaned_data['group'])
 
-            context = {'object_list': inserted_objects, 'errors': errors}
+            context = {'object_list': sorted(inserted + updated,
+                                             key=lambda i: i.update_date),
+                       'errors': errors}
 
             return render(self.request,
                           'contacts/{}_import.html'
