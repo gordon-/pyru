@@ -1,6 +1,7 @@
 import sys
+import logging
 
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
@@ -25,6 +26,74 @@ SEARCH_CHOICES = (('Contact', 'contact'),
                   )
 
 
+def apply_mapping(row, mapping):
+    mapped_row = {}
+    for k, v in mapping.items():
+        if v not in row:
+            raise ImportError('valeur {} absente'.format(v))
+
+    rev_mapping = {v: k for k, v in mapping.items()}
+    for k, v in row.items():
+        if k in rev_mapping:
+            mapped_row[rev_mapping[k]] = v
+        else:
+            mapped_row[k] = v
+    return mapped_row
+
+
+class ImportError(Exception):
+    pass
+
+
+class ImportCache:
+
+    def __init__(self, model, user, group, logger, key='name'):
+        self.model = model
+        self.user = user
+        self.group = group
+        self.logger = logger
+        self.key = key
+        self.items = {}
+
+    def get(self, item):
+        if item is None or item == '':
+            return None
+        if isinstance(item, dict):
+            item_hash = tuple(item.items())
+        else:
+            item_hash = item
+        if item_hash not in self.items.keys():
+            # TODO: check permissions!
+            try:
+                if isinstance(item, dict):
+                    args = item
+                else:
+                    args = {self.key: item}
+                obj = self.model.get_queryset(self.user)\
+                    .get(**args)
+                self.logger.debug('Récupération de {} : {}'
+                                  .format(self.model._meta.verbose_name,
+                                          obj))
+            except self.model.DoesNotExist:
+                if isinstance(item, dict):
+                    args = item.copy()
+                    args.update({'author': self.user,
+                                 'group': self.group})
+                else:
+                    args = {self.key: item,
+                            'author': self.user,
+                            'group': self.group}
+                if args is None:
+                    import ipdb
+                    ipdb.set_trace()
+                obj = self.model.objects.create(**args)
+                self.logger.info('Création de {} : {}'
+                                 .format(self.model._meta.verbose_name, obj))
+            # obj = self.model.objects.get_or_create(**args)
+            self.items[item_hash] = obj
+        return self.items[item_hash]
+
+
 class Properties(models.Model):
     name = models.CharField('nom', max_length=100)
     order = models.PositiveIntegerField('ordre', default=1)
@@ -32,6 +101,10 @@ class Properties(models.Model):
     type = models.CharField('type', max_length=16, choices=PROP_CHOICES)
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='properties')
+    author = models.ForeignKey(User, verbose_name='créateur',
+                               related_name='added_properties')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
         return self.name
@@ -98,11 +171,15 @@ class Alert(models.Model):
 
 
 class ContactType(models.Model):
-    name = models.CharField('type', max_length=100, unique=True)
+    name = models.CharField('type', max_length=100)
     active = models.BooleanField('actif', default=True, db_index=True)
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='contacttypes')
     icon = models.CharField('glyphicone', max_length=16, blank=True, null=True)
+    author = models.ForeignKey(User, verbose_name='créateur',
+                               related_name='added_contact_types')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
         return self.name
@@ -121,6 +198,7 @@ class ContactType(models.Model):
         verbose_name_plural = 'types de contact'
         ordering = ['name']
         permissions = (('view_contacttype', 'Can view a contact type'), )
+        unique_together = (('name', 'group'), )
 
 
 class Company(models.Model):
@@ -213,6 +291,45 @@ class Contact(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
+    def import_data(cls, data, mapping, user, group):
+        logger = logging.getLogger('import.contact')
+        company_cache = ImportCache(Company, user, group, logger)
+        type_cache = ImportCache(ContactType, user, group, logger)
+        prop_cache = ImportCache(Properties, user, group, logger)
+        imported_objects = []
+        errors = 0
+        for row in data:
+            try:
+                with transaction.atomic():
+                    row = apply_mapping(row, mapping)
+                    args = {}
+                    args['company'] = company_cache.get(row.pop('company'))
+                    args['type'] = type_cache.get(row.pop('type'))
+                    args['firstname'] = row.pop('firstname')
+                    args['lastname'] = row.pop('lastname')
+                    args['comments'] = row.pop('comments')
+                    args['properties'] = {}
+                    args['author'] = user
+                    args['group'] = group
+                    for prop, prop_value in row.items():
+                        if prop is not None:
+                            prop_cache.get({'type': 'contact', 'name': prop})
+                            args['properties'][prop] = prop_value
+                    contact = cls.objects.create(**args)
+                    logger.info('Création de contact : {}'.format(contact))
+                    imported_objects.append(contact)
+            except ImportError as e:
+                logger.error('Erreur lors de l’import du contact : {}'
+                             .format(e))
+                errors += 1
+            except Exception as e:
+                logger.error('Erreur inattendue ({}) : {}'
+                             .format(e.__class__.__name__, e))
+                errors += 1
+                raise e
+        return (imported_objects, errors)
+
+    @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
@@ -229,11 +346,15 @@ class Contact(models.Model):
 
 
 class MeetingType(models.Model):
-    name = models.CharField('type', max_length=100, unique=True)
+    name = models.CharField('type', max_length=100)
     active = models.BooleanField('actif', default=True, db_index=True),
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='meetingtypes')
     icon = models.CharField('glyphicone', max_length=16, blank=True, null=True)
+    author = models.ForeignKey(User, verbose_name='créateur',
+                               related_name='added_meeting_types')
+    creation_date = models.DateTimeField('date de création', auto_now_add=True)
+    update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
     def __str__(self):
         return self.name
@@ -252,6 +373,7 @@ class MeetingType(models.Model):
         verbose_name_plural = 'types d’échange'
         ordering = ['name']
         permissions = (('view_meetingtype', 'Can view a meeting type'), )
+        unique_together = (('name', 'group'), )
 
 
 class Meeting(models.Model):

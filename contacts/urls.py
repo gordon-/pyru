@@ -108,6 +108,16 @@ urlpatterns = [
         views.SavedSearchDelete.as_view(),
         name='search-delete'),
 
+    url(r'^import/(?P<type>(' + saved_searches_types + '))/?$',
+        views.Import.as_view(),
+        name='import'),
+    url(r'^export/(?P<type>(' + saved_searches_types + '))/?$',
+        views.Export.as_view(),
+        name='export'),
+    url(r'^/search/(?P<slug>[-\w]+)/export/?$',
+        views.Export.as_view(),
+        name='export'),
+
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},
         name='logout'),

@@ -321,3 +321,46 @@ class SavedSearchForm(forms.ModelForm):
     class Meta:
         model = SavedSearch
         fields = ('name', 'group', 'display_in_menu')
+
+
+class ImportForm(forms.Form):
+    content = forms.CharField(label='contenu CSV', widget=forms.Textarea,
+                              required=False)
+    file = forms.FileField(label='fichier CSV', required=False)
+    group = forms.ModelChoiceField(
+        label='groupe',
+        queryset=Group.objects.all(),
+        required=False,
+        to_field_name='name',
+        )
+
+    def get_form_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the form.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+
+        return kwargs
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs.pop('request')
+
+            self.base_fields['group'].queryset = \
+                self.request.user.groups.all()
+
+        super().__init__(*args, **kwargs)
+
+
+class ContactImportForm(ImportForm):
+    type_field = forms.CharField(label='nom du champ « type »',
+                                 initial='type')
+    company_field = forms.CharField(label='nom du champ « société »',
+                                    initial='company')
+    firstname_field = forms.CharField(label='nom du champ « prénom »',
+                                      initial='firstname')
+    lastname_field = forms.CharField(label='nom du champ « nom »',
+                                     initial='lastname')
+    comments_field = forms.CharField(label='nom du champ « commentaires »',
+                                     initial='comments')

@@ -1,19 +1,23 @@
+import csv
+from io import StringIO
+
 from django.utils import timezone
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse_lazy
 from django import forms
-from django.views.generic.edit import ModelFormMixin
+from django.views.generic.edit import ModelFormMixin, FormView
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.forms.widgets import HiddenInput
+import chardet
 
 from . import generic
 from .models import (
     Properties, Alert, Company, Contact, Meeting, SavedSearch, SEARCH_CHOICES
 )
 from .forms import (
-    ContactSearchForm, CompanySearchForm, MeetingSearchForm, AlertSearchForm
+    ContactSearchForm, CompanySearchForm, MeetingSearchForm, AlertSearchForm,
 )
 
 
@@ -665,3 +669,87 @@ class SavedSearchDelete(generic.DeleteView):
                              'La recherche {} a été supprimée.'
                              .format(self.get_object()))
         return super().delete(*args, **kwargs)
+
+
+class Export(generic.ListView):
+    model = Contact
+
+
+class Import(FormView):
+    template_name = 'contacts/import.html'
+
+    def get_form_class(self):
+        types = {c[0].lower(): c for c in SEARCH_CHOICES}
+        form_class_name = '{}ImportForm'.format(types[self.kwargs['type']][0])
+        from . import forms
+        return getattr(forms, form_class_name)
+
+    def get_model_class(self):
+        types = {c[0].lower(): c for c in SEARCH_CHOICES}
+        class_name = types[self.kwargs['type']][0]
+        from . import models
+        return getattr(models, class_name)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            if ('file' not in form.changed_data
+                and 'content' not in form.changed_data)\
+                    or ('file' in form.changed_data
+                        and 'content' in form.changed_data):
+                form.errors['content'] = ['Vous devez remplir un seul de ces '
+                                          'champs']
+                form.errors['file'] = ['Vous devez remplir un seul de ces '
+                                       'champs']
+                return self.form_invalid(form)
+
+            # parsing the CSV
+            if 'file' in form.changed_data:
+                content = form.cleaned_data['file'].read()
+                detection = chardet.detect(content)
+                if detection['confidence'] < .5:
+                    form.errors['file'] = ['Encodage non reconnu']
+                    return self.form_invalid(form)
+                content = content.decode(detection['encoding'])
+            else:  # we parse the inline content
+                content = form.cleaned_data['content']
+            dialect = csv.Sniffer().sniff(content)
+            reader = csv.DictReader(StringIO(content), dialect=dialect)
+
+            # mapping extraction
+            mapping = {k[:-6]: v for k, v in form.cleaned_data.items()
+                       if k.endswith('_field') and v != ''}
+
+            # values charset detection
+            data = []
+            for row in reader:
+                reencoded_row = {}
+                for key, value in row.items():
+                    if key is not None:
+                        det = chardet.detect(value.encode())
+                        if det['encoding'] != detection['encoding']\
+                                and det['confidence'] > .5:
+                            reencoded_row[key] = value.encode(detection['encoding'])\
+                                    .decode(det['encoding'])
+                        else:
+                            reencoded_row[key] = value
+                data.append(reencoded_row)
+            inserted_objects, errors = self.get_model_class()\
+                .import_data(data, mapping,
+                             self.request.user, form.cleaned_data['group'])
+
+            context = {'object_list': inserted_objects, 'errors': errors}
+
+            return render(self.request,
+                          'contacts/{}_import.html'
+                          .format(self.kwargs['type']),
+                          context)
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        types = {c[0].lower(): c for c in SEARCH_CHOICES}
+        context['import_type'] = types[self.kwargs['type']][0].lower()
+        context['import_type_name'] = types[self.kwargs['type']][1]
+        return context
