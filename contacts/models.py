@@ -1,5 +1,6 @@
 import sys
 import logging
+from datetime import datetime
 
 from django.db import models, transaction
 from django.utils import timezone
@@ -282,7 +283,7 @@ class Company(models.Model):
                             contact = cls.objects.create(**args)
                             logger.info('Création de société : {}'
                                         .format(contact))
-                        imported_objects.append(contact)
+                            imported_objects.append(contact)
                     else:
                         logger.info('Société sans nom : on passe')
             except ImportError as e:
@@ -396,7 +397,7 @@ class Contact(models.Model):
                             contact = cls.objects.create(**args)
                             logger.info('Création de contact : {}'
                                         .format(contact))
-                        imported_objects.append(contact)
+                            imported_objects.append(contact)
                     else:
                         logger.info('Contact sans nom : on passe')
             except ImportError as e:
@@ -488,6 +489,50 @@ class Meeting(models.Model):
 
     def is_owned(self, user, perm=None):
         return self.contact.group in user.groups.all()
+
+    @classmethod
+    def import_data(cls, data, mapping, format, user, group):
+        logger = logging.getLogger('import.meeting')
+        logger.debug('Début de l’import d’échanges')
+        company_cache = ImportCache(Company, user, group, logger)
+        contact_cache = ImportCache(Contact, user, group, logger)
+        type_cache = ImportCache(MeetingType, user, group, logger)
+        imported_objects = []
+        updated_objects = []
+        errors = 0
+        for row in data:
+            try:
+                with transaction.atomic():
+                    row = apply_mapping(row, mapping)
+                    args = {}
+                    company = company_cache.get(row.pop('company'))
+                    args['type'] = type_cache.get(row.pop('type'))
+                    firstname = row.pop('firstname')
+                    lastname = row.pop('lastname')
+                    contact = contact_cache.get({'company': company,
+                                                 'firstname': firstname,
+                                                 'lastname': lastname})
+                    args['comments'] = row.pop('comments')
+                    args['date'] = datetime.strptime(row.pop('date'), format)
+                    args['author'] = user
+                    args['group'] = group
+                    contact = cls.objects.create(**args)
+                    logger.info('Création d’échange : {}'
+                                .format(contact))
+                    imported_objects.append(contact)
+            except ImportError as e:
+                logger.error('Erreur lors de l’import de l’échange : {}'
+                             .format(e))
+                errors += 1
+            except Exception as e:
+                logger.error('Erreur inattendue ({}) : {}'
+                             .format(e.__class__.__name__, e))
+                errors += 1
+        logger.debug('Fin de l’import d’échanges ({} créés, {} modifiés, '
+                     '{} erreurs)'
+                     .format(len(imported_objects), len(updated_objects),
+                             errors))
+        return (imported_objects, updated_objects, errors)
 
     class Meta:
         verbose_name = 'échange'

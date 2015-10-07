@@ -763,6 +763,8 @@ class Import(FormView):
                 properties = [p.strip() for p in
                               form.cleaned_data['properties_list'].split(',')
                               ]
+            if 'date_format' in form.cleaned_data:
+                properties = form.cleaned_data['date_format']  # urk!
             inserted, updated, errors = self.get_model_class()\
                 .import_data(data, mapping, properties,
                              self.request.user, form.cleaned_data['group'])

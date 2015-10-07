@@ -381,3 +381,25 @@ class CompanyImportForm(ImportForm):
                                       help_text='séparez les propriétés par '
                                       'des espaces, et laissez vide pour '
                                       'extraire toutes les propriétés')
+
+
+class MeetingImportForm(ImportForm):
+    type_field = forms.CharField(label='nom du champ « type »',
+                                 initial='type')
+    company_field = forms.CharField(label='nom du champ « société »',
+                                    initial='company')
+    firstname_field = forms.CharField(label='nom du champ « prénom »',
+                                      initial='firstname')
+    lastname_field = forms.CharField(label='nom du champ « nom »',
+                                     initial='lastname')
+    date_field = forms.CharField(label='nom du champ « date »',
+                                 initial='date')
+    date_format = forms.CharField(label='format du champ « date »',
+                                  initial='%Y-%m-%dT%H:%M:%S%z',
+                                  help_text='Consulter <a href="https://docs.'
+                                  'python.org/2/library/datetime.html#strftime'
+                                  '-and-strptime-behavior">la documentation '
+                                  'Python</a> pour plus de détails sur le '
+                                  'format')
+    comments_field = forms.CharField(label='nom du champ « commentaires »',
+                                     initial='comments')
