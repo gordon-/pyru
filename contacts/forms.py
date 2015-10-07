@@ -364,6 +364,10 @@ class ContactImportForm(ImportForm):
                                      initial='lastname')
     comments_field = forms.CharField(label='nom du champ « commentaires »',
                                      initial='comments')
+    properties_list = forms.CharField(label='liste des propriétés à importer',
+                                      help_text='séparez les propriétés par '
+                                      'des espaces, et laissez vide pour '
+                                      'extraire toutes les propriétés')
 
 
 class CompanyImportForm(ImportForm):
@@ -373,3 +377,7 @@ class CompanyImportForm(ImportForm):
                                  initial='name')
     comments_field = forms.CharField(label='nom du champ « commentaires »',
                                      initial='comments')
+    properties_list = forms.CharField(label='liste des propriétés à importer',
+                                      help_text='séparez les propriétés par '
+                                      'des espaces, et laissez vide pour '
+                                      'extraire toutes les propriétés')

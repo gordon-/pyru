@@ -21,6 +21,36 @@ from .forms import (
 )
 
 
+def reencode_data(reader, detection):
+    """
+    Iterates through a reader (a list of dicts) and re-encode each value, with
+    encoding guessing.
+    """
+    data = []
+    for row in reader:
+        reencoded_row = {}
+        for key, value in row.items():
+            if key is not None and value is not None:
+                det = chardet.detect(value.encode())
+                if det['encoding'] != detection['encoding']\
+                        and det['confidence'] > .5\
+                        and detection['encoding'] != 'utf-8':
+                    reencoded_row[key] = value.encode(
+                        detection['encoding']).decode(det['encoding'])
+                    # print('reencoding {} from {} to {} ({})'
+                    #       .format(value, detection['encoding'],
+                    #               det['encoding'], reencoded_row[key]))
+                else:
+                    reencoded_row[key] = value.encode(detection['encoding'])\
+                        .decode()
+                    # if det['encoding'] is not None:
+                    #     print('No need to reencode {} (key {}) from {} ({})'
+                    #           .format(value, key, det['encoding'],
+                    #                   det['confidence']))
+        data.append(reencoded_row)
+    return data
+
+
 class Home(generic.ListView):
     model = Alert
     template_name = 'contacts/home.html'
@@ -712,7 +742,10 @@ class Import(FormView):
                     return self.form_invalid(form)
                 content = content.decode(detection['encoding'])
             else:  # we parse the inline content
-                content = form.cleaned_data['content'].encode('latin-1')
+                try:
+                    content = form.cleaned_data['content'].encode('latin-1')
+                except UnicodeEncodeError:
+                    content = form.cleaned_data['content'].encode()
                 detection = chardet.detect(content)
                 content = content.decode(detection['encoding'])
             dialect = csv.Sniffer().sniff(content)
@@ -723,22 +756,15 @@ class Import(FormView):
                        if k.endswith('_field') and v != ''}
 
             # values charset detection
-            data = []
-            for row in reader:
-                reencoded_row = {}
-                for key, value in row.items():
-                    if key is not None and value is not None:
-                        det = chardet.detect(value.encode())
-                        if det['encoding'] != detection['encoding']\
-                                and det['confidence'] > .5\
-                                and det['encoding'] != 'utf-8':
-                            reencoded_row[key] = value.encode(
-                                detection['encoding']).decode(det['encoding'])
-                        else:
-                            reencoded_row[key] = value
-                data.append(reencoded_row)
+            data = reencode_data(reader, detection)
+
+            properties = None
+            if 'properties_list' in form.cleaned_data:
+                properties = [p.strip() for p in
+                              form.cleaned_data['properties_list'].split(',')
+                              ]
             inserted, updated, errors = self.get_model_class()\
-                .import_data(data, mapping,
+                .import_data(data, mapping, properties,
                              self.request.user, form.cleaned_data['group'])
 
             context = {'object_list': sorted(inserted + updated,

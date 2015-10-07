@@ -241,7 +241,7 @@ class Company(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def import_data(cls, data, mapping, user, group):
+    def import_data(cls, data, mapping, properties, user, group):
         logger = logging.getLogger('import.company')
         logger.debug('Début de l’import de sociétés')
         type_cache = ImportCache(ContactType, user, group, logger)
@@ -253,32 +253,38 @@ class Company(models.Model):
             try:
                 with transaction.atomic():
                     row = apply_mapping(row, mapping)
-                    args = {}
-                    args['type'] = type_cache.get(row.pop('type'))
-                    args['name'] = row.pop('name')
-                    args['comments'] = row.pop('comments')
-                    args['properties'] = {}
-                    args['author'] = user
-                    args['group'] = group
-                    for prop, prop_value in row.items():
-                        if prop is not None:
-                            prop_cache.get({'type': 'company', 'name': prop})
-                            args['properties'][prop] = prop_value
-                    # do we have to create an object, or is there an existing
-                    # one to update?
-                    try:
-                        contact = cls.get_queryset(user).get(name=args['name'])
-                        contact.properties.update(args['properties'])
-                        contact.type = args['type']
-                        contact.comments = args['comments']
-                        contact.save()
-                        updated_objects.append(contact)
-                        logger.info('Modification de société : {}'
-                                    .format(contact))
-                    except cls.DoesNotExist:
-                        contact = cls.objects.create(**args)
-                        logger.info('Création de société : {}'.format(contact))
-                    imported_objects.append(contact)
+                    if row['name'] != '':
+                        args = {}
+                        args['type'] = type_cache.get(row.pop('type'))
+                        args['name'] = row.pop('name')
+                        args['comments'] = row.pop('comments')
+                        args['properties'] = {}
+                        args['author'] = user
+                        args['group'] = group
+                        for prop, prop_value in row.items():
+                            if prop is not None and prop in properties:
+                                prop_cache.get({'type': 'company',
+                                                'name': prop})
+                                args['properties'][prop] = prop_value
+                        # do we have to create an object, or is there an
+                        # existing one to update?
+                        try:
+                            contact = cls.get_queryset(user).get(
+                                name=args['name'])
+                            contact.properties.update(args['properties'])
+                            contact.type = args['type']
+                            contact.comments = args['comments']
+                            contact.save()
+                            updated_objects.append(contact)
+                            logger.info('Modification de société : {}'
+                                        .format(contact))
+                        except cls.DoesNotExist:
+                            contact = cls.objects.create(**args)
+                            logger.info('Création de société : {}'
+                                        .format(contact))
+                        imported_objects.append(contact)
+                    else:
+                        logger.info('Société sans nom : on passe')
             except ImportError as e:
                 logger.error('Erreur lors de l’import de la société : {}'
                              .format(e))
@@ -344,7 +350,7 @@ class Contact(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def import_data(cls, data, mapping, user, group):
+    def import_data(cls, data, mapping, properties, user, group):
         logger = logging.getLogger('import.contact')
         logger.debug('Début de l’import de contacts')
         company_cache = ImportCache(Company, user, group, logger)
@@ -357,37 +363,42 @@ class Contact(models.Model):
             try:
                 with transaction.atomic():
                     row = apply_mapping(row, mapping)
-                    args = {}
-                    args['company'] = company_cache.get(row.pop('company'))
-                    args['type'] = type_cache.get(row.pop('type'))
-                    args['firstname'] = row.pop('firstname')
-                    args['lastname'] = row.pop('lastname')
-                    args['comments'] = row.pop('comments')
-                    args['properties'] = {}
-                    args['author'] = user
-                    args['group'] = group
-                    for prop, prop_value in row.items():
-                        if prop is not None:
-                            prop_cache.get({'type': 'contact', 'name': prop})
-                            args['properties'][prop] = prop_value
-                    # do we have to create an object, or is there an existing
-                    # one to update?
-                    try:
-                        contact = cls.get_queryset(user).get(
-                            company=args['company'],
-                            firstname=args['firstname'],
-                            lastname=args['lastname'])
-                        contact.properties.update(args['properties'])
-                        contact.type = args['type']
-                        contact.comments = args['comments']
-                        contact.save()
-                        updated_objects.append(contact)
-                        logger.info('Modification de contact : {}'
-                                    .format(contact))
-                    except cls.DoesNotExist:
-                        contact = cls.objects.create(**args)
-                        logger.info('Création de contact : {}'.format(contact))
-                    imported_objects.append(contact)
+                    if row['firstname'] != '' or row['lastname'] != '':
+                        args = {}
+                        args['company'] = company_cache.get(row.pop('company'))
+                        args['type'] = type_cache.get(row.pop('type'))
+                        args['firstname'] = row.pop('firstname')
+                        args['lastname'] = row.pop('lastname')
+                        args['comments'] = row.pop('comments')
+                        args['properties'] = {}
+                        args['author'] = user
+                        args['group'] = group
+                        for prop, prop_value in row.items():
+                            if prop is not None and prop in properties:
+                                prop_cache.get({'type': 'contact',
+                                                'name': prop})
+                                args['properties'][prop] = prop_value
+                        # do we have to create an object, or is there an
+                        # existing one to update?
+                        try:
+                            contact = cls.get_queryset(user).get(
+                                company=args['company'],
+                                firstname=args['firstname'],
+                                lastname=args['lastname'])
+                            contact.properties.update(args['properties'])
+                            contact.type = args['type']
+                            contact.comments = args['comments']
+                            contact.save()
+                            updated_objects.append(contact)
+                            logger.info('Modification de contact : {}'
+                                        .format(contact))
+                        except cls.DoesNotExist:
+                            contact = cls.objects.create(**args)
+                            logger.info('Création de contact : {}'
+                                        .format(contact))
+                        imported_objects.append(contact)
+                    else:
+                        logger.info('Contact sans nom : on passe')
             except ImportError as e:
                 logger.error('Erreur lors de l’import du contact : {}'
                              .format(e))
