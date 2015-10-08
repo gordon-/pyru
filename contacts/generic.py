@@ -9,6 +9,8 @@ from django.contrib.auth.views import redirect_to_login
 from django.conf import settings
 from django.shortcuts import resolve_url
 from django.forms import ModelChoiceField, DateTimeField, DateField
+from django.utils.six.moves.urllib.parse import urlparse
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from datetimewidget.widgets import DateTimeWidget, DateWidget
 from autocomplete_light.forms import ModelForm
 
@@ -43,9 +45,16 @@ class LoginRequiredMixin():
 class PermissionMixin():
 
     @classmethod
+    def get_model(cls):
+        if hasattr(cls, 'model'):
+            return cls.model
+        else:
+            return super().get_model()
+
+    @classmethod
     def _get_perm(cls):
         if not hasattr(cls, 'permission_name'):
-            permission_name = cls.model.__name__.lower()
+            permission_name = cls.get_model().__name__.lower()
             if hasattr(cls, 'permission_suffix'):
                 permission_name = 'contacts.{permission}_{model}'.format(
                     model=permission_name,
@@ -79,7 +88,7 @@ class PermissionMixin():
         if len(filters) == 0:
             obj = super().get_object()
         else:
-            obj = super().get_object(self.model.filter(**filters))
+            obj = super().get_object(self.get_model().filter(**filters))
         if not self.request.user.has_perm(self._get_perm(), obj):
             resolved_login_url = resolve_url(settings.LOGIN_URL)
             path = self.request.build_absolute_uri()
@@ -87,8 +96,69 @@ class PermissionMixin():
         return obj
 
     def get_queryset(self):
-        if hasattr(self.model, 'get_queryset'):
-            qs = self.model.get_queryset(self.request.user)
+        model = self.get_model()
+        if hasattr(model, 'get_queryset'):
+            qs = model.get_queryset(self.request.user)
+        return qs
+
+
+class LatePermissionMixin():
+
+    def get_model(self):
+        if hasattr(self, 'model'):
+            return self.model
+        else:
+            return super().get_model()
+
+    def _get_perm(self):
+        if not hasattr(self, 'permission_name'):
+            permission_name = self.get_model().__name__.lower()
+            if hasattr(self, 'permission_suffix'):
+                permission_name = 'contacts.{permission}_{model}'.format(
+                    model=permission_name,
+                    permission=self.permission_suffix,
+                )
+        return permission_name
+
+    def dispatch(self, request, *args, **kwargs):
+        perm = self._get_perm()
+
+        if not isinstance(perm, (list, tuple)):
+            perms = (perm, )
+        else:
+            perms = perm
+        # First check if the user has the permission (even anon users)
+        if request.user.has_perms(perms):
+            return super().dispatch(request, *args, **kwargs)
+        # As the last resort, show the login form
+        path = request.build_absolute_uri()
+        resolved_login_url = resolve_url(settings.LOGIN_URL)
+        # If the login url is the same scheme and net location then just
+        # use the path as the "next" url.
+        login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
+        current_scheme, current_netloc = urlparse(path)[:2]
+        if ((not login_scheme or login_scheme == current_scheme) and
+                (not login_netloc or login_netloc == current_netloc)):
+            path = request.get_full_path()
+        from django.contrib.auth.views import redirect_to_login
+        return redirect_to_login(
+            path, resolved_login_url, REDIRECT_FIELD_NAME)
+
+    def get_object(self, **filters):
+        if len(filters) == 0:
+            obj = super().get_object()
+        else:
+            obj = super().get_object(self.get_model().filter(**filters))
+        if not self.request.user.has_perm(self._get_perm(), obj):
+            resolved_login_url = resolve_url(settings.LOGIN_URL)
+            path = self.request.build_absolute_uri()
+            raise ForceResponse(redirect_to_login(path, resolved_login_url))
+        return obj
+
+    def get_queryset(self):
+        model = self.get_model()
+        if hasattr(model, 'get_queryset'):
+            qs = model.get_queryset(self.request.user)
         return qs
 
 

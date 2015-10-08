@@ -705,7 +705,9 @@ class Export(generic.ListView):
     model = Contact
 
 
-class Import(FormView):
+class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
+             FormView):
+    permission_suffix = 'add'
     template_name = 'contacts/import.html'
 
     def get_form_class(self):
@@ -714,7 +716,7 @@ class Import(FormView):
         from . import forms
         return getattr(forms, form_class_name)
 
-    def get_model_class(self):
+    def get_model(self):
         types = {c[0].lower(): c for c in SEARCH_CHOICES}
         class_name = types[self.kwargs['type']][0]
         from . import models
@@ -735,6 +737,7 @@ class Import(FormView):
 
             # parsing the CSV
             if 'file' in form.changed_data:  # upload
+                field = 'file'
                 content = form.cleaned_data['file'].read()
                 detection = chardet.detect(content)
                 if detection['confidence'] < .5:
@@ -742,6 +745,7 @@ class Import(FormView):
                     return self.form_invalid(form)
                 content = content.decode(detection['encoding'])
             else:  # we parse the inline content
+                field = 'content'
                 try:
                     content = form.cleaned_data['content'].encode('latin-1')
                 except UnicodeEncodeError:
@@ -749,6 +753,8 @@ class Import(FormView):
                 detection = chardet.detect(content)
                 content = content.decode(detection['encoding'])
             dialect = csv.Sniffer().sniff(content)
+            if dialect.escapechar is None:
+                dialect.escapechar = '\\'  # hack
             reader = csv.DictReader(StringIO(content), dialect=dialect)
 
             # mapping extraction
@@ -765,9 +771,13 @@ class Import(FormView):
                               ]
             if 'date_format' in form.cleaned_data:
                 properties = form.cleaned_data['date_format']  # urk!
-            inserted, updated, errors = self.get_model_class()\
-                .import_data(data, mapping, properties,
-                             self.request.user, form.cleaned_data['group'])
+            try:
+                inserted, updated, errors = self.get_model()\
+                    .import_data(data, mapping, properties,
+                                 self.request.user, form.cleaned_data['group'])
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                form.errors[field] = ['Encodage incorrect']
+                return self.form_invalid(form)
 
             context = {'object_list': sorted(inserted + updated,
                                              key=lambda i: i.update_date),
