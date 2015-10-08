@@ -254,7 +254,7 @@ class SearchFormMixin(generic.edit.FormMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         self.form.full_clean()
-        search_params = {k: self.form.data[k][0] for k, v in
+        search_params = {k: self.form.data[k] for k, v in
                          self.form.cleaned_data.items()
                          if v not in [None, '']}
         if len(search_params):

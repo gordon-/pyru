@@ -576,7 +576,8 @@ class SavedSearch(models.Model):
     data = fields.HStoreField('données de recherche', default={})
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='saved_searches')
-    results_count = models.PositiveIntegerField('nombre de résultats')
+    results_count = models.PositiveIntegerField('nombre de résultats',
+                                                default=0)
     creation_date = models.DateTimeField('date de création', auto_now_add=True)
     update_date = models.DateTimeField('date de mise à jour', auto_now=True)
 
