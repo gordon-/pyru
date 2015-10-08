@@ -15,6 +15,8 @@
         <dt>{{ prop_name }}</dt>
         <dd>{{ prop_value }}</dd>
     {% endfor %}
+        <dt>Commentaires</dt>
+        <dd>{{ object.get_comments | safe }}</dd>
     </dl>
     {% if perms.contacts.view_contact %}
     <h3>{% bootstrap_icon 'user' %} Contacts
@@ -67,7 +69,7 @@
             <td>{% if meeting.type.icon %}{% bootstrap_icon meeting.type.icon %}
                 {% endif %}{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
-            <td>{{ meeting.comments }}</td>
+            <td>{{ meeting.get_comments | safe }}</td>
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>

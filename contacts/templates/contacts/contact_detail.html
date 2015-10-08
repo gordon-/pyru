@@ -16,7 +16,7 @@
         <dd><a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a></dd>
     {% endif %}
         <dt>Commentaires</dt>
-        <dd><p>{{ object.comments }}</p></dd>
+        <dd>{{ object.get_comments | safe }}</dd>
     {% for prop_name, prop_value in object.properties.items %}
         <dt>{{ prop_name }}</dt>
         <dd>{{ prop_value }}</dd>
@@ -47,7 +47,7 @@
                     data-original-title="{{ meeting.date }}" href="{{ meeting.get_absolute_url }}">{{ meeting.date | naturaltime }}</a></td>
             <td>{{ meeting.type }}</td>
             <td>{{ meeting.author }}</td>
-            <td>{{ meeting.comments }}</td>
+            <td>{{ meeting.get_comments | safe }}</td>
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>

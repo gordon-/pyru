@@ -8,6 +8,8 @@ from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres import fields
+from markdown import markdown
+import bleach
 
 
 PROP_CHOICES = (('company', 'société'),
@@ -25,6 +27,8 @@ SEARCH_CHOICES = (('Contact', 'contact'),
                   ('Meeting', 'échange'),
                   ('Alert', 'alerte'),
                   )
+
+ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['p']
 
 
 def apply_mapping(row, mapping):
@@ -168,6 +172,9 @@ class Alert(models.Model):
     def __str__(self):
         return self.title
 
+    def get_comments(self):
+        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
+
     def get_glyphicon(self):
         return 'bell'
 
@@ -242,6 +249,9 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_comments(self):
+        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
 
     def get_glyphicon(self):
         return 'briefcase'
@@ -359,6 +369,9 @@ class Contact(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.firstname, self.lastname)
+
+    def get_comments(self):
+        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
 
     def get_glyphicon(self):
         return 'user'
@@ -497,6 +510,9 @@ class Meeting(models.Model):
 
     def __str__(self):
         return str(self.contact)
+
+    def get_comments(self):
+        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
 
     def get_glyphicon(self):
         return self.type.icon

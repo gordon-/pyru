@@ -19,8 +19,9 @@
                 {% endif %}{{ object.type }}</dd>
         <dt>Date</dt>
         <dd><span class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}">{{ object.date | naturaltime }}</span></dd>
+        <dt>Compte-rendu</dt>
+        <dd>{{ object.get_comments | safe }}</dd>
     </dl>
-    <p>{{ object.comments }}</p>
 
     <p>
     {% if perms.contacts.change_meeting %}
