@@ -11,12 +11,12 @@
         <dt>Type</dt>
         <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</dd>
-    {% for prop_name, prop_value in object.properties.items %}
-        <dt>{{ prop_name }}</dt>
-        <dd>{{ prop_value }}</dd>
-    {% endfor %}
         <dt>Commentaires</dt>
         <dd>{{ object.get_comments | safe }}</dd>
+    {% for prop_name, prop_value in object.get_properties.items %}
+        <dt>{{ prop_name }}</dt>
+        <dd>{{ prop_value | safe }}</dd>
+    {% endfor %}
     </dl>
     {% if perms.contacts.view_contact %}
     <h3>{% bootstrap_icon 'user' %} Contacts

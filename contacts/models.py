@@ -28,7 +28,7 @@ SEARCH_CHOICES = (('Contact', 'contact'),
                   ('Alert', 'alerte'),
                   )
 
-ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['p']
+ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['p', 'pre']
 
 
 def apply_mapping(row, mapping):
@@ -173,7 +173,8 @@ class Alert(models.Model):
         return self.title
 
     def get_comments(self):
-        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
+        return bleach.clean(bleach.linkify(markdown(self.comments)),
+                            ALLOWED_TAGS)
 
     def get_glyphicon(self):
         return 'bell'
@@ -251,7 +252,17 @@ class Company(models.Model):
         return self.name
 
     def get_comments(self):
-        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
+        return bleach.clean(bleach.linkify(markdown(self.comments)),
+                            ALLOWED_TAGS)
+
+    def get_properties(self):
+
+        def prop_order(i):
+            return Properties.objects.get(type='company', name=i[0]).order
+
+        return {k: bleach.linkify(v, parse_email=True) for k, v in
+                sorted(self.properties.items(), key=prop_order)
+                }
 
     def get_glyphicon(self):
         return 'briefcase'
@@ -371,7 +382,17 @@ class Contact(models.Model):
         return '{} {}'.format(self.firstname, self.lastname)
 
     def get_comments(self):
-        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
+        return bleach.clean(bleach.linkify(markdown(self.comments)),
+                            ALLOWED_TAGS)
+
+    def get_properties(self):
+
+        def prop_order(i):
+            return Properties.objects.get(type='contact', name=i[0]).order
+
+        return {k: bleach.linkify(v, parse_email=True) for k, v in
+                sorted(self.properties.items(), key=prop_order)
+                }
 
     def get_glyphicon(self):
         return 'user'
@@ -512,7 +533,8 @@ class Meeting(models.Model):
         return str(self.contact)
 
     def get_comments(self):
-        return bleach.clean(markdown(self.comments), ALLOWED_TAGS)
+        return bleach.clean(bleach.linkify(markdown(self.comments)),
+                            ALLOWED_TAGS)
 
     def get_glyphicon(self):
         return self.type.icon
