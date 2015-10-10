@@ -10,6 +10,9 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.forms import ModelChoiceField, DateTimeField, DateField
 from django.utils.six.moves.urllib.parse import urlparse
+from django.db.models import Count
+from django.db.models.fields.related import (
+    ForeignKey, ManyToManyRel, ManyToOneRel)
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from datetimewidget.widgets import DateTimeWidget, DateWidget
 from autocomplete_light.forms import ModelForm
@@ -230,8 +233,33 @@ class SearchFormMixin(generic.edit.FormMixin):
         return kwargs
 
     def get_queryset(self):
+        model = self.get_model()
         qs = super().get_queryset()
         qs = self.get_form().search(qs)
+        if 'order' in self.request.GET:
+            order = self.request.GET['order']
+            if order[0] == '-':
+                order = order[1:]
+            if order in model._meta.get_all_field_names():
+                self.order = self.request.GET['order']
+                field = model._meta.get_field(order)
+                if isinstance(field, ForeignKey):
+                    if hasattr(field.rel.to._meta, 'ordering') and\
+                            len(field.rel.to._meta.ordering) > 0:
+                        qs = qs.order_by('{}__{}'.format(self.order,
+                                         field.rel.to._meta.ordering[0]))
+                    elif 'name' in field.rel.to._meta.get_all_field_names():
+                        qs = qs.order_by('{}__name'.format(self.order))
+                    else:
+                        qs = qs.order_by(self.order)
+                elif isinstance(field, ManyToManyRel) or\
+                        isinstance(field, ManyToOneRel):
+                    sign = self.order[0] if self.order[0] == '-' else ''
+                    qs = qs.annotate(count_order=Count(order))\
+                        .order_by('{}count_order'.format(sign))
+                    pass
+                else:
+                    qs = qs.order_by(self.order)
         return qs
 
     def get(self, request, *args, **kwargs):
@@ -257,8 +285,24 @@ class SearchFormMixin(generic.edit.FormMixin):
         search_params = {k: self.form.data[k] for k, v in
                          self.form.cleaned_data.items()
                          if v not in [None, '']}
+        if hasattr(self, 'order'):
+            search_params['order'] = self.order
+            context['order'] = self.order
+        else:
+            context['order'] = self.get_model()._meta.ordering[0]
         if len(search_params):
             context['querystring'] = urlencode(search_params)
+            try:
+                search_params.pop('order')
+            except Exception:
+                pass
+            context['querystring_without_order'] = urlencode(search_params)
+            if len(context['querystring_without_order']) == 0:
+                context['querystring_without_order'] += '?'
+            else:
+                context['querystring_without_order'] += '&'
+        else:
+            context['querystring_without_order'] = '?'
         if self.form.is_submitted():
             context['add_search_form'] = SavedSearchForm()
             context['saved_search_url'] = resolve_url(
