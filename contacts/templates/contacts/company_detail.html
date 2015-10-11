@@ -7,7 +7,7 @@
 {% block content %}
 <h2>{% bootstrap_icon 'briefcase' %} Détail de la société {{ object }}</h2>
     <div>{{ object }}</div>
-    <dl>
+    <dl class="dl-horizontal">
         <dt>Type</dt>
         <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</dd>

@@ -23,11 +23,26 @@ de la société {{ company }}{% endif %}{% endblock %}
     <p>Affichage de {{ objects_count }}
     alerte{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
+    <table class="table table-striped table-bordered">
         <tr><th>Contact</th>
-            {% if not company %}<th>Société</th>{% endif %}
-            <th>Date</th>
-            <th>Titre</th>
+            {% if not company %}<th>Société
+                <span class="pull-right">
+                <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-company">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>{% endif %}
+            <th>Date
+                <span class="pull-right">
+                <a{% if order == 'date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=date">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-date">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Titre
+                <span class="pull-right">
+                <a{% if order == 'title' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=title">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-title' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-title">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
             <th>Actions</th>
         </tr>
         {% for object in object_list %}

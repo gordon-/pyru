@@ -22,12 +22,37 @@ de la société {{ company }}{% endif %}{% endblock %}
     <p>Affichage de {{ objects_count }}
     contact{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
-        <tr><th>Nom</th>
-            <th>Groupe</th>
-            {% if not company %}<th>Société</th>{% endif %}
-            <th>Type</th>
-            <th>Échanges</th>
+    <table class="table table-striped table-bordered">
+        <tr><th>Nom
+                <span class="pull-right">
+                <a{% if order == 'firstname' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=firstname">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-firstname' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-firstname">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Groupe
+                <span class="pull-right">
+                <a{% if order == 'group' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=group">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-group' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-group">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            {% if not company %}<th>Société
+                <span class="pull-right">
+                <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-company">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>{% endif %}
+            <th>Type
+                <span class="pull-right">
+                <a{% if order == 'type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=type">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-type">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Échanges
+                <span class="pull-right">
+                <a{% if order == 'meetings' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=meetings">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-meetings' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-meetings">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
             <th>Actions</th>
         </tr>
         {% for object in object_list %}

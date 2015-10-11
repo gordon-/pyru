@@ -32,13 +32,43 @@
     <p>Affichage de {{ objects_count }}
     échange{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
-        <tr>{% if not company %}<th>Société</th>{% endif %}
-            {% if not contact %}<th>Contact</th>{% endif %}
-            <th>Date</th>
-            <th>Type</th>
-            <th>Auteur</th>
-            <th>Commentaire</th>
+    <table class="table table-striped table-bordered">
+        <tr>{% if not company %}<th>Société
+                <span class="pull-right">
+                <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-company">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>{% endif %}
+            {% if not contact %}<th>Contact
+                <span class="pull-right">
+                <a{% if order == 'contact' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=contact">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-contact' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-contact">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>{% endif %}
+            <th>Date
+                <span class="pull-right">
+                <a{% if order == 'date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=date">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-date">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Type
+                <span class="pull-right">
+                <a{% if order == 'type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=type">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-type">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Auteur
+                <span class="pull-right">
+                <a{% if order == 'author' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=author">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-author' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-author">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            <th>Commentaire
+                <span class="pull-right">
+                <a{% if order == 'comments' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=comments">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-comments' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-comments">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
             <th>Actions</th>
         </tr>
         {% for object in object_list %}
