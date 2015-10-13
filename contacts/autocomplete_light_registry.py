@@ -24,9 +24,8 @@ class ContactAutocomplete(autocomplete_light.AutocompleteModelBase):
     }
 
     def choices_for_request(self):
-        if not self.request.user.is_staff:
-            self.choices = self.model.get_queryset(self.request.user,
-                                                   self.choices)
+        self.choices = self.model.get_queryset(self.request.user,
+                                               self.choices)
 
         return super().choices_for_request()
 
@@ -44,9 +43,8 @@ class CompanyAutocomplete(autocomplete_light.AutocompleteModelBase):
     }
 
     def choices_for_request(self):
-        if not self.request.user.is_staff:
-            self.choices = self.model.get_queryset(self.request.user,
-                                                   self.choices)
+        self.choices = self.model.get_queryset(self.request.user,
+                                               self.choices)
 
         return super().choices_for_request()
 

@@ -7,7 +7,7 @@
 {% block content %}
 <h2>{% bootstrap_icon 'briefcase' %} Détail de la société {{ object }}</h2>
     <div>{{ object }}</div>
-    <dl class="dl-horizontal">
+    <dl>
         <dt>Type</dt>
         <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</dd>
@@ -28,13 +28,11 @@
     </h3>
     <table class="table">
         <tr><th>Nom</th>
-            <th>Groupe</th>
             <th>Type</th>
             <th>Actions</th>
         </tr>
         {% for contact in object.contacts.all %}
         <tr><td><a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a></td>
-            <td>{{ contact.group }}</td>
             <td>{% if contact.type.icon %}{% bootstrap_icon contact.type.icon %}
                 {% endif %}{{ contact.type }}</td>
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}

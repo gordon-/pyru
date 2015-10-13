@@ -21,12 +21,6 @@
                 <a{% if order == '-name' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-name">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
-            <th>Groupe
-                <span class="pull-right">
-                <a{% if order == 'group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=group">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-group">{% bootstrap_icon 'triangle-bottom' %}</a>
-                </span>
-            </th>
             <th>Type
                 <span class="pull-right">
                 <a{% if order == 'type' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=type">{% bootstrap_icon 'triangle-top' %}</a>
@@ -44,7 +38,6 @@
         </tr>
         {% for object in object_list %}
         <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object }}</a></td>
-            <td>{{ object.group }}</td>
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</td>
             <td><a href="{% url 'contacts:contact-list' company=object.slug %}">{% bootstrap_icon 'user' %} {{ object.contacts.count }}</a></td>

@@ -3,7 +3,6 @@ from functools import reduce
 
 from django import forms
 from django.db.models import Q
-from django.contrib.auth.models import Group
 from django.forms import ModelChoiceField
 from datetimewidget.widgets import DateWidget
 
@@ -130,12 +129,6 @@ class ContactSearchForm(SearchForm):
         required=False,
         to_field_name='name',
         )
-    group = forms.ModelChoiceField(
-        label='groupe',
-        queryset=Group.objects.all(),
-        required=False,
-        to_field_name='name',
-        )
 
     class Meta:
         mappings = {'id': {'target': ['==pk'],
@@ -150,9 +143,6 @@ class ContactSearchForm(SearchForm):
             self.request = kwargs.pop('request')
             self.base_fields['type'].queryset = \
                 ContactType.get_queryset(self.request.user)
-
-            self.base_fields['group'].queryset = \
-                self.request.user.groups.all()
 
             self.properties = Properties.get_queryset(self.request.user)\
                 .filter(type='contact')
@@ -192,12 +182,6 @@ class CompanySearchForm(SearchForm):
         required=False,
         to_field_name='name',
         )
-    group = forms.ModelChoiceField(
-        label='groupe',
-        queryset=Group.objects.all(),
-        required=False,
-        to_field_name='name',
-        )
 
     class Meta:
         mappings = {'id': {'target': ['==pk'],
@@ -209,9 +193,6 @@ class CompanySearchForm(SearchForm):
             self.request = kwargs.pop('request')
             self.base_fields['type'].queryset = \
                 ContactType.get_queryset(self.request.user)
-
-            self.base_fields['group'].queryset = \
-                self.request.user.groups.all()
 
             self.properties = Properties.get_queryset(self.request.user)\
                 .filter(type='contact')
@@ -342,19 +323,13 @@ class SavedSearchForm(forms.ModelForm):
 
     class Meta:
         model = SavedSearch
-        fields = ('name', 'group', 'display_in_menu')
+        fields = ('name', 'display_in_menu')
 
 
 class ImportForm(forms.Form):
     content = forms.CharField(label='contenu CSV', widget=forms.Textarea,
                               required=False)
     file = forms.FileField(label='fichier CSV', required=False)
-    group = forms.ModelChoiceField(
-        label='groupe',
-        queryset=Group.objects.all(),
-        required=False,
-        to_field_name='name',
-        )
 
     def get_form_kwargs(self):
         """
@@ -368,9 +343,6 @@ class ImportForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:
             self.request = kwargs.pop('request')
-
-            self.base_fields['group'].queryset = \
-                self.request.user.groups.all()
 
         super().__init__(*args, **kwargs)
 

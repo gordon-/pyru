@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 
 from django.db import models, transaction
-import django.db.models.options as options
+from django.db.models import Q, options
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
@@ -80,10 +80,10 @@ class DataImportError(Exception):
 
 class ImportCache:
 
-    def __init__(self, model, user, group, logger, key='name'):
+    def __init__(self, model, user, logger, key='name'):
         self.model = model
         self.user = user
-        self.group = group
+        self.group = user.default_group.group
         self.logger = logger
         self.key = key
         self.items = {}
@@ -153,13 +153,13 @@ class Properties(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.contact.group in user.groups.all()
+        return self.contact.group == user.default_group.group
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     class Meta:
         verbose_name = 'propriété'
@@ -168,7 +168,7 @@ class Properties(models.Model):
                  'of_the': 'de la ',
                  'an': 'une',
                  }
-        unique_together = (('name', 'type'), )
+        unique_together = (('name', 'group', 'type'), )
         ordering = ['order']
         permissions = (('view_property', 'Can view a property'), )
 
@@ -206,14 +206,15 @@ class Alert(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(user=user)
+        return qs.filter((Q(user=user) | Q(author=user)) &
+                         Q(contact__group=user.default_group.group))
 
     @classmethod
-    def import_data(cls, data, mapping, format, user, group):
+    def import_data(cls, data, mapping, format, user):
         logger = logging.getLogger('import.alert')
         logger.debug('Début de l’import d’alertes')
-        company_cache = ImportCache(Company, user, group, logger)
-        contact_cache = ImportCache(Contact, user, group, logger)
+        company_cache = ImportCache(Company, user, logger)
+        contact_cache = ImportCache(Contact, user, logger)
         imported_objects = {}
         errors = 0
         data = combine_rows(data, mapping)
@@ -290,13 +291,13 @@ class ContactType(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.group in user.groups.all()
+        return self.group == user.default_group.group
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     class Meta:
         verbose_name = 'type de contact'
@@ -313,7 +314,7 @@ class ContactType(models.Model):
 
 class Company(models.Model):
     name = models.CharField('nom', max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField()
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='companies')
     type = models.ForeignKey(ContactType, verbose_name='type', null=True,
@@ -336,7 +337,8 @@ class Company(models.Model):
     def get_properties(self):
 
         def prop_order(i):
-            return Properties.objects.get(type='company', name=i[0]).order
+            return Properties.objects.get(group=self.group, type='company',
+                                          name=i[0]).order
 
         return {k: bleach.linkify(v, parse_email=True) for k, v in
                 sorted(self.properties.items(), key=prop_order)
@@ -364,11 +366,11 @@ class Company(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def import_data(cls, data, mapping, properties, user, group):
+    def import_data(cls, data, mapping, properties, user):
         logger = logging.getLogger('import.company')
         logger.debug('Début de l’import de sociétés')
-        type_cache = ImportCache(ContactType, user, group, logger)
-        prop_cache = ImportCache(Properties, user, group, logger)
+        type_cache = ImportCache(ContactType, user, logger)
+        prop_cache = ImportCache(Properties, user, logger)
         imported_objects = {}
         updated_objects = {}
         errors = 0
@@ -383,7 +385,7 @@ class Company(models.Model):
                         args['comments'] = row.pop('comments')
                         args['properties'] = {}
                         args['author'] = user
-                        args['group'] = group
+                        args['group'] = user.default_group.group
                         for prop, prop_value in row.items():
                             if prop is not None and prop in properties:
                                 prop_cache.get({'type': 'company',
@@ -427,10 +429,10 @@ class Company(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     def is_owned(self, user, perm=None):
-        return self.group in user.groups.all()
+        return self.group == user.default_group.group
 
     class Meta:
         verbose_name = 'société'
@@ -441,13 +443,14 @@ class Company(models.Model):
                  }
         get_latest_by = 'update_date'
         ordering = ['name']
+        unique_together = (('slug', 'group'), )
         permissions = (('view_company', 'Can view a company'), )
 
 
 class Contact(models.Model):
     firstname = models.CharField('prénom', max_length=100)
     lastname = models.CharField('nom', max_length=100, blank=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField()
     company = models.ForeignKey(Company, verbose_name='société', null=True,
                                 related_name='contacts')
     group = models.ForeignKey(Group, verbose_name='groupe',
@@ -472,7 +475,8 @@ class Contact(models.Model):
     def get_properties(self):
 
         def prop_order(i):
-            return Properties.objects.get(type='contact', name=i[0]).order
+            return Properties.objects.get(group=self.group, type='contact',
+                                          name=i[0]).order
 
         return {k: bleach.linkify(v, parse_email=True) for k, v in
                 sorted(self.properties.items(), key=prop_order)
@@ -486,18 +490,17 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('{} {} {}'.format(self.group.pk,
-                                                  self.firstname,
-                                                  self.lastname))
+            self.slug = slugify('{} {}'.format(self.firstname,
+                                               self.lastname))
         return super().save(*args, **kwargs)
 
     @classmethod
-    def import_data(cls, data, mapping, properties, user, group):
+    def import_data(cls, data, mapping, properties, user):
         logger = logging.getLogger('import.contact')
         logger.debug('Début de l’import de contacts')
-        company_cache = ImportCache(Company, user, group, logger)
-        type_cache = ImportCache(ContactType, user, group, logger)
-        prop_cache = ImportCache(Properties, user, group, logger)
+        company_cache = ImportCache(Company, user, logger)
+        type_cache = ImportCache(ContactType, user, logger)
+        prop_cache = ImportCache(Properties, user, logger)
         imported_objects = {}
         updated_objects = {}
         errors = 0
@@ -514,7 +517,7 @@ class Contact(models.Model):
                         args['comments'] = row.pop('comments')
                         args['properties'] = {}
                         args['author'] = user
-                        args['group'] = group
+                        args['group'] = user.default_group.group
                         for prop, prop_value in row.items():
                             if prop is not None and prop in properties:
                                 prop_cache.get({'type': 'contact',
@@ -560,10 +563,10 @@ class Contact(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     def is_owned(self, user, perm=None):
-        return self.group in user.groups.all()
+        return self.group == user.default_group.group
 
     class Meta:
         verbose_name = 'contact'
@@ -574,6 +577,7 @@ class Contact(models.Model):
                  }
         get_latest_by = 'update_date'
         ordering = ['firstname', 'lastname']
+        unique_together = (('slug', 'group'), )
         permissions = (('view_contact', 'Can view a contact'), )
 
 
@@ -592,13 +596,13 @@ class MeetingType(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.group in user.groups.all()
+        return self.group == user.default_group.group
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     class Meta:
         verbose_name = 'type d’échange'
@@ -641,18 +645,18 @@ class Meeting(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(contact__group__in=user.groups.all())
+        return qs.filter(contact__group=user.default_group.group)
 
     def is_owned(self, user, perm=None):
-        return self.contact.group in user.groups.all()
+        return self.contact.group == user.default_group.group
 
     @classmethod
-    def import_data(cls, data, mapping, format, user, group):
+    def import_data(cls, data, mapping, format, user):
         logger = logging.getLogger('import.meeting')
         logger.debug('Début de l’import d’échanges')
-        company_cache = ImportCache(Company, user, group, logger)
-        contact_cache = ImportCache(Contact, user, group, logger)
-        type_cache = ImportCache(MeetingType, user, group, logger)
+        company_cache = ImportCache(Company, user, logger)
+        contact_cache = ImportCache(Contact, user, logger)
+        type_cache = ImportCache(MeetingType, user, logger)
         imported_objects = {}
         errors = 0
         data = combine_rows(data, mapping)
@@ -707,7 +711,7 @@ class SavedSearch(models.Model):
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='searches')
     name = models.CharField('nom', max_length=32)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField()
     type = models.CharField('type', max_length=32, choices=SEARCH_CHOICES)
     display_in_menu = models.BooleanField('affichage dans le menu',
                                           default=True)
@@ -733,10 +737,10 @@ class SavedSearch(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group__in=user.groups.all())
+        return qs.filter(group=user.default_group.group)
 
     def is_owned(self, user, perm=None):
-        return self.group in user.groups.all()
+        return self.group == user.default_group.group
 
     def get_search_queryset(self, user):
         from . import forms
@@ -754,7 +758,7 @@ class SavedSearch(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('{} {}'.format(self.group.pk, self.name))
+            self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -766,4 +770,5 @@ class SavedSearch(models.Model):
                  }
         verbose_name_plural = 'recherches sauvegardées'
         ordering = ['name']
+        unique_together = (('slug', 'group'), )
         permissions = (('view_savedsearch', 'Can view a saved search'), )

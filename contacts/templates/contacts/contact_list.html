@@ -29,12 +29,6 @@ de la société {{ company }}{% endif %}{% endblock %}
                 <a{% if order == '-firstname' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-firstname">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
-            <th>Groupe
-                <span class="pull-right">
-                <a{% if order == 'group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=group">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-group">{% bootstrap_icon 'triangle-bottom' %}</a>
-                </span>
-            </th>
             {% if not company %}<th>Société
                 <span class="pull-right">
                 <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
@@ -57,7 +51,6 @@ de la société {{ company }}{% endif %}{% endblock %}
         </tr>
         {% for object in object_list %}
         <tr><td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object }}</a></td>
-            <td>{{ object.group }}</td>
             {% if not company %}<td>{% if object.company %}<a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a>{% endif %}</td>{% endif %}
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</td>

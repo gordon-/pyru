@@ -136,12 +136,10 @@ class CompanyDetail(generic.DetailView):
 
 class CompanyCreation(generic.CreateView):
     model = Company
-    fields = ('name', 'group', 'type', 'comments', 'active', )
+    fields = ('name', 'type', 'comments', 'active', )
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
-        # standard filtering
-        form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
         self.properties = Properties.get_queryset(self.request.user)\
@@ -156,6 +154,7 @@ class CompanyCreation(generic.CreateView):
         company.properties = {p.name: form.cleaned_data[p.name] for p in
                               self.properties}
         company.author = self.request.user
+        company.group = self.request.user.default_group.group
         self.object = company
         try:
             company.save()
@@ -175,12 +174,10 @@ class CompanyCreation(generic.CreateView):
 
 class CompanyUpdate(generic.UpdateView):
     model = Company
-    fields = ('name', 'group', 'type', 'comments', 'active', )
+    fields = ('name', 'type', 'comments', 'active', )
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
-        # standard filtering
-        form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
         self.properties = Properties.get_queryset(self.request.user)\
@@ -237,7 +234,7 @@ class MeetingCreation(generic.CreateView):
         if 'company' in self.kwargs:
             company = get_object_or_404(
                 Company, slug=self.kwargs['company'],
-                group__in=self.request.user.groups.all()
+                group=self.request.user.default_group.group
             )
             form.fields['contact'].queryset = form.fields['contact'].queryset\
                 .filter(company=company)
@@ -246,7 +243,7 @@ class MeetingCreation(generic.CreateView):
         if 'contact' in self.kwargs:
             contact = get_object_or_404(
                 Contact, slug=self.kwargs['contact'],
-                group__in=self.request.user.groups.all()
+                group=self.request.user.default_group.group
             )
             self.contact = contact
             del(form.fields['contact'])
@@ -285,17 +282,17 @@ class MeetingList(generic.SearchFormMixin, generic.ListView):
         qs = super().get_queryset()
 
         if 'company' in self.kwargs:
-            self.company = get_object_or_404(Company,
-                                             slug=self.kwargs['company'],
-                                             group__in=self.request.user.groups
-                                             .all())
+            self.company = get_object_or_404(
+                Company,
+                slug=self.kwargs['company'],
+                group=self.request.user.default_group.group)
             qs = qs.filter(contact__company=self.company)
 
         if 'contact' in self.kwargs:
-            self.contact = get_object_or_404(Contact,
-                                             slug=self.kwargs['contact'],
-                                             group__in=self.request.user.groups
-                                             .all())
+            self.contact = get_object_or_404(
+                Contact,
+                slug=self.kwargs['contact'],
+                group=self.request.user.default_group.group)
             qs = qs.filter(contact=self.contact)
         return qs
 
@@ -342,18 +339,16 @@ class MeetingDelete(generic.DeleteView):
 
 class ContactCreation(generic.CreateView):
     model = Contact
-    fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
+    fields = ('firstname', 'lastname', 'company', 'type', 'comments',
               'active', )
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
-        # standard filtering
-        form.fields['group'].queryset = self.request.user.groups.all()
 
         if 'company' in self.kwargs:
             company = get_object_or_404(
                 Company, slug=self.kwargs['company'],
-                group__in=self.request.user.groups.all()
+                group=self.request.user.default_group.group
             )
             self.company = company
             del(form.fields['company'])
@@ -373,6 +368,7 @@ class ContactCreation(generic.CreateView):
         contact.properties = {p.name: form.cleaned_data[p.name] for p in
                               self.properties}
         contact.author = self.request.user
+        contact.group = self.request.user.default_group.group
         self.object = contact
         try:
             contact.save()
@@ -402,10 +398,10 @@ class ContactList(generic.SearchFormMixin, generic.ListView):
         qs = super().get_queryset()
 
         if 'company' in self.kwargs:
-            self.company = get_object_or_404(Company,
-                                             slug=self.kwargs['company'],
-                                             group__in=self.request.user.groups
-                                             .all())
+            self.company = get_object_or_404(
+                Company,
+                slug=self.kwargs['company'],
+                group=self.request.user.default_group.group)
             qs = qs.filter(company=self.company)
         return qs
 
@@ -422,13 +418,11 @@ class ContactDetail(generic.DetailView):
 
 class ContactUpdate(generic.UpdateView):
     model = Contact
-    fields = ('firstname', 'lastname', 'company', 'group', 'type', 'comments',
+    fields = ('firstname', 'lastname', 'company', 'type', 'comments',
               'active', )
 
     def get_form(self, form_class):
         form = super().get_form(form_class)
-        # standard filtering
-        form.fields['group'].queryset = self.request.user.groups.all()
 
         # properties fetching
         self.properties = Properties.get_queryset(self.request.user)\
@@ -483,15 +477,14 @@ class AlertCreation(generic.CreateView):
     def get_form(self, form_class):
         form = super().get_form(form_class)
 
-        form.fields['user'].queryset = User.objects.filter(
-            groups__in=self.request.user.groups.all()
-        ).distinct()
+        form.fields['user'].queryset = self.request.user.default_group.group\
+            .users
         form.fields['user'].initial = self.request.user
 
         if 'company' in self.kwargs:
             company = get_object_or_404(
                 Company, slug=self.kwargs['company'],
-                group__in=self.request.user.groups.all()
+                group=self.request.user.default_group.group
             )
             form.fields['contact'].queryset = form.fields['contact'].queryset\
                 .filter(company=company)
@@ -500,7 +493,7 @@ class AlertCreation(generic.CreateView):
         if 'contact' in self.kwargs:
             contact = get_object_or_404(
                 Contact, slug=self.kwargs['contact'],
-                group__in=self.request.user.groups.all()
+                group=self.request.user.default_group.group
             )
             self.contact = contact
             del(form.fields['contact'])
@@ -539,17 +532,17 @@ class AlertList(generic.SearchFormMixin, generic.ListView):
         qs = super().get_queryset()
 
         if 'company' in self.kwargs:
-            self.company = get_object_or_404(Company,
-                                             slug=self.kwargs['company'],
-                                             group__in=self.request.user.groups
-                                             .all())
+            self.company = get_object_or_404(
+                Company,
+                slug=self.kwargs['company'],
+                group=self.request.user.default_group.group)
             qs = qs.filter(contact__company=self.company)
 
         if 'contact' in self.kwargs:
-            self.contact = get_object_or_404(Contact,
-                                             slug=self.kwargs['contact'],
-                                             group__in=self.request.user.groups
-                                             .all())
+            self.contact = get_object_or_404(
+                Contact,
+                slug=self.kwargs['contact'],
+                group=self.request.user.default_group.group)
             qs = qs.filter(contact=self.contact)
         return qs
 
@@ -596,7 +589,7 @@ class AlertDelete(generic.DeleteView):
 
 class SavedSearchCreation(generic.CreateView):
     model = SavedSearch
-    fields = ('name', 'group', 'display_in_menu', 'type', 'data')
+    fields = ('name', 'display_in_menu', 'type', 'data')
 
     def get_form_kwargs(self):
         """
@@ -627,6 +620,7 @@ class SavedSearchCreation(generic.CreateView):
     def form_valid(self, form):
         search = form.save(commit=False)
         search.author = self.request.user
+        search.group = self.request.user.default_group.group
         self.object = search
         try:
             search.save()
@@ -682,7 +676,7 @@ class SavedSearchList(generic.ListView):
 
 class SavedSearchUpdate(generic.UpdateView):
     model = SavedSearch
-    fields = ('name', 'display_in_menu', 'group')
+    fields = ('name', 'display_in_menu')
 
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS,
@@ -783,7 +777,7 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
             try:
                 inserted, updated, errors = model\
                     .import_data(data, mapping, properties,
-                                 self.request.user, form.cleaned_data['group'])
+                                 self.request.user)
             except (UnicodeEncodeError, UnicodeDecodeError):
                 form.errors[field] = ['Encodage incorrect']
                 return self.form_invalid(form)
@@ -806,7 +800,7 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
                 messages.add_message(self.request, messages.ERROR,
                                      'Import de {} : {} erreur{}.'
                                      .format(model._meta.verbose_name_plural,
-                                             len(inserted + updated),
+                                             errors,
                                              plural))
 
             return redirect(
