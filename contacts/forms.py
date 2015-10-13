@@ -18,9 +18,11 @@ class SearchForm(forms.Form):
     def _process_multiple_targets(self, field_name, field_value, mapping):
         queries = []
         split_mode = False
-        if 'split' in mapping and mapping['split'] and ' ' in field_value:
+        split_char = mapping.get('split_char', ' ')
+        if 'split' in mapping and mapping['split']\
+                and split_char in field_value:
             split_mode = True
-            field_value = field_value.split(' ')
+            field_value = field_value.split(split_char)
         else:
             field_value = [field_value]
         for value in field_value:
@@ -47,6 +49,9 @@ class SearchForm(forms.Form):
         elif field_name.endswith('_more'):
             field_name = field_name[:-5]
             filters['{}__gt'.format(field_name)] = field_value
+        elif field_name.startswith('=='):
+            field_name = field_name[2:]
+            filters[field_name] = field_value
         elif field_name.startswith('='):
             field_name = field_name[1:]
             filters['{}__iequals'.format(field_name)] = field_value
@@ -93,6 +98,7 @@ class SearchForm(forms.Form):
 
 
 class ContactSearchForm(SearchForm):
+    id = forms.CharField(label='ID', required=False, widget=forms.HiddenInput)
     name = forms.CharField(label='nom', required=False)
     company = forms.CharField(label='société', required=False)
     creation_date_less = forms.DateTimeField(
@@ -130,8 +136,10 @@ class ContactSearchForm(SearchForm):
         )
 
     class Meta:
-        mappings = {'name': {'target': ['firstname', 'lastname'],
-                    'split': True, 'operator': 'and'},
+        mappings = {'id': {'target': ['==pk'],
+                           'split': True, 'operator': 'or', 'split_char': ','},
+                    'name': {'target': ['firstname', 'lastname'],
+                             'split': True, 'operator': 'and'},
                     'company': {'target': ['company__name']},
                     }
 
@@ -153,6 +161,7 @@ class ContactSearchForm(SearchForm):
 
 
 class CompanySearchForm(SearchForm):
+    id = forms.CharField(label='ID', required=False, widget=forms.HiddenInput)
     name = forms.CharField(label='nom', required=False)
     creation_date_less = forms.DateTimeField(
         label='ajouté avant le',
@@ -188,6 +197,11 @@ class CompanySearchForm(SearchForm):
         to_field_name='name',
         )
 
+    class Meta:
+        mappings = {'id': {'target': ['==pk'],
+                           'split': True, 'operator': 'or', 'split_char': ','},
+                    }
+
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:
             self.request = kwargs.pop('request')
@@ -206,6 +220,7 @@ class CompanySearchForm(SearchForm):
 
 
 class MeetingSearchForm(SearchForm):
+    id = forms.CharField(label='ID', required=False, widget=forms.HiddenInput)
     contact = forms.CharField(label='nom du contact', required=False)
     company = forms.CharField(label='société', required=False)
     date_less = forms.DateTimeField(
@@ -255,7 +270,9 @@ class MeetingSearchForm(SearchForm):
         super().__init__(*args, **kwargs)
 
     class Meta:
-        mappings = {'contact': {'target': ['contact__firstname',
+        mappings = {'id': {'target': ['==pk'],
+                           'split': True, 'operator': 'or', 'split_char': ','},
+                    'contact': {'target': ['contact__firstname',
                                            'contact__lastname'],
                                 'split': True, 'operator': 'and'},
                     'company': {'target': 'contact__company__name'},
@@ -263,6 +280,7 @@ class MeetingSearchForm(SearchForm):
 
 
 class AlertSearchForm(SearchForm):
+    id = forms.CharField(label='ID', required=False, widget=forms.HiddenInput)
     contact = forms.CharField(label='nom du contact', required=False)
     company = forms.CharField(label='société', required=False)
     date_less = forms.DateTimeField(
@@ -303,7 +321,9 @@ class AlertSearchForm(SearchForm):
     )
 
     class Meta:
-        mappings = {'contact': {'target': ['contact__firstname',
+        mappings = {'id': {'target': ['==pk'],
+                           'split': True, 'operator': 'or', 'split_char': ','},
+                    'contact': {'target': ['contact__firstname',
                                            'contact__lastname'],
                                 'split': True, 'operator': 'and'},
                     'company': {'target': 'contact__company__name'},
