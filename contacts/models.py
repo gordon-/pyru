@@ -201,8 +201,7 @@ class Alert(models.Model):
         logger.debug('Début de l’import d’alertes')
         company_cache = ImportCache(Company, user, group, logger)
         contact_cache = ImportCache(Contact, user, group, logger)
-        imported_objects = []
-        updated_objects = []
+        imported_objects = {}
         errors = 0
         data = combine_rows(data, mapping)
         for row in data:
@@ -228,7 +227,7 @@ class Alert(models.Model):
                     alert = cls.objects.create(**args)
                     logger.info('Création d’alerte : {}'
                                 .format(alert))
-                    imported_objects.append(alert)
+                    imported_objects[alert.pk] = alert
             except DataImportError as e:
                 logger.error('Erreur lors de l’import de l’alerte : {}'
                              .format(e))
@@ -237,11 +236,11 @@ class Alert(models.Model):
                 logger.error('Erreur inattendue ({}) : {}'
                              .format(e.__class__.__name__, e))
                 errors += 1
-        logger.debug('Fin de l’import d’alertes ({} créés, {} modifiés, '
+        logger.debug('Fin de l’import d’alertes ({} créés, '
                      '{} erreurs)'
-                     .format(len(imported_objects), len(updated_objects),
+                     .format(len(imported_objects),
                              errors))
-        return (imported_objects, updated_objects, errors)
+        return (list(imported_objects.values()), [], errors)
 
     def is_owned(self, user, perm=None):
         return self.user == user or self.author == user
@@ -357,8 +356,8 @@ class Company(models.Model):
         logger.debug('Début de l’import de sociétés')
         type_cache = ImportCache(ContactType, user, group, logger)
         prop_cache = ImportCache(Properties, user, group, logger)
-        imported_objects = []
-        updated_objects = []
+        imported_objects = {}
+        updated_objects = {}
         errors = 0
         for row in data:
             try:
@@ -386,14 +385,14 @@ class Company(models.Model):
                             contact.type = args['type']
                             contact.comments = args['comments']
                             contact.save()
-                            updated_objects.append(contact)
+                            updated_objects[contact.pk] = contact
                             logger.info('Modification de société : {}'
                                         .format(contact))
                         except cls.DoesNotExist:
                             contact = cls.objects.create(**args)
                             logger.info('Création de société : {}'
                                         .format(contact))
-                            imported_objects.append(contact)
+                            imported_objects[contact.pk] = contact
                     else:
                         logger.info('Société sans nom : on passe')
             except DataImportError as e:
@@ -408,7 +407,8 @@ class Company(models.Model):
                      '{} erreurs)'
                      .format(len(imported_objects), len(updated_objects),
                              errors))
-        return (imported_objects, updated_objects, errors)
+        return (list(imported_objects.values()),
+                list(updated_objects.values()), errors)
 
     @classmethod
     def get_queryset(cls, user, qs=None):
@@ -485,8 +485,8 @@ class Contact(models.Model):
         company_cache = ImportCache(Company, user, group, logger)
         type_cache = ImportCache(ContactType, user, group, logger)
         prop_cache = ImportCache(Properties, user, group, logger)
-        imported_objects = []
-        updated_objects = []
+        imported_objects = {}
+        updated_objects = {}
         errors = 0
         for row in data:
             try:
@@ -518,16 +518,16 @@ class Contact(models.Model):
                             contact.type = args['type']
                             contact.comments = args['comments']
                             contact.save()
-                            updated_objects.append(contact)
+                            updated_objects[contact.pk] = contact
                             logger.info('Modification de contact : {}'
                                         .format(contact))
                         except cls.DoesNotExist:
                             contact = cls.objects.create(**args)
                             logger.info('Création de contact : {}'
                                         .format(contact))
-                            imported_objects.append(contact)
-                    else:
-                        logger.info('Contact sans nom : on passe')
+                            imported_objects[contact.pk] = contact
+                        else:
+                            logger.info('Contact sans nom : on passe')
             except DataImportError as e:
                 logger.error('Erreur lors de l’import du contact : {}'
                              .format(e))
@@ -540,7 +540,8 @@ class Contact(models.Model):
                      '{} erreurs)'
                      .format(len(imported_objects), len(updated_objects),
                              errors))
-        return (imported_objects, updated_objects, errors)
+        return (list(imported_objects.values()),
+                list(updated_objects.values()), errors)
 
     @classmethod
     def get_queryset(cls, user, qs=None):
@@ -639,8 +640,7 @@ class Meeting(models.Model):
         company_cache = ImportCache(Company, user, group, logger)
         contact_cache = ImportCache(Contact, user, group, logger)
         type_cache = ImportCache(MeetingType, user, group, logger)
-        imported_objects = []
-        updated_objects = []
+        imported_objects = {}
         errors = 0
         data = combine_rows(data, mapping)
         for row in data:
@@ -663,7 +663,7 @@ class Meeting(models.Model):
                     meeting = cls.objects.create(**args)
                     logger.info('Création d’échange : {}'
                                 .format(meeting))
-                    imported_objects.append(meeting)
+                    imported_objects[meeting.pk] = meeting
             except DataImportError as e:
                 logger.error('Erreur lors de l’import de l’échange : {}'
                              .format(e))
@@ -672,11 +672,11 @@ class Meeting(models.Model):
                 logger.error('Erreur inattendue ({}) : {}'
                              .format(e.__class__.__name__, e))
                 errors += 1
-        logger.debug('Fin de l’import d’échanges ({} créés, {} modifiés, '
+        logger.debug('Fin de l’import d’échanges ({} créés, '
                      '{} erreurs)'
-                     .format(len(imported_objects), len(updated_objects),
+                     .format(len(imported_objects),
                              errors))
-        return (imported_objects, updated_objects, errors)
+        return (list(imported_objects.values()), [], errors)
 
     class Meta:
         verbose_name = 'échange'

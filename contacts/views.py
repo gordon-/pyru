@@ -788,14 +788,14 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
                 form.errors[field] = ['Encodage incorrect']
                 return self.form_invalid(form)
 
-            context = {'object_list': sorted(inserted + updated,
-                                             key=lambda i: i.update_date),
+            context = {'object_list': set(sorted(inserted + updated,
+                                                 key=lambda i: i.update_date)),
                        'errors': errors}
 
             if len(inserted + updated) > 0:
-                model_name_plural = model._meta.verbose_name\
+                model_name_plural = model._meta.verbose_name_plural\
                     if len(inserted + updated) > 0\
-                    else model._meta.verbose_name_plural
+                    else model._meta.verbose_name
                 messages.add_message(self.request, messages.SUCCESS,
                                      'Import de {} {} effectué.'
                                      .format(len(inserted + updated),
@@ -811,7 +811,8 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
 
             return redirect(
                 resolve_url('contacts:{}-list'.format(self.kwargs['type']))
-                + '?id=' + ','.join([o.pk for o in context['object_list']]))
+                + '?id=' + ','.join([str(o.pk) for o in
+                                     context['object_list']]))
             # return render(self.request,
             #               'contacts/{}_import.html'
             #               .format(self.kwargs['type']),

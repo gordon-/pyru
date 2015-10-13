@@ -12,6 +12,17 @@ saved_searches_types = '|'.join([c[0].lower() for c in SEARCH_CHOICES])
 
 urlpatterns = [
     url(r'^$', views.Home.as_view(), name='home'),
+
+    url(r'^(?P<type>(' + saved_searches_types + '))/import/?$',
+        views.Import.as_view(),
+        name='import'),
+    url(r'^(?P<type>(' + saved_searches_types + '))/export/?$',
+        views.Export.as_view(),
+        name='export'),
+    url(r'^/search/(?P<slug>[-\w]+)/export/?$',
+        views.Export.as_view(),
+        name='export'),
+
     url(r'^companies/?$', views.CompaniesList.as_view(), name='company-list'),
     url(r'^company/create/?$', views.CompanyCreation.as_view(),
         name='company-create'),
@@ -109,16 +120,6 @@ urlpatterns = [
     url(r'^search/(?P<slug>[-\w]+)/delete/?$',
         views.SavedSearchDelete.as_view(),
         name='search-delete'),
-
-    url(r'^import/(?P<type>(' + saved_searches_types + '))/?$',
-        views.Import.as_view(),
-        name='import'),
-    url(r'^export/(?P<type>(' + saved_searches_types + '))/?$',
-        views.Export.as_view(),
-        name='export'),
-    url(r'^/search/(?P<slug>[-\w]+)/export/?$',
-        views.Export.as_view(),
-        name='export'),
 
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},

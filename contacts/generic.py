@@ -297,12 +297,10 @@ class SearchFormMixin(generic.edit.FormMixin):
             except Exception:
                 pass
             context['querystring_without_order'] = urlencode(search_params)
-            if len(context['querystring_without_order']) == 0:
-                context['querystring_without_order'] += '?'
-            else:
+            if len(context['querystring_without_order']) > 0:
                 context['querystring_without_order'] += '&'
         else:
-            context['querystring_without_order'] = '?'
+            context['querystring_without_order'] = ''
         if self.form.is_submitted():
             context['add_search_form'] = SavedSearchForm()
             context['saved_search_url'] = resolve_url(

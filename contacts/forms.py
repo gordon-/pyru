@@ -94,7 +94,9 @@ class SearchForm(forms.Form):
         return qs
 
     def is_submitted(self):
-        return len(self.changed_data) != 0
+        return len(
+            [i for i in self.changed_data if
+             not isinstance(self.fields[i].widget, forms.HiddenInput)]) != 0
 
 
 class ContactSearchForm(SearchForm):

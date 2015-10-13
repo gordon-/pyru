@@ -17,26 +17,26 @@
     <table class="table table-striped table-bordered">
         <tr><th>Nom
                 <span class="pull-right">
-                <a{% if order == 'name' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=name">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-name' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-name">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'name' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=name">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-name' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-name">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Groupe
                 <span class="pull-right">
-                <a{% if order == 'group' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=group">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-group' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-group">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=group">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-group' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-group">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Type
                 <span class="pull-right">
-                <a{% if order == 'type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=type">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-type' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-type">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'type' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=type">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-type' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-type">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Contacts
                 <span class="pull-right">
-                <a{% if order == 'contacts' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=contacts">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-contacts' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-contacts">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'contacts' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=contacts">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-contacts' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-contacts">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Échanges</th>

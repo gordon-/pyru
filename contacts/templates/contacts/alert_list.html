@@ -27,26 +27,26 @@ de la société {{ company }}{% endif %}{% endblock %}
         <tr><th>Contact</th>
             {% if not company %}<th>Société
                 <span class="pull-right">
-                <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-company' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-company">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-company' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-company">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>{% endif %}
             <th>Date
                 <span class="pull-right">
-                <a{% if order == 'date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=date">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-date' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-date">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'date' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=date">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-date' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-date">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Titre
                 <span class="pull-right">
-                <a{% if order == 'title' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=title">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-title' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-title">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'title' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=title">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-title' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-title">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Achevé
                 <span class="pull-right">
-                <a{% if order == 'done' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=done">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == '-done' %} class="text-muted disabled"{% endif %} href="{{ querystring_without_order }}order=-done">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == 'done' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=done">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-done' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-done">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
             <th>Actions</th>
