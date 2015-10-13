@@ -25,7 +25,10 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'briefcase' %} Sociétés <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:company-list' %}">Liste</a></li>
-                {% if perms.contacts.add_company %}<li><a href="{% url 'contacts:company-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
+                {% if perms.contacts.add_company %}
+                <li><a href="{% url 'contacts:company-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>
+                <li><a href="{% url 'contacts:import' type='company' %}">{% bootstrap_icon 'import' %} Importer</a></li>
+                {% endif %}
                 {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=companies_displayed_searches type='company' %}
             </ul>
         </li>
@@ -36,7 +39,10 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'user' %} Contacts <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:contact-list' %}">Liste</a></li>
-                {% if perms.contacts.add_contact %}<li><a href="{% url 'contacts:contact-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
+                {% if perms.contacts.add_contact %}
+                <li><a href="{% url 'contacts:contact-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>
+                <li><a href="{% url 'contacts:import' type='contact' %}">{% bootstrap_icon 'import' %} Importer</a></li>
+                {% endif %}
                 {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=contacts_displayed_searches type='contact' %}
             </ul>
         </li>
@@ -49,7 +55,10 @@
             aria-expanded="false">{% bootstrap_icon 'comment' %} Échanges <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:meeting-list' %}">Liste</a></li>
-                {% if perms.contacts.add_meeting %}<li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
+                {% if perms.contacts.add_meeting %}
+                <li><a href="{% url 'contacts:meeting-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>
+                <li><a href="{% url 'contacts:import' type='meeting' %}">{% bootstrap_icon 'import' %} Importer</a></li>
+                {% endif %}
                 {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=meetings_displayed_searches type='meeting' %}
             </ul>
         </li>
@@ -60,7 +69,10 @@
             <a href="#" class="dropdown-toggle{% ifstartswith 'contacts:alert' %} active{% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'bell' %} Alertes <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="{% url 'contacts:alert-list' %}">Liste</a></li>
-                {% if perms.contacts.add_alert %}<li><a href="{% url 'contacts:alert-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>{% endif %}
+                {% if perms.contacts.add_alert %}
+                <li><a href="{% url 'contacts:alert-create' %}">{% bootstrap_icon 'plus' %} Ajouter</a></li>
+                <li><a href="{% url 'contacts:import' type='alert' %}">{% bootstrap_icon 'import' %} Importer</a></li>
+                {% endif %}
                 {% include 'contacts/partials/savedsearches_menu.html' with displayed_searches=alerts_displayed_searches type='alert' %}
             </ul>
         </li>

@@ -2,7 +2,7 @@ import csv
 from io import StringIO
 
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.core.urlresolvers import reverse_lazy
 from django import forms
 from django.views.generic.edit import ModelFormMixin, FormView
@@ -732,6 +732,7 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
+        model = self.get_model()
         if form.is_valid():
             if ('file' not in form.changed_data
                 and 'content' not in form.changed_data)\
@@ -780,7 +781,7 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
             if 'date_format' in form.cleaned_data:
                 properties = form.cleaned_data['date_format']  # urk!
             try:
-                inserted, updated, errors = self.get_model()\
+                inserted, updated, errors = model\
                     .import_data(data, mapping, properties,
                                  self.request.user, form.cleaned_data['group'])
             except (UnicodeEncodeError, UnicodeDecodeError):
@@ -791,10 +792,30 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
                                              key=lambda i: i.update_date),
                        'errors': errors}
 
-            return render(self.request,
-                          'contacts/{}_import.html'
-                          .format(self.kwargs['type']),
-                          context)
+            if len(inserted + updated) > 0:
+                model_name_plural = model._meta.verbose_name\
+                    if len(inserted + updated) > 0\
+                    else model._meta.verbose_name_plural
+                messages.add_message(self.request, messages.SUCCESS,
+                                     'Import de {} {} effectué.'
+                                     .format(len(inserted + updated),
+                                             model_name_plural))
+
+            if errors > 0:
+                plural = 's' if errors > 0 else ''
+                messages.add_message(self.request, messages.ERROR,
+                                     'Import de {} : {} erreur{}.'
+                                     .format(model._meta.verbose_name_plural,
+                                             len(inserted + updated),
+                                             plural))
+
+            return redirect(
+                resolve_url('contacts:{}-list'.format(self.kwargs['type']))
+                + '?id=' + ','.join([o.pk for o in context['object_list']]))
+            # return render(self.request,
+            #               'contacts/{}_import.html'
+            #               .format(self.kwargs['type']),
+            #               context)
         else:
             return self.form_invalid(form)
 
@@ -803,4 +824,6 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
         types = {c[0].lower(): c for c in SEARCH_CHOICES}
         context['import_type'] = types[self.kwargs['type']][0].lower()
         context['import_type_name'] = types[self.kwargs['type']][1]
+        context['search_type'] = self.kwargs['type']
+        context['words'] = self.get_model()._meta.words
         return context
