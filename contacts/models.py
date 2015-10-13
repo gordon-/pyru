@@ -240,7 +240,8 @@ class Alert(models.Model):
 
     def is_near(self):
         now = timezone.now()
-        return self.date > now and (self.date - now).days < 1
+        return (self.date < now and not self.done) or\
+            (self.date > now and (self.date - now).days < 1)
 
     class Meta:
         verbose_name = 'alerte'

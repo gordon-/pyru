@@ -21,7 +21,12 @@
             <p><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></p>
             <p><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></p>
             <p><span class="label{% if object.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}">{{ object.date | naturaltime }}</span></p>
-            <p>{{ object.comments }}</p>
+            <div>{{ object.get_comments | safe }}</div>
+            <form method="post" action="{% url 'contacts:alert-done' pk=object.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="done" value="1" />
+            <p class="pull-right"><button class="btn btn-success" data-toggle="tooltip" data-placement="top" data-original-title="Marquer comme achevé">{% bootstrap_icon 'ok' %}</button></p>
+            </form>
             </div>
         </div>
         {% empty %}

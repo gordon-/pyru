@@ -75,6 +75,8 @@ urlpatterns = [
     url(r'^contact/(?P<contact>[-\w]+)/alerts/?$',
         views.AlertList.as_view(),
         name='alert-list'),
+    url(r'^alert/(?P<pk>\d+)/done/?$', views.AlertDone.as_view(),
+        name='alert-done'),
     url(r'^company/(?P<company>[-\w]+)/alert/create/?$',
         views.AlertCreation.as_view(),
         name='alert-create'),

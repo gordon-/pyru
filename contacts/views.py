@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse_lazy
 from django import forms
 from django.views.generic.edit import ModelFormMixin, FormView
 from django.db import IntegrityError
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.forms.widgets import HiddenInput
@@ -57,7 +58,7 @@ class Home(generic.ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(date__gt=timezone.now(), done=False)
+        qs = qs.filter(Q(date__gt=timezone.now(), done=False) | Q(done=False))
         return qs.order_by('date')
 
     def get_context_data(self):
@@ -113,6 +114,13 @@ class Home(generic.ListView):
         context['notifications'] = last_updated
 
         return context
+
+
+class AlertDone(generic.UpdateView):
+
+    model = Alert
+    fields = ['done']
+    success_url = reverse_lazy('contacts:home')
 
 
 class CompaniesList(generic.SearchFormMixin, generic.ListView):
