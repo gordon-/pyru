@@ -35,7 +35,7 @@ def apply_mapping(row, mapping):
     mapped_row = {}
     for k, v in mapping.items():
         if v not in row:
-            raise ImportError('valeur {} absente'.format(v))
+            raise DataImportError('valeur {} absente'.format(v))
 
     rev_mapping = {v: k for k, v in mapping.items()}
     for k, v in row.items():
@@ -66,10 +66,12 @@ def combine_rows(data, mapping):
         else:
             row.update(fk_row)
             combined.append(row)
+    if len(combined) == 0:
+        return data
     return combined
 
 
-class ImportError(Exception):
+class DataImportError(Exception):
     pass
 
 
@@ -111,9 +113,6 @@ class ImportCache:
                     args = {self.key: item,
                             'author': self.user,
                             'group': self.group}
-                if args is None:
-                    import ipdb
-                    ipdb.set_trace()
                 obj = self.model.objects.create(**args)
                 self.logger.info('Création de {} : {}'
                                  .format(self.model._meta.verbose_name, obj))
@@ -187,6 +186,54 @@ class Alert(models.Model):
         if qs is None:
             qs = cls.objects
         return qs.filter(user=user)
+
+    @classmethod
+    def import_data(cls, data, mapping, format, user, group):
+        logger = logging.getLogger('import.alert')
+        logger.debug('Début de l’import d’alertes')
+        company_cache = ImportCache(Company, user, group, logger)
+        contact_cache = ImportCache(Contact, user, group, logger)
+        imported_objects = []
+        updated_objects = []
+        errors = 0
+        data = combine_rows(data, mapping)
+        for row in data:
+            try:
+                with transaction.atomic():
+                    row = apply_mapping(row, mapping)
+                    args = {}
+                    company = company_cache.get(row.pop('company'))
+                    firstname = row.pop('firstname')
+                    lastname = row.pop('lastname')
+                    contact = contact_cache.get({'company': company,
+                                                 'firstname': firstname,
+                                                 'lastname': lastname})
+                    args['contact'] = contact
+                    args['title'] = row.pop('title', '')
+                    args['comments'] = row.pop('comments')
+                    args['priority'] = row.pop('priority', 0)
+                    args['done'] = row.pop('done', 0)
+                    args['date'] = timezone.make_aware(
+                        datetime.strptime(row.pop('date'), format))
+                    args['author'] = user
+                    args['user'] = user
+                    alert = cls.objects.create(**args)
+                    logger.info('Création d’alerte : {}'
+                                .format(alert))
+                    imported_objects.append(alert)
+            except DataImportError as e:
+                logger.error('Erreur lors de l’import de l’alerte : {}'
+                             .format(e))
+                errors += 1
+            except Exception as e:
+                logger.error('Erreur inattendue ({}) : {}'
+                             .format(e.__class__.__name__, e))
+                errors += 1
+        logger.debug('Fin de l’import d’alertes ({} créés, {} modifiés, '
+                     '{} erreurs)'
+                     .format(len(imported_objects), len(updated_objects),
+                             errors))
+        return (imported_objects, updated_objects, errors)
 
     def is_owned(self, user, perm=None):
         return self.user == user or self.author == user
@@ -330,7 +377,7 @@ class Company(models.Model):
                             imported_objects.append(contact)
                     else:
                         logger.info('Société sans nom : on passe')
-            except ImportError as e:
+            except DataImportError as e:
                 logger.error('Erreur lors de l’import de la société : {}'
                              .format(e))
                 errors += 1
@@ -457,7 +504,7 @@ class Contact(models.Model):
                             imported_objects.append(contact)
                     else:
                         logger.info('Contact sans nom : on passe')
-            except ImportError as e:
+            except DataImportError as e:
                 logger.error('Erreur lors de l’import du contact : {}'
                              .format(e))
                 errors += 1
@@ -576,13 +623,14 @@ class Meeting(models.Model):
                                                  'lastname': lastname})
                     args['contact'] = contact
                     args['comments'] = row.pop('comments')
-                    args['date'] = datetime.strptime(row.pop('date'), format)
+                    args['date'] = timezone.make_aware(
+                        datetime.strptime(row.pop('date'), format))
                     args['author'] = user
                     meeting = cls.objects.create(**args)
                     logger.info('Création d’échange : {}'
                                 .format(meeting))
                     imported_objects.append(meeting)
-            except ImportError as e:
+            except DataImportError as e:
                 logger.error('Erreur lors de l’import de l’échange : {}'
                              .format(e))
                 errors += 1

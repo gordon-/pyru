@@ -403,3 +403,32 @@ class MeetingImportForm(ImportForm):
                                   'format')
     comments_field = forms.CharField(label='nom du champ « commentaires »',
                                      initial='comments')
+
+
+class AlertImportForm(ImportForm):
+    company_field = forms.CharField(label='nom du champ « société »',
+                                    initial='company')
+    firstname_field = forms.CharField(label='nom du champ « prénom »',
+                                      initial='firstname')
+    lastname_field = forms.CharField(label='nom du champ « nom »',
+                                     initial='lastname')
+    priority_field = forms.CharField(label='nom du champ « priorité »',
+                                     initial='priority',
+                                     required=False)
+    done_field = forms.CharField(label='nom du champ « fait »',
+                                 initial='done',
+                                 required=False)
+    date_field = forms.CharField(label='nom du champ « date »',
+                                 initial='date')
+    date_format = forms.CharField(label='format du champ « date »',
+                                  initial='%Y-%m-%dT%H:%M:%S%z',
+                                  help_text='Consulter <a href="https://docs.'
+                                  'python.org/2/library/datetime.html#strftime'
+                                  '-and-strptime-behavior">la documentation '
+                                  'Python</a> pour plus de détails sur le '
+                                  'format')
+    title_field = forms.CharField(label='nom du champ « titre »',
+                                  initial='title',
+                                  required=False)
+    comments_field = forms.CharField(label='nom du champ « commentaires »',
+                                     initial='comments')

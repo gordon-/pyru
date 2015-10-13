@@ -9,7 +9,7 @@
     <p>Affichage de {{ objects_count }}
     recherche{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
+    <table class="table table-striped table-bordered">
         <tr><th>Nom</th>
             <th>Groupe</th>
             <th>Type</th>
