@@ -10,7 +10,7 @@
     <p>Affichage de {{ objects_count }}
     alerte{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
+    <table class="table table-striped table-bordered">
         <tr><th>Contact</th>
             {% if not company %}<th>Société</th>{% endif %}
             <th>Date</th>

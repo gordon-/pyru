@@ -10,7 +10,7 @@
     <p>Affichage de {{ objects_count }}
     échange{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
-    <table class="table">
+    <table class="table table-striped table-bordered">
         <tr>{% if not company %}<th>Société</th>{% endif %}
             {% if not contact %}<th>Contact</th>{% endif %}
             <th>Date</th>
