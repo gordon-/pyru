@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'contacts.context_processors.saved_searches',
+                'contacts.context_processors.default_group',
             ],
         },
     },

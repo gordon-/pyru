@@ -12,12 +12,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'contacts:home' %}">Pyru</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li{% ifactive 'contacts:home' %} class="active"{% endifactive %}>
-            <a href="{% url 'contacts:home' %}">{% bootstrap_icon 'home' %} Accueil</a>
+            <a class="navbar-brand" href="{% url 'contacts:home' %}">{% bootstrap_icon 'home' %} Pyru</a>
         </li>
 
         {% if perms.contacts.view_company %}
@@ -78,11 +77,23 @@
         </li>
         {% endif %}
       </ul>
+      {% if perms.contacts.view_contact %}
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Recherche rapide">
+        </div>
+      </form>
+      {%  endif %}
       {% if user.is_authenticated %}
       <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown"><a href="#" class="dropdown-toggle {% ifstartswith 'contacts:account' %} active {% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'menu-hamburger' %} Bienvenue, {{ user }} <span class="caret"></span></a>
+          <li class="dropdown"><a href="#" class="dropdown-toggle {% ifstartswith 'contacts:account' %} active {% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'menu-hamburger' %} Bienvenue, <strong>{{ user }}</strong> <span class="caret"></span></a>
           <ul class="dropdown-menu">
             {# <li><a href="{% url 'contacts:account-detail' %}">{% bootstrap_icon 'wrench' %} Gestion du compte</a></li> #}
+            <li class="dropdown-header">Groupe par défaut</li>
+            {% for group in user.groups.all %}
+            <li><a href="{% url 'contacts:group-change' pk=group.pk %}" title="Activer ce groupe">{% if group == default_group %}{% bootstrap_icon 'ok' %} {% endif %}{{ group }}</a></li>
+            {% endfor %}
+            <li role="separator" class="divider"></li>
             {% if user.is_staff %}<li><a href="{% url 'admin:index' %}">
                     {% bootstrap_icon 'cog' %} Administration</a></li>
             {% endif %}

@@ -102,6 +102,8 @@ class PermissionMixin():
         model = self.get_model()
         if hasattr(model, 'get_queryset'):
             qs = model.get_queryset(self.request.user)
+        else:
+            qs = model.objects.all()
         return qs
 
 

@@ -9,7 +9,7 @@ from django.views.generic.edit import ModelFormMixin, FormView
 from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms.widgets import HiddenInput
 import chardet
 
@@ -828,3 +828,18 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
         context['search_type'] = self.kwargs['type']
         context['words'] = self.get_model()._meta.words
         return context
+
+
+class GroupChange(generic.DetailView):
+    model = Group
+
+    def get(self, request, pk):
+        group = self.get_object()
+        request.user.default_group.group = group
+        request.user.default_group.save()
+        messages.add_message(self.request, messages.INFO,
+                             'Groupe changé : {}'.format(group))
+        return redirect('contacts:home')
+
+    def get_queryset(self):
+        return self.request.user.groups

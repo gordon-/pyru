@@ -124,6 +124,19 @@ class ImportCache:
         return self.items[item_hash]
 
 
+class DefaultGroup(models.Model):
+    user = models.OneToOneField(User, related_name='default_group')
+    group = models.ForeignKey(Group, related_name='users_with_default')
+
+    def str(self):
+        return self.group.name
+
+    class Meta:
+        verbose_name = 'groupe par défaut'
+        verbose_name_plural = 'groupes par défaut'
+        unique_together = (('user', 'group'), )
+
+
 class Properties(models.Model):
     name = models.CharField('nom', max_length=100)
     order = models.PositiveIntegerField('ordre', default=1)

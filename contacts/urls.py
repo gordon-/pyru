@@ -121,6 +121,10 @@ urlpatterns = [
         views.SavedSearchDelete.as_view(),
         name='search-delete'),
 
+    url(r'^group-change/(?P<pk>\d+)/?$',
+        views.GroupChange.as_view(),
+        name='group-change'),
+
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},
         name='logout'),
