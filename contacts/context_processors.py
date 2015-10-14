@@ -1,4 +1,4 @@
-from .models import SavedSearch, DefaultGroup
+from .models import SavedSearch
 
 
 def saved_searches(request):
@@ -14,11 +14,6 @@ def saved_searches(request):
 
 def default_group(request):
     context = {}
-    try:
-        default_group = request.user.default_group
-    except DefaultGroup.DoesNotExist:
-        default_group = DefaultGroup.objects.create(
-            user=request.user,
-            group=request.user.groups.first())
+    default_group = request.user.default_group
     context['default_group'] = default_group.group
     return context
