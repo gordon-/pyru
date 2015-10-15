@@ -28,13 +28,23 @@
     </h3>
     <table class="table">
         <tr><th>Nom</th>
-            <th>Type</th>
+            {% for prop in properties_names %}
+            {% with '-'|add:prop as minus_prop %}
+            <th>{{ prop }}
+                <span class="pull-right">
+                <a{% if order == prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=properties__{{ prop }}">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == minus_prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-properties__{{ prop }}">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            {% endwith %}
+            {% endfor %}
             <th>Actions</th>
         </tr>
         {% for contact in object.contacts.all %}
         <tr><td><a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a></td>
-            <td>{% if contact.type.icon %}{% bootstrap_icon contact.type.icon %}
-                {% endif %}{{ contact.type }}</td>
+            {% for prop_name, prop_value in object.get_displayed_properties.items %}
+            <td>{{ prop_value | safe }}</td>
+            {% endfor %}
             <td>{% if perms.contacts.change_contact %}<a href="{% url 'contacts:contact-update' slug=contact.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_contact %}<a href="{% url 'contacts:contact-delete' slug=contact.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>

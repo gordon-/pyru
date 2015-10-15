@@ -9,7 +9,7 @@ from django.views.generic.edit import ModelFormMixin, FormView
 from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.forms.widgets import HiddenInput
 import chardet
 
@@ -128,10 +128,24 @@ class CompaniesList(generic.SearchFormMixin, generic.ListView):
     form_class = CompanySearchForm
     paginate_by = 10
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['properties_names'] = Properties.get_displayed_names(
+            self.request.user.default_group.group,
+            'company')
+        return context
+
 
 class CompanyDetail(generic.DetailView):
 
     model = Company
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['properties_names'] = Properties.get_displayed_names(
+            self.request.user.default_group.group,
+            'contact')
+        return context
 
 
 class CompanyCreation(generic.CreateView):
@@ -409,6 +423,9 @@ class ContactList(generic.SearchFormMixin, generic.ListView):
         context = super().get_context_data(*args, **kwargs)
         if hasattr(self, 'company'):
             context['company'] = self.company
+        context['properties_names'] = Properties.get_displayed_names(
+            self.request.user.default_group.group,
+            'contact')
         return context
 
 

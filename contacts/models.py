@@ -144,6 +144,8 @@ class Properties(models.Model):
     type = models.CharField('type', max_length=16, choices=PROP_CHOICES)
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='properties')
+    display_on_list = models.BooleanField('afficher dans les listes',
+                                          default=False)
     author = models.ForeignKey(User, verbose_name='créateur',
                                related_name='added_properties')
     creation_date = models.DateTimeField('date de création', auto_now_add=True)
@@ -160,6 +162,14 @@ class Properties(models.Model):
         if qs is None:
             qs = cls.objects
         return qs.filter(group=user.default_group.group)
+
+    @classmethod
+    def get_displayed_names(cls, group, type):
+        displayed = [p.name for p in
+                     Properties.objects.filter(type=type,
+                                               group=group,
+                                               display_on_list=True)]
+        return displayed
 
     class Meta:
         verbose_name = 'propriété'
@@ -334,14 +344,23 @@ class Company(models.Model):
         return bleach.clean(bleach.linkify(markdown(self.comments)),
                             ALLOWED_TAGS)
 
+    def _prop_order(self, i):
+        return Properties.objects.get(group=self.group, type='company',
+                                      name=i[0]).order
+
     def get_properties(self):
-
-        def prop_order(i):
-            return Properties.objects.get(group=self.group, type='company',
-                                          name=i[0]).order
-
         return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=prop_order)
+                sorted(self.properties.items(), key=self._prop_order)
+                }
+
+    def get_displayed_properties(self):
+        displayed = [p.name for p in
+                     Properties.objects.filter(type='company',
+                                               group=self.group,
+                                               display_on_list=True)]
+        return {k: bleach.linkify(v, parse_email=True) for k, v in
+                sorted(self.properties.items(), key=self._prop_order)
+                if k in displayed
                 }
 
     def get_glyphicon(self):
@@ -472,14 +491,23 @@ class Contact(models.Model):
         return bleach.clean(bleach.linkify(markdown(self.comments)),
                             ALLOWED_TAGS)
 
+    def _prop_order(self, i):
+        return Properties.objects.get(group=self.group, type='contact',
+                                      name=i[0]).order
+
     def get_properties(self):
-
-        def prop_order(i):
-            return Properties.objects.get(group=self.group, type='contact',
-                                          name=i[0]).order
-
         return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=prop_order)
+                sorted(self.properties.items(), key=self._prop_order)
+                }
+
+    def get_displayed_properties(self):
+        displayed = [p.name for p in
+                     Properties.objects.filter(type='contact',
+                                               group=self.group,
+                                               display_on_list=True)]
+        return {k: bleach.linkify(v, parse_email=True) for k, v in
+                sorted(self.properties.items(), key=self._prop_order)
+                if k in displayed
                 }
 
     def get_glyphicon(self):

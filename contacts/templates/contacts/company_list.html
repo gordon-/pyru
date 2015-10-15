@@ -34,6 +34,16 @@
                 </span>
             </th>
             <th>Échanges</th>
+            {% for prop in properties_names %}
+            {% with '-'|add:prop as minus_prop %}
+            <th>{{ prop }}
+                <span class="pull-right">
+                <a{% if order == prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=properties__{{ prop }}">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == minus_prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-properties__{{ prop }}">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
+            {% endwith %}
+            {% endfor %}
             <th>Actions</th>
         </tr>
         {% for object in object_list %}
@@ -42,6 +52,9 @@
                 {% endif %}{{ object.type }}</td>
             <td><a href="{% url 'contacts:contact-list' company=object.slug %}">{% bootstrap_icon 'user' %} {{ object.contacts.count }}</a></td>
             <td><a href="{% url 'contacts:meeting-list' company=object.slug %}">{% bootstrap_icon 'comment' %} {{ object.meetings.count }}</a></td>
+            {% for prop_name, prop_value in object.get_displayed_properties.items %}
+            <td>{{ prop_value | safe }}</td>
+            {% endfor %}
             <td>{% if perms.contacts.change_company %}<a href="{% url 'contacts:company-update' slug=object.slug %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_company %}<a href="{% url 'contacts:company-delete' slug=object.slug %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
