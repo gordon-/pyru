@@ -5,7 +5,8 @@ class DefaultGroupMiddleware:
 
     def process_request(self, request):
         try:
-            request.user.default_group
+            if request.user.is_authenticated():
+                request.user.default_group
         except DefaultGroup.DoesNotExist:
             DefaultGroup.objects.create(
                 user=request.user,
