@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
+from django.utils.text import slugify
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.contrib.auth.decorators import login_required, permission_required
@@ -14,6 +15,7 @@ from django.db.models import Count
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyRel, ManyToOneRel)
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.postgres.fields import HStoreField
 from datetimewidget.widgets import DateTimeWidget, DateWidget
 from autocomplete_light.forms import ModelForm
 
@@ -242,6 +244,8 @@ class SearchFormMixin(generic.edit.FormMixin):
             order = self.request.GET['order']
             if order[0] == '-':
                 order = order[1:]
+            if '__' in order:
+                order = order[:order.find('__')]
             if order in model._meta.get_all_field_names():
                 self.order = self.request.GET['order']
                 field = model._meta.get_field(order)
@@ -260,6 +264,25 @@ class SearchFormMixin(generic.edit.FormMixin):
                     qs = qs.annotate(count_order=Count(order))\
                         .order_by('{}count_order'.format(sign))
                     pass
+                elif isinstance(field, HStoreField):
+                    try:
+                        if self.order[0] == '-':
+                            order = self.order[1:]
+                            minus = '-'
+                        else:
+                            order = self.order
+                            minus = ''
+                        field, name = order.split('__')
+                        field_name = '{}_{}'.format(field,
+                                                    slugify(name)
+                                                    .replace('-', '_'))
+                        select = {field_name:
+                                  "{}->'{}'".format(field, name)}
+                        qs = qs.extra(select=select).order_by(
+                            '{}{}'.format(minus, field_name))
+                    except Exception as e:
+                        import ipdb
+                        ipdb.set_trace()
                 else:
                     qs = qs.order_by(self.order)
         return qs

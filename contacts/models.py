@@ -1,6 +1,7 @@
 import sys
 import logging
 from datetime import datetime
+from collections import OrderedDict
 
 from django.db import models, transaction
 from django.db.models import Q, options
@@ -359,10 +360,11 @@ class Company(models.Model):
                      Properties.objects.filter(type='company',
                                                group=self.group,
                                                display_on_list=True)]
-        return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=self._prop_order)
-                if k in displayed
-                }
+        props = OrderedDict()
+        for k, v in sorted(self.properties.items(), key=self._prop_order):
+            if k in displayed:
+                props[k] = bleach.linkify(v, parse_email=True)
+        return props
 
     def get_glyphicon(self):
         return 'briefcase'
@@ -506,10 +508,11 @@ class Contact(models.Model):
                      Properties.objects.filter(type='contact',
                                                group=self.group,
                                                display_on_list=True)]
-        return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=self._prop_order)
-                if k in displayed
-                }
+        props = OrderedDict()
+        for k, v in sorted(self.properties.items(), key=self._prop_order):
+            if k in displayed:
+                props[k] = bleach.linkify(v, parse_email=True)
+        return props
 
     def get_glyphicon(self):
         return 'user'

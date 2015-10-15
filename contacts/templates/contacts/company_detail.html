@@ -29,14 +29,7 @@
     <table class="table">
         <tr><th>Nom</th>
             {% for prop in properties_names %}
-            {% with '-'|add:prop as minus_prop %}
-            <th>{{ prop }}
-                <span class="pull-right">
-                <a{% if order == prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=properties__{{ prop }}">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == minus_prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-properties__{{ prop }}">{% bootstrap_icon 'triangle-bottom' %}</a>
-                </span>
-            </th>
-            {% endwith %}
+            <th>{{ prop }}</th>
             {% endfor %}
             <th>Actions</th>
         </tr>

@@ -35,13 +35,15 @@
             </th>
             <th>Échanges</th>
             {% for prop in properties_names %}
-            {% with '-'|add:prop as minus_prop %}
+            {% with 'properties__'|add:prop as prop_name %}
+            {% with '-properties__'|add:prop as minus_prop_name %}
             <th>{{ prop }}
                 <span class="pull-right">
-                <a{% if order == prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=properties__{{ prop }}">{% bootstrap_icon 'triangle-top' %}</a>
-                <a{% if order == minus_prop %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-properties__{{ prop }}">{% bootstrap_icon 'triangle-bottom' %}</a>
+                <a{% if order == prop_name %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=properties__{{ prop }}">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == minus_prop_name %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-properties__{{ prop }}">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
+            {% endwith %}
             {% endwith %}
             {% endfor %}
             <th>Actions</th>
