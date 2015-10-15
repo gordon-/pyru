@@ -168,7 +168,8 @@ class Properties(models.Model):
         displayed = [p.name for p in
                      Properties.objects.filter(type=type,
                                                group=group,
-                                               display_on_list=True)]
+                                               display_on_list=True)
+                     .order_by('order')]
         return displayed
 
     class Meta:
