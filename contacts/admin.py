@@ -8,8 +8,8 @@ from .models import (
 
 @admin.register(Properties)
 class PropertiesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group', 'order', 'display_on_list')
-    list_filter = ('group', 'display_on_list')
+    list_display = ('name', 'group', 'type', 'order', 'display_on_list')
+    list_filter = ('group', 'type', 'display_on_list')
     search_fields = ('name', )
 
 
