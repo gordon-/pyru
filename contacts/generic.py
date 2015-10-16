@@ -273,14 +273,16 @@ class SearchFormMixin(generic.edit.FormMixin):
                             order = self.order
                             minus = ''
                         field, name = order.split('__')
-                        field_name = '{}_{}'.format(field,
-                                                    slugify(name)
-                                                    .replace('-', '_'))
+                        field_name = 'ordering_{}_{}'.format(
+                            field, slugify(name).replace('-', '_'))
                         select = {field_name:
-                                  "{}->'{}'".format(field, name)}
+                                  "{}.{}->'{}'".format(model._meta.db_table,
+                                                       field, name)}
+                        import ipdb
+                        ipdb.set_trace()
                         qs = qs.extra(select=select).order_by(
                             '{}{}'.format(minus, field_name))
-                    except Exception as e:
+                    except Exception:
                         import ipdb
                         ipdb.set_trace()
                 else:
