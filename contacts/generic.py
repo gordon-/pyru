@@ -278,8 +278,6 @@ class SearchFormMixin(generic.edit.FormMixin):
                         select = {field_name:
                                   "{}.{}->'{}'".format(model._meta.db_table,
                                                        field, name)}
-                        import ipdb
-                        ipdb.set_trace()
                         qs = qs.extra(select=select).order_by(
                             '{}{}'.format(minus, field_name))
                     except Exception:
