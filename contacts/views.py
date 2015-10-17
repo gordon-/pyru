@@ -1,11 +1,13 @@
 import csv
 from io import StringIO
 
+from django.http.response import HttpResponse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.core.urlresolvers import reverse_lazy
 from django import forms
 from django.views.generic.edit import ModelFormMixin, FormView
+from django.views.generic import ListView
 from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib import messages
@@ -720,10 +722,6 @@ class SavedSearchDelete(generic.DeleteView):
         return super().delete(*args, **kwargs)
 
 
-class Export(generic.ListView):
-    model = Contact
-
-
 class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
              FormView):
     permission_suffix = 'add'
@@ -854,3 +852,37 @@ class GroupChange(generic.DetailView):
 
     def get_queryset(self):
         return self.request.user.groups
+
+
+class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
+             generic.LatePermissionMixin, ListView):
+
+    def get_model(self):
+        types = {c[0].lower(): c for c in SEARCH_CHOICES}
+        class_name = types[self.kwargs['type']][0]
+        from . import models
+        self.model = getattr(models, class_name)
+        return self.model
+
+    def get_form_class(self):
+        types = {c[0].lower(): c for c in SEARCH_CHOICES}
+        if 'type' in self.kwargs:
+            form_class_name = '{}SearchForm'.format(
+                types[self.kwargs['type']][0])
+        else:
+            obj = self.get_object()
+            form_class_name = '{}SearchForm'.format(
+                obj._meta.model_name)
+        from . import forms
+        return getattr(forms, form_class_name)
+
+    def get(self, request, *args, **kwargs):
+        model = self.get_model()
+        super().get(request, *args, **kwargs)
+        qs = self.object_list
+        response = HttpResponse(content_type='text/csv')
+        import ipdb
+        ipdb.set_trace()
+        export = model.export(qs)
+        writer = csv.DictWriter(response)
+        return response
