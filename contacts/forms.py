@@ -361,7 +361,8 @@ class ContactImportForm(ImportForm):
     properties_list = forms.CharField(label='liste des propriétés à importer',
                                       help_text='séparez les propriétés par '
                                       'des espaces, et laissez vide pour '
-                                      'extraire toutes les propriétés')
+                                      'extraire toutes les propriétés',
+                                      required=False)
 
 
 class CompanyImportForm(ImportForm):
@@ -374,7 +375,8 @@ class CompanyImportForm(ImportForm):
     properties_list = forms.CharField(label='liste des propriétés à importer',
                                       help_text='séparez les propriétés par '
                                       'des espaces, et laissez vide pour '
-                                      'extraire toutes les propriétés')
+                                      'extraire toutes les propriétés',
+                                      required=False)
 
 
 class MeetingImportForm(ImportForm):
