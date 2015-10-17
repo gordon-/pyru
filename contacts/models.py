@@ -356,14 +356,14 @@ class Company(models.Model):
                 }
 
     def get_displayed_properties(self):
-        displayed = [p.name for p in
-                     Properties.objects.filter(type='company',
-                                               group=self.group,
-                                               display_on_list=True)]
+        displayed = OrderedDict()
+        for p in Properties.objects.filter(type='company', group=self.group,
+                                           display_on_list=True):
+            displayed[p.name] = ''
         props = OrderedDict()
         for k, v in sorted(self.properties.items(), key=self._prop_order):
             if k in displayed:
-                props[k] = bleach.linkify(v, parse_email=True)
+                displayed[k] = bleach.linkify(v, parse_email=True)
         return props
 
     def get_glyphicon(self):
@@ -505,15 +505,14 @@ class Contact(models.Model):
                 }
 
     def get_displayed_properties(self):
-        displayed = [p.name for p in
-                     Properties.objects.filter(type='contact',
-                                               group=self.group,
-                                               display_on_list=True)]
-        props = OrderedDict()
+        displayed = OrderedDict()
+        for p in Properties.objects.filter(type='contact', group=self.group,
+                                           display_on_list=True):
+            displayed[p.name] = ''
         for k, v in sorted(self.properties.items(), key=self._prop_order):
             if k in displayed:
-                props[k] = bleach.linkify(v, parse_email=True)
-        return props
+                displayed[k] = bleach.linkify(v, parse_email=True)
+        return displayed
 
     def get_glyphicon(self):
         return 'user'
