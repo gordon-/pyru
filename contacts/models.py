@@ -592,6 +592,46 @@ class Contact(models.Model):
                 list(updated_objects.values()), errors)
 
     @classmethod
+    def export_data(self, qs):
+        export = []
+        fields = {'firstname': None,
+                  'lastname': None,
+                  'company': 'company__name',
+                  'type': 'type__name',
+                  'group': 'group__name',
+                  'creation_date': None,
+                  'update_date': None,
+                  'author': 'author__username',
+                  'active': None,
+                  'comments': None,
+                  }
+        logger = logging.getLogger('export.contact')
+        for obj in qs:
+            logger.debug('Beginning export of contact {}'.format(obj))
+            row = OrderedDict()
+            for key, mapping in fields.items():
+                if mapping is None:
+                    row[key] = getattr(obj, key)
+                else:
+                    logger.debug('exporting field {} to {}'
+                                 .format(key, mapping))
+                    remaining_fields = mapping.split('__')
+                    value = obj
+                    while len(remaining_fields) >= 1:
+                        logger.debug('remaining fields: {}, value: {}'
+                                     .format(remaining_fields, value))
+                        try:
+                            value = getattr(value, remaining_fields.pop(0))
+                        except AttributeError:
+                            value = ''
+                    row[key] = value
+            # properties fetch
+            row.update(obj.properties)
+            export.append(row)
+
+        return export
+
+    @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects

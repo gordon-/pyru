@@ -881,8 +881,13 @@ class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
         super().get(request, *args, **kwargs)
         qs = self.object_list
         response = HttpResponse(content_type='text/csv')
-        import ipdb
-        ipdb.set_trace()
-        export = model.export(qs)
-        writer = csv.DictWriter(response)
+        response['Content-Disposition'] = 'attachment; '\
+            'filename="pyru_contacts_{}.csv"'.format(timezone.now()
+                                                     .strftime('%Y-%M-%d'))
+        export = model.export_data(qs)
+        if len(export):
+            writer = csv.DictWriter(response, fieldnames=export[0].keys())
+            writer.writeheader()
+            for row in export:
+                writer.writerow(row)
         return response
