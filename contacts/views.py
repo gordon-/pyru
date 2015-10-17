@@ -783,7 +783,8 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
             data = reencode_data(reader, detection)
 
             properties = None
-            if 'properties_list' in form.cleaned_data:
+            if 'properties_list' in form.cleaned_data and\
+                    form.cleaned_data['properties_list'] != '':
                 properties = [p.strip() for p in
                               form.cleaned_data['properties_list'].split(',')
                               ]
@@ -883,7 +884,7 @@ class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; '\
             'filename="pyru_contacts_{}.csv"'.format(timezone.now()
-                                                     .strftime('%Y-%M-%d'))
+                                                     .strftime('%Y%m%d%H%m%S'))
         export = model.export_data(qs)
         if len(export):
             writer = csv.DictWriter(response, fieldnames=export[0].keys())

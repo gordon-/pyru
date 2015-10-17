@@ -409,7 +409,8 @@ class Company(models.Model):
                         args['author'] = user
                         args['group'] = user.default_group.group
                         for prop, prop_value in row.items():
-                            if prop is not None and prop in properties:
+                            if prop is not None and\
+                                    (properties is None or prop in properties):
                                 prop_cache.get({'type': 'company',
                                                 'name': prop})
                                 args['properties'][prop] = prop_value
@@ -551,7 +552,8 @@ class Contact(models.Model):
                         args['author'] = user
                         args['group'] = user.default_group.group
                         for prop, prop_value in row.items():
-                            if prop is not None and prop in properties:
+                            if prop is not None and\
+                                    (properties is None or prop in properties):
                                 prop_cache.get({'type': 'contact',
                                                 'name': prop})
                                 args['properties'][prop] = prop_value
@@ -625,6 +627,8 @@ class Contact(models.Model):
                         except AttributeError:
                             value = ''
                     row[key] = value
+                if isinstance(row[key], bool):
+                    row[key] = int(row[key])
             # properties fetch
             row.update(obj.properties)
             export.append(row)
