@@ -599,10 +599,6 @@ class Contact(models.Model):
                   'lastname': None,
                   'company': 'company__name',
                   'type': 'type__name',
-                  'group': 'group__name',
-                  'creation_date': None,
-                  'update_date': None,
-                  'author': 'author__username',
                   'active': None,
                   'comments': None,
                   }
