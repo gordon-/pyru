@@ -72,8 +72,8 @@
             <th>Actions</th>
         </tr>
         {% for object in object_list %}
-        <tr>{% if not company %}<td><a href="{{ object.contact.company.get_absolute_url }}"> {% bootstrap_icon 'briefcase' %}
-            {{ object.contact.company }}</a></td>{% endif %}
+        <tr>{% if not company %}<td>{% if object.contact.company %}<a href="{{ object.contact.company.get_absolute_url }}"> {% bootstrap_icon 'briefcase' %}
+            {{ object.contact.company }}</a>{% endif %}</td>{% endif %}
             {% if not contact %}<td><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></td>{% endif %}
             <td><a class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}" href="{{ object.get_absolute_url }}">{{ object.date | naturaltime }}</a></td>
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
