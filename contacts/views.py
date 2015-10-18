@@ -731,7 +731,14 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
         types = {c[0].lower(): c for c in SEARCH_CHOICES}
         form_class_name = '{}ImportForm'.format(types[self.kwargs['type']][0])
         from . import forms
-        return getattr(forms, form_class_name)
+        form = getattr(forms, form_class_name)
+        # default attributes
+        if 'properties_list' in form.base_fields:
+            form.base_fields['properties_list'].initial = ','\
+                .join(Properties.get_displayed_names(
+                      self.request.user.default_group.group,
+                      self.kwargs['type']))
+        return form
 
     def get_model(self):
         types = {c[0].lower(): c for c in SEARCH_CHOICES}
@@ -888,7 +895,8 @@ class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
                                                .strftime('%Y%m%d%H%m%S'))
         export = model.export_data(qs)
         if len(export):
-            writer = csv.DictWriter(response, fieldnames=export[0].keys())
+            writer = csv.DictWriter(response, fieldnames=export[0].keys(),
+                                    escapechar='\\', doublequote=False)
             writer.writeheader()
             for row in export:
                 writer.writerow(row)

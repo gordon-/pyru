@@ -57,7 +57,7 @@ class MeetingTypeAdmin(admin.ModelAdmin):
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
     list_display = ('author', 'group', 'contact', 'type', 'date')
-    list_filter = ('author', 'type', 'date')
+    list_filter = ('author', 'contact__group', 'type', 'date')
     search_fields = ('contact__firstname', 'contact__lastname',
                      'author__username')
 

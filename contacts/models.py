@@ -12,6 +12,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.postgres import fields
 from markdown import markdown
 import bleach
+from dateutil import parser
 
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('words',)
@@ -246,8 +247,13 @@ class Alert(models.Model):
                     args['comments'] = row.pop('comments')
                     args['priority'] = row.pop('priority', 0)
                     args['done'] = row.pop('done', 0)
-                    args['date'] = timezone.make_aware(
-                        datetime.strptime(row.pop('date'), format))
+                    date_str = row.pop('date')
+                    try:
+                        date = timezone.make_aware(
+                            datetime.strptime(date_str, format))
+                    except ValueError:
+                        date = parser.parse(date_str)
+                    args['date'] = date
                     args['author'] = user
                     args['user'] = user
                     alert = cls.objects.create(**args)
@@ -298,6 +304,8 @@ class Alert(models.Model):
                     row[key] = value
                 if isinstance(row[key], bool):
                     row[key] = int(row[key])
+                elif hasattr(row[key], 'isoformat'):
+                    row[key] = row[key].isoformat()
             export.append(row)
 
         return export
@@ -506,6 +514,8 @@ class Company(models.Model):
                     row[key] = value
                 if isinstance(row[key], bool):
                     row[key] = int(row[key])
+                elif hasattr(row[key], 'isoformat'):
+                    row[key] = row[key].isoformat()
             # properties fetch
             row.update(obj.properties)
             export.append(row)
@@ -586,8 +596,9 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('{} {}'.format(self.firstname,
-                                               self.lastname))
+            company = '{} '.format(self.company) if self.company else ''
+            self.slug = slugify('{}{} {}'.format(company, self.firstname,
+                                                 self.lastname))
         return super().save(*args, **kwargs)
 
     @classmethod
@@ -683,6 +694,8 @@ class Contact(models.Model):
                     row[key] = value
                 if isinstance(row[key], bool):
                     row[key] = int(row[key])
+                elif hasattr(row[key], 'isoformat'):
+                    row[key] = row[key].isoformat()
             # properties fetch
             row.update(obj.properties)
             export.append(row)
@@ -804,8 +817,13 @@ class Meeting(models.Model):
                                                  'lastname': lastname})
                     args['contact'] = contact
                     args['comments'] = row.pop('comments')
-                    args['date'] = timezone.make_aware(
-                        datetime.strptime(row.pop('date'), format))
+                    date_str = row.pop('date')
+                    try:
+                        date = timezone.make_aware(
+                            datetime.strptime(date_str, format))
+                    except ValueError:
+                        date = parser.parse(date_str)
+                    args['date'] = date
                     args['author'] = user
                     meeting = cls.objects.create(**args)
                     logger.info('Création d’échange : {}'
@@ -830,7 +848,7 @@ class Meeting(models.Model):
         export = []
         fields = {'firstname': 'contact__firstname',
                   'lastname': 'contact__lastname',
-                  'company': 'company__name',
+                  'company': 'contact__company__name',
                   'type': 'type__name',
                   'date': None,
                   'comments': None,
@@ -853,6 +871,8 @@ class Meeting(models.Model):
                     row[key] = value
                 if isinstance(row[key], bool):
                     row[key] = int(row[key])
+                elif hasattr(row[key], 'isoformat'):
+                    row[key] = row[key].isoformat()
             export.append(row)
 
         return export
