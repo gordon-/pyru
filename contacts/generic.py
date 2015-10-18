@@ -338,6 +338,11 @@ class SearchFormMixin(generic.edit.FormMixin):
 class ListView(LoginRequiredMixin, PermissionMixin, generic.ListView):
     permission_suffix = 'view'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['model'] = self.get_model()._meta.model_name
+        return context
+
 
 class DetailView(LoginRequiredMixin, PermissionMixin, generic.DetailView):
     permission_suffix = 'view'

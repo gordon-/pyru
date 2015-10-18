@@ -4,6 +4,7 @@
     data-target="#search-panel" aria-expanded="false">
         Recherche {% bootstrap_icon 'menu-down' %}
     </button>
+    <a class="btn btn-default btn-s" href="{% url 'contacts:export' type=model %}?{{ querystring }}">Exporter</a>
 </p>
 <div class="collapse{% if form.is_submitted %} in{% endif %}" id="search-panel">
     <div class="panel well bs-component">
