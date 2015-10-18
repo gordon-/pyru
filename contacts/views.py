@@ -892,7 +892,7 @@ class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
         response['Content-Disposition'] = 'attachment; '\
             'filename="pyru_{}_{}.csv"'.format(self.kwargs['type'],
                                                timezone.now()
-                                               .strftime('%Y%m%d%H%m%S'))
+                                               .strftime('%Y%m%d%H%M%S'))
         export = model.export_data(qs)
         if len(export):
             writer = csv.DictWriter(response, fieldnames=export[0].keys(),
