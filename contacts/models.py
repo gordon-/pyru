@@ -268,6 +268,40 @@ class Alert(models.Model):
                              errors))
         return (list(imported_objects.values()), [], errors)
 
+    @classmethod
+    def export_data(self, qs):
+        export = []
+        fields = {'title': None,
+                  'firstname': 'contact__firstname',
+                  'lastname': 'contact__lastname',
+                  'company': 'contact__company__name',
+                  'date': None,
+                  'priority': None,
+                  'done': None,
+                  'comments': None,
+                  }
+        logger = logging.getLogger('export.alert')
+        for obj in qs:
+            logger.debug('Beginning export of alert {}'.format(obj))
+            row = OrderedDict()
+            for key, mapping in fields.items():
+                if mapping is None:
+                    row[key] = getattr(obj, key)
+                else:
+                    remaining_fields = mapping.split('__')
+                    value = obj
+                    while len(remaining_fields) >= 1:
+                        try:
+                            value = getattr(value, remaining_fields.pop(0))
+                        except AttributeError:
+                            value = ''
+                    row[key] = value
+                if isinstance(row[key], bool):
+                    row[key] = int(row[key])
+            export.append(row)
+
+        return export
+
     def is_owned(self, user, perm=None):
         return self.user == user or self.author == user
 
@@ -360,11 +394,10 @@ class Company(models.Model):
         for p in Properties.objects.filter(type='company', group=self.group,
                                            display_on_list=True):
             displayed[p.name] = ''
-        props = OrderedDict()
         for k, v in sorted(self.properties.items(), key=self._prop_order):
             if k in displayed:
                 displayed[k] = bleach.linkify(v, parse_email=True)
-        return props
+        return displayed
 
     def get_glyphicon(self):
         return 'briefcase'
@@ -447,6 +480,37 @@ class Company(models.Model):
                              errors))
         return (list(imported_objects.values()),
                 list(updated_objects.values()), errors)
+
+    @classmethod
+    def export_data(self, qs):
+        export = []
+        fields = {'name': None,
+                  'type': 'type__name',
+                  'comments': None,
+                  }
+        logger = logging.getLogger('export.company')
+        for obj in qs:
+            logger.debug('Beginning export of company {}'.format(obj))
+            row = OrderedDict()
+            for key, mapping in fields.items():
+                if mapping is None:
+                    row[key] = getattr(obj, key)
+                else:
+                    remaining_fields = mapping.split('__')
+                    value = obj
+                    while len(remaining_fields) >= 1:
+                        try:
+                            value = getattr(value, remaining_fields.pop(0))
+                        except AttributeError:
+                            value = ''
+                    row[key] = value
+                if isinstance(row[key], bool):
+                    row[key] = int(row[key])
+            # properties fetch
+            row.update(obj.properties)
+            export.append(row)
+
+        return export
 
     @classmethod
     def get_queryset(cls, user, qs=None):
@@ -599,7 +663,6 @@ class Contact(models.Model):
                   'lastname': None,
                   'company': 'company__name',
                   'type': 'type__name',
-                  'active': None,
                   'comments': None,
                   }
         logger = logging.getLogger('export.contact')
@@ -610,13 +673,9 @@ class Contact(models.Model):
                 if mapping is None:
                     row[key] = getattr(obj, key)
                 else:
-                    logger.debug('exporting field {} to {}'
-                                 .format(key, mapping))
                     remaining_fields = mapping.split('__')
                     value = obj
                     while len(remaining_fields) >= 1:
-                        logger.debug('remaining fields: {}, value: {}'
-                                     .format(remaining_fields, value))
                         try:
                             value = getattr(value, remaining_fields.pop(0))
                         except AttributeError:
@@ -765,6 +824,38 @@ class Meeting(models.Model):
                      .format(len(imported_objects),
                              errors))
         return (list(imported_objects.values()), [], errors)
+
+    @classmethod
+    def export_data(self, qs):
+        export = []
+        fields = {'firstname': 'contact__firstname',
+                  'lastname': 'contact__lastname',
+                  'company': 'company__name',
+                  'type': 'type__name',
+                  'date': None,
+                  'comments': None,
+                  }
+        logger = logging.getLogger('export.meeting')
+        for obj in qs:
+            logger.debug('Beginning export of meeting {}'.format(obj))
+            row = OrderedDict()
+            for key, mapping in fields.items():
+                if mapping is None:
+                    row[key] = getattr(obj, key)
+                else:
+                    remaining_fields = mapping.split('__')
+                    value = obj
+                    while len(remaining_fields) >= 1:
+                        try:
+                            value = getattr(value, remaining_fields.pop(0))
+                        except AttributeError:
+                            value = ''
+                    row[key] = value
+                if isinstance(row[key], bool):
+                    row[key] = int(row[key])
+            export.append(row)
+
+        return export
 
     class Meta:
         verbose_name = 'échange'
