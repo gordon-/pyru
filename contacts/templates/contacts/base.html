@@ -80,7 +80,7 @@
       {% if perms.contacts.view_contact %}
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Recherche rapide">
+            <input type="text" class="form-control" placeholder="Recherche rapide" id="fastsearch" data-url="{% url 'contacts:fast-search' %}">
         </div>
       </form>
       {%  endif %}

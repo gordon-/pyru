@@ -1,5 +1,8 @@
 import csv
 from io import StringIO
+import json
+import operator
+from functools import reduce
 
 from django.http.response import HttpResponse
 from django.utils import timezone
@@ -900,4 +903,33 @@ class Export(generic.SearchFormMixin, generic.LoginRequiredMixin,
             writer.writeheader()
             for row in export:
                 writer.writerow(row)
+        return response
+
+
+class ContactFastSearch(generic.ListView):
+    model = Contact
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if 'q' in self.request.GET:
+            query_words = self.request.GET['q'].split(' ')
+            filters = []
+            for word in query_words:
+                filters.append(Q(firstname__icontains=word)
+                               | Q(lastname__icontains=word)
+                               | Q(company__name__icontains=word))
+            query = reduce(operator.and_, filters)
+            qs = qs.filter(query)
+
+        qs = qs.distinct()[:10]
+        return qs
+
+    def get(self, *args, **kwargs):
+        super().get(*args, **kwargs)
+        response = HttpResponse(content_type='application/json')
+        content = []
+        for obj in self.object_list:
+            row = {'name': str(obj), 'url': obj.get_absolute_url()}
+            content.append(row)
+        response.write(json.dumps(content))
         return response

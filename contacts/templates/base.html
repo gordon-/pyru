@@ -9,11 +9,13 @@
         {% include 'autocomplete_light/static.html' %}
         <link href="{% static 'bootstrap/css/bootstrap-paper.min.css' %}" rel="stylesheet">
         {% bootstrap_javascript %}
+        <script src="{% static 'typeahead/bootstrap3-typeahead.min.js' %}" type="text/javascript"></script>
         <link href="{% static 'css/main.css' %}" rel="stylesheet">
         {% if form %}{{ form.media }}
         <script src="{% static 'js/search-form.js' %}" type="text/javascript"></script>
         {% endif %}
         <script src="{% static 'js/tooltips.js' %}" type="text/javascript"></script>
+        <script src="{% static 'js/search.js' %}" type="text/javascript"></script>
 	</head>
 	<body>
         {% block body %}{% endblock %}

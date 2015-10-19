@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^/search/(?P<slug>[-\w]+)/export/?$',
         views.Export.as_view(),
         name='export'),
+    url(r'^search/?$', views.ContactFastSearch.as_view(),
+        name='fast-search'),
 
     url(r'^companies/?$', views.CompaniesList.as_view(), name='company-list'),
     url(r'^company/create/?$', views.CompanyCreation.as_view(),
