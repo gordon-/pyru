@@ -588,6 +588,10 @@ class Contact(models.Model):
                 displayed[k] = bleach.linkify(v, parse_email=True)
         return displayed
 
+    def active_alerts(self):
+        return Alert.objects.filter(contact=self, done=False,
+                                    date__gt=timezone.now())
+
     def get_glyphicon(self):
         return 'user'
 

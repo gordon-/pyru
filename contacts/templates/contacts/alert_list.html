@@ -24,7 +24,7 @@ de la société {{ company }}{% endif %}{% endblock %}
     alerte{{ objects_count | pluralize }}{% if is_paginated %} sur {{ paginator.count }}{% endif %}.</p>
     {% endwith %}
     <table class="table table-striped table-bordered">
-        <tr><th>Contact</th>
+        <tr>{% if not contact %}<th>Contact</th>{% endif %}
             {% if not company %}<th>Société
                 <span class="pull-right">
                 <a{% if order == 'company' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=company">{% bootstrap_icon 'triangle-top' %}</a>

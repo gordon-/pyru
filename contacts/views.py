@@ -500,7 +500,7 @@ class AlertCreation(generic.CreateView):
         form = super().get_form(form_class)
 
         form.fields['user'].queryset = self.request.user.default_group.group\
-            .users
+            .user_set
         form.fields['user'].initial = self.request.user
 
         if 'company' in self.kwargs:

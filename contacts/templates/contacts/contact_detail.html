@@ -6,56 +6,94 @@
 
 {% block content %}
 <h2>{% bootstrap_icon 'user' %} Détail du contact {{ object }}</h2>
-    <div>{{ object }}</div>
-    <dl class="dl-horizontal">
-        <dt>Type</dt>
-        <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
-                {% endif %}{{ object.type }}</dd>
-    {% if object.company %}
-        <dt>Société</dt>
-        <dd><a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a></dd>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel">
+            <dl class="dl-horizontal">
+                <dt>Type</dt>
+                <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                        {% endif %}{{ object.type }}</dd>
+            {% if object.company %}
+                <dt>Société</dt>
+                <dd><a href="{{ object.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.company }}</a></dd>
+            {% endif %}
+                <dt>Commentaires</dt>
+                <dd>{{ object.get_comments | safe }}</dd>
+            {% for prop_name, prop_value in object.get_properties.items %}
+                <dt>{{ prop_name }}</dt>
+                <dd>{{ prop_value | safe }}</dd>
+            {% endfor %}
+                <dt>Date de création</dt>
+                <dd>{{ object.creation_date }}</dd>
+                <dt>Date de dernière modification</dt>
+                <dd>{{ object.update_date }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    {% if perms.contacts.view_alert %}
+    <div class="col-md-8">
+        <h3>{% bootstrap_icon 'bell' %} <a href="{% url 'contacts:alert-list' contact=object.slug %}">Alertes</a>
+        {% if perms.contacts.add_alert %}
+        <a href="{% url 'contacts:alert-create' contact=object.slug %}"
+                class="btn btn-primary btn-xs">
+            {% bootstrap_icon 'plus' %} Ajouter une alerte</a>
+        {% endif %}
+        </h3>
+        <table class="table">
+            <tr><th>Contact</th>
+                <th>Date</th>
+                <th>Titre</th>
+                <th>Actions</th>
+            </tr>
+            {% for alert in object.active_alerts %}
+            <tr>
+                <td><a href="{{ alert.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ alert.contact }}</a></td>
+                <td><span class="label{% if alert.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top" data-original-title="{{ alert.date }}">{{ alert.date | naturaltime }}</span></td>
+                <td><a href="{{ alert.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ alert }}</a></td>
+                <td>{% if perms.contacts.change_alert %}<a href="{% url 'contacts:alert-update' pk=alert.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                    {% if perms.contacts.delete_alert %}<a href="{% url 'contacts:alert-delete' pk=alert.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">Ce contact ne possède pour l’instant aucune alerte.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
     {% endif %}
-        <dt>Commentaires</dt>
-        <dd>{{ object.get_comments | safe }}</dd>
-    {% for prop_name, prop_value in object.get_properties.items %}
-        <dt>{{ prop_name }}</dt>
-        <dd>{{ prop_value | safe }}</dd>
-    {% endfor %}
-        <dt>Date de création</dt>
-        <dd>{{ object.creation_date }}</dd>
-        <dt>Date de dernière modification</dt>
-        <dd>{{ object.update_date }}</dd>
-    </dl>
+
     {% if perms.contacts.view_meeting %}
-    <h3>{% bootstrap_icon 'comment' %} Échanges
-    {% if perms.contacts.add_meeting %}
-    <a href="{% url 'contacts:meeting-create' contact=object.slug %}"
-          class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} ajouter un
-          échange</a>
+    <div class="col-md-8">
+        <h3>{% bootstrap_icon 'comment' %} <a href="{% url 'contacts:meeting-list' contact=object.slug %}">Échanges</a>
+        {% if perms.contacts.add_meeting %}
+        <a href="{% url 'contacts:meeting-create' contact=object.slug %}"
+              class="btn btn-primary btn-xs">{% bootstrap_icon 'plus' %} ajouter un
+              échange</a>
+        {% endif %}
+        </h3>
+        <table class="table">
+            <tr><th>Date</th>
+                <th>Type</th>
+                <th>Auteur</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
+            </tr>
+            {% for meeting in object.meetings.all %}
+            <tr>
+                <td><a class="label label-default" data-toggle="tooltip" data-placement="top"
+                        data-original-title="{{ meeting.date }}" href="{{ meeting.get_absolute_url }}">{{ meeting.date | naturaltime }}</a></td>
+                <td>{{ meeting.type }}</td>
+                <td>{{ meeting.author }}</td>
+                <td>{{ meeting.get_comments | safe }}</td>
+                <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
+                    {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">Ce contact ne possède pour l’instant aucun échange.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
     {% endif %}
-    </h3>
-    <table class="table">
-        <tr><th>Date</th>
-            <th>Type</th>
-            <th>Auteur</th>
-            <th>Commentaire</th>
-            <th>Actions</th>
-        </tr>
-        {% for meeting in object.meetings.all %}
-        <tr>
-            <td><a class="label label-default" data-toggle="tooltip" data-placement="top"
-                    data-original-title="{{ meeting.date }}" href="{{ meeting.get_absolute_url }}">{{ meeting.date | naturaltime }}</a></td>
-            <td>{{ meeting.type }}</td>
-            <td>{{ meeting.author }}</td>
-            <td>{{ meeting.get_comments | safe }}</td>
-            <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
-                {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">Ce contact ne possède pour l’instant aucun échange.</td></tr>
-        {% endfor %}
-    </table>
-    {% endif %}
+</div>
 
     <p>
     {% if perms.contacts.change_contact %}
