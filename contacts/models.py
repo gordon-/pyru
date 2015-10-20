@@ -549,7 +549,7 @@ class Contact(models.Model):
     lastname = models.CharField('nom', max_length=100, blank=True)
     slug = models.SlugField()
     company = models.ForeignKey(Company, verbose_name='société', null=True,
-                                related_name='contacts')
+                                blank=True, related_name='contacts')
     group = models.ForeignKey(Group, verbose_name='groupe',
                               related_name='contacts')
     type = models.ForeignKey(ContactType, verbose_name='type', null=True,
