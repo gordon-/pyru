@@ -4,7 +4,7 @@
 
 {% block title %}Liste des échanges
 {% if company %} avec la société {{ company }}
-{% elif contact %} avec contact {{ contact }}{% endif %}
+{% elif contact %} avec {{ contact }}{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
     {% if company %}
     avec la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
     {% elif contact %}
-    avec contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>
+    avec <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>
     {% endif %}
     {% if perms.contacts.add_meeting %}
         {% if company %}
