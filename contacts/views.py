@@ -929,7 +929,10 @@ class ContactFastSearch(generic.ListView):
         response = HttpResponse(content_type='application/json')
         content = []
         for obj in self.object_list:
-            row = {'name': str(obj), 'url': obj.get_absolute_url()}
+            company = '' if obj.company is None else\
+                ' ({})'.format(obj.company)
+            row = {'name': '{}{}'.format(obj, company),
+                   'url': obj.get_absolute_url()}
             content.append(row)
         response.write(json.dumps(content))
         return response
