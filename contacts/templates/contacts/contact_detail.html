@@ -95,14 +95,14 @@
     {% endif %}
 </div>
 
-    <p>
-    {% if perms.contacts.change_contact %}
-    <a href="{% url 'contacts:contact-update' slug=object.slug %}"
-        class="btn btn-primary btn-xs">modifier le contact</a>
-    {% endif %}
-    {% if perms.contacts.delete_contact %}
-    <a href="{% url 'contacts:contact-delete' slug=object.slug %}"
-        class="btn btn-danger btn-xs">Supprimer le contact</a>
-    {% endif %}
-    </p>
+<p>
+{% if perms.contacts.change_contact %}
+<a href="{% url 'contacts:contact-update' slug=object.slug %}"
+    class="btn btn-primary btn-xs">modifier le contact</a>
+{% endif %}
+{% if perms.contacts.delete_contact %}
+<a href="{% url 'contacts:contact-delete' slug=object.slug %}"
+    class="btn btn-danger btn-xs">Supprimer le contact</a>
+{% endif %}
+</p>
 {% endblock %}
