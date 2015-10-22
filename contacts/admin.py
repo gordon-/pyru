@@ -28,9 +28,15 @@ class AlertAdmin(admin.ModelAdmin):
 
 @admin.register(ContactType)
 class ContactTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group')
+    list_display = ('name', 'group', 'get_icon')
     list_filter = ('group', )
     search_fields = ('name', )
+
+    def get_icon(self, object):
+        return '<span class="glyphicon glyphicon-{}"></span>'.format(
+            object.icon)
+    get_icon.short_description = 'Glyphicône'
+    get_icon.allow_tags = True
 
 
 @admin.register(Company)
@@ -49,9 +55,15 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(MeetingType)
 class MeetingTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group')
+    list_display = ('name', 'group', 'get_icon')
     list_filter = ('group', )
     search_fields = ('name', )
+
+    def get_icon(self, object):
+        return '<span class="glyphicon glyphicon-{}"></span>'.format(
+            object.icon)
+    get_icon.short_description = 'Glyphicône'
+    get_icon.allow_tags = True
 
 
 @admin.register(Meeting)
