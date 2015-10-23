@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.shortcuts import urlresolvers
 from django.contrib.auth.views import (
     login, logout, password_reset, password_reset_complete,
     password_reset_confirm, password_reset_done
@@ -130,12 +131,19 @@ urlpatterns = [
     url(r'^login/?$', login, name='login'),
     url(r'^logout/?$', logout, {'template_name': 'registration/logout.html'},
         name='logout'),
-    url(r'^password-reset/?$', password_reset, name='password_reset'),
+    url(r'^password-reset/?$', password_reset,
+        {'post_reset_redirect':
+         urlresolvers.reverse_lazy('contacts:password_reset_done')},
+        name='password_reset'),
     url(r'^password-reset/complete?$', password_reset_complete,
         name='password_reset_complete'),
-    url(r'^password-reset/confirm?$', password_reset_confirm,
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/'
+        '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        password_reset_confirm,
+        {'post_reset_redirect':
+         urlresolvers.reverse_lazy('contacts:password_reset_complete')},
         name='password_reset_confirm'),
-    url(r'^password-reset/done?$', password_reset_done,
+    url(r'^password-reset/done/?$', password_reset_done,
         name='password_reset_done'),
 
 ]
