@@ -157,13 +157,13 @@ class Properties(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.contact.group == user.default_group.group
+        return self.contact.group.id == user.default_group.group_id
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     @classmethod
     def get_displayed_names(cls, group, type):
@@ -220,7 +220,7 @@ class Alert(models.Model):
         if qs is None:
             qs = cls.objects
         return qs.filter((Q(user=user) | Q(author=user)) &
-                         Q(contact__group=user.default_group.group))
+                         Q(contact__group_id=user.default_group.group_id))
 
     @classmethod
     def import_data(cls, data, mapping, format, user):
@@ -345,13 +345,13 @@ class ContactType(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.group == user.default_group.group
+        return self.group.id == user.default_group.group_id
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     class Meta:
         verbose_name = 'type de contact'
@@ -526,10 +526,10 @@ class Company(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     def is_owned(self, user, perm=None):
-        return self.group == user.default_group.group
+        return self.group.id == user.default_group.group_id
 
     class Meta:
         verbose_name = 'société'
@@ -710,10 +710,10 @@ class Contact(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     def is_owned(self, user, perm=None):
-        return self.group == user.default_group.group
+        return self.group.id == user.default_group.group_id
 
     class Meta:
         verbose_name = 'contact'
@@ -743,13 +743,13 @@ class MeetingType(models.Model):
         return self.name
 
     def is_owned(self, user, perm=None):
-        return self.group == user.default_group.group
+        return self.group.id == user.default_group.group_id
 
     @classmethod
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     class Meta:
         verbose_name = 'type d’échange'
@@ -792,10 +792,10 @@ class Meeting(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(contact__group=user.default_group.group)
+        return qs.filter(contact__group_id=user.default_group.group_id)
 
     def is_owned(self, user, perm=None):
-        return self.contact.group == user.default_group.group
+        return self.contact.group.id == user.default_group.group_id
 
     @classmethod
     def import_data(cls, data, mapping, format, user):
@@ -923,10 +923,10 @@ class SavedSearch(models.Model):
     def get_queryset(cls, user, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(group=user.default_group.group)
+        return qs.filter(group_id=user.default_group.group_id)
 
     def is_owned(self, user, perm=None):
-        return self.group == user.default_group.group
+        return self.group.id == user.default_group.group_id
 
     def get_search_queryset(self, user):
         from . import forms
