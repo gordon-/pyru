@@ -393,23 +393,29 @@ class Company(models.Model):
         return bleach.clean(bleach.linkify(markdown(self.comments)),
                             ALLOWED_TAGS)
 
-    def _prop_order(self, i):
-        return Properties.objects.get(group=self.group, type='company',
-                                      name=i[0]).order
-
     @method_cache(60)
     def get_properties(self):
+        props = Properties.objects.filter(type='company', group=self.group)\
+            .only('name', 'order')
+        props_order = {}
+        for p in props:
+            props_order[p.name] = p.order
         return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=self._prop_order)
-                }
+                sorted(self.properties.items(),
+                       key=lambda i: props_order.get(i, 0))}
 
     @method_cache(60)
     def get_displayed_properties(self):
         displayed = OrderedDict()
-        for p in Properties.objects.filter(type='company', group=self.group,
-                                           display_on_list=True):
+        props = Properties.objects.filter(type='company', group=self.group,
+                                          display_on_list=True)\
+            .only('name', 'order')
+        props_order = {}
+        for p in props:
             displayed[p.name] = ''
-        for k, v in sorted(self.properties.items(), key=self._prop_order):
+            props_order[p.name] = p.order
+        for k, v in sorted(self.properties.items(),
+                           key=lambda i: props_order.get(i, 0)):
             if k in displayed:
                 displayed[k] = bleach.linkify(v, parse_email=True)
         return displayed
@@ -577,23 +583,29 @@ class Contact(models.Model):
         return bleach.clean(bleach.linkify(markdown(self.comments)),
                             ALLOWED_TAGS)
 
-    def _prop_order(self, i):
-        return Properties.objects.get(group=self.group, type='contact',
-                                      name=i[0]).order
-
     @method_cache(60)
     def get_properties(self):
+        props = Properties.objects.filter(type='contact', group=self.group)\
+            .only('name', 'order')
+        props_order = {}
+        for p in props:
+            props_order[p.name] = p.order
         return {k: bleach.linkify(v, parse_email=True) for k, v in
-                sorted(self.properties.items(), key=self._prop_order)
-                }
+                sorted(self.properties.items(),
+                       key=lambda i: props_order.get(i, 0))}
 
     @method_cache(60)
     def get_displayed_properties(self):
         displayed = OrderedDict()
-        for p in Properties.objects.filter(type='contact', group=self.group,
-                                           display_on_list=True):
+        props = Properties.objects.filter(type='contact', group=self.group,
+                                          display_on_list=True)\
+            .only('name', 'order')
+        props_order = {}
+        for p in props:
             displayed[p.name] = ''
-        for k, v in sorted(self.properties.items(), key=self._prop_order):
+            props_order[p.name] = p.order
+        for k, v in sorted(self.properties.items(),
+                           key=lambda i: props_order.get(i, 0)):
             if k in displayed:
                 displayed[k] = bleach.linkify(v, parse_email=True)
         return displayed
