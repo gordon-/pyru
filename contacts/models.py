@@ -14,8 +14,11 @@ from markdown import markdown
 import bleach
 from dateutil import parser
 
+from .decorators import method_cache, classmethod_cache
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('words', 'order_mapping')
+
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('words', 'order_mapping',
+                                                 'select_related', )
 
 PROP_CHOICES = (('company', 'société'),
                 ('contact', 'contact'),
@@ -137,6 +140,7 @@ class DefaultGroup(models.Model):
         verbose_name = 'groupe par défaut'
         verbose_name_plural = 'groupes par défaut'
         unique_together = (('user', 'group'), )
+        select_related = ('group', )
 
 
 class Properties(models.Model):
@@ -165,7 +169,7 @@ class Properties(models.Model):
             qs = cls.objects
         return qs.filter(group_id=user.default_group.group_id)
 
-    @classmethod
+    @classmethod_cache(60)
     def get_displayed_names(cls, group, type):
         displayed = [p.name for p in
                      Properties.objects.filter(type=type,
@@ -328,6 +332,7 @@ class Alert(models.Model):
         get_latest_by = 'date'
         ordering = ['-date']
         permissions = (('view_alert', 'Can view an alert'), )
+        select_related = ('user', 'contact', 'author', )
 
 
 class ContactType(models.Model):
@@ -392,11 +397,13 @@ class Company(models.Model):
         return Properties.objects.get(group=self.group, type='company',
                                       name=i[0]).order
 
+    @method_cache(60)
     def get_properties(self):
         return {k: bleach.linkify(v, parse_email=True) for k, v in
                 sorted(self.properties.items(), key=self._prop_order)
                 }
 
+    @method_cache(60)
     def get_displayed_properties(self):
         displayed = OrderedDict()
         for p in Properties.objects.filter(type='company', group=self.group,
@@ -542,6 +549,7 @@ class Company(models.Model):
         ordering = ['name']
         unique_together = (('slug', 'group'), )
         permissions = (('view_company', 'Can view a company'), )
+        select_related = ('type', 'author', )
 
 
 class Contact(models.Model):
@@ -573,11 +581,13 @@ class Contact(models.Model):
         return Properties.objects.get(group=self.group, type='contact',
                                       name=i[0]).order
 
+    @method_cache(60)
     def get_properties(self):
         return {k: bleach.linkify(v, parse_email=True) for k, v in
                 sorted(self.properties.items(), key=self._prop_order)
                 }
 
+    @method_cache(60)
     def get_displayed_properties(self):
         displayed = OrderedDict()
         for p in Properties.objects.filter(type='contact', group=self.group,
@@ -726,6 +736,7 @@ class Contact(models.Model):
         ordering = ['firstname', 'lastname']
         unique_together = (('slug', 'group'), )
         permissions = (('view_contact', 'Can view a contact'), )
+        select_related = ('company', 'type', 'author', )
 
 
 class MeetingType(models.Model):
@@ -892,6 +903,7 @@ class Meeting(models.Model):
         ordering = ['-date']
         order_mapping = {'company': 'contact__company__name'}
         permissions = (('view_meeting', 'Can view a meeting'), )
+        select_related = ('contact', 'contact__company', 'type', 'author', )
 
 
 class SavedSearch(models.Model):

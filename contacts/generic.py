@@ -236,9 +236,17 @@ class SearchFormMixin(generic.edit.FormMixin):
 
         return kwargs
 
+    def select_related(self, qs):
+        model = self.get_model()
+        if hasattr(model._meta, 'select_related'):
+            for sel in model._meta.select_related:
+                qs = qs.select_related(sel)
+        return qs
+
     def get_queryset(self):
         model = self.get_model()
         qs = super().get_queryset()
+        qs = self.select_related(qs)
         qs = self.get_form().search(qs)
         if 'order' in self.request.GET:
             self.order = self.request.GET['order']
