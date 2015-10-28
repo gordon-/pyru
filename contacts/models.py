@@ -15,7 +15,7 @@ import bleach
 from dateutil import parser
 
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('words',)
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('words', 'order_mapping')
 
 PROP_CHOICES = (('company', 'société'),
                 ('contact', 'contact'),
@@ -890,6 +890,7 @@ class Meeting(models.Model):
                  }
         get_latest_by = 'date'
         ordering = ['-date']
+        order_mapping = {'company': 'contact__company__name'}
         permissions = (('view_meeting', 'Can view a meeting'), )
 
 

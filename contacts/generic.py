@@ -241,23 +241,28 @@ class SearchFormMixin(generic.edit.FormMixin):
         qs = super().get_queryset()
         qs = self.get_form().search(qs)
         if 'order' in self.request.GET:
-            order = self.request.GET['order']
+            self.order = self.request.GET['order']
+            order = self.order
+            sign = ''
             if order[0] == '-':
                 order = order[1:]
+                sign = '-'
             if '__' in order:
                 order = order[:order.find('__')]
-            if order in model._meta.get_all_field_names():
-                self.order = self.request.GET['order']
+            if hasattr(model._meta, 'order_mapping')\
+                    and order in model._meta.order_mapping:
+                qs = qs.order_by(sign + model._meta.order_mapping[order])
+            elif order in model._meta.get_all_field_names():
                 field = model._meta.get_field(order)
                 if isinstance(field, ForeignKey):
                     if hasattr(field.rel.to._meta, 'ordering') and\
                             len(field.rel.to._meta.ordering) > 0:
-                        qs = qs.order_by('{}__{}'.format(self.order,
+                        qs = qs.order_by('{}__{}'.format(order,
                                          field.rel.to._meta.ordering[0]))
                     elif 'name' in field.rel.to._meta.get_all_field_names():
-                        qs = qs.order_by('{}__name'.format(self.order))
+                        qs = qs.order_by('{}__name'.format(order))
                     else:
-                        qs = qs.order_by(self.order)
+                        qs = qs.order_by(order)
                 elif isinstance(field, ManyToManyRel) or\
                         isinstance(field, ManyToOneRel):
                     sign = self.order[0] if self.order[0] == '-' else ''
@@ -280,11 +285,12 @@ class SearchFormMixin(generic.edit.FormMixin):
                                                        field, name)}
                         qs = qs.extra(select=select).order_by(
                             '{}{}'.format(minus, field_name))
-                    except Exception:
-                        import ipdb
-                        ipdb.set_trace()
+                    except Exception as e:
+                        raise e
                 else:
-                    qs = qs.order_by(self.order)
+                    # don’t accept to order by an unknown field anymore
+                    # qs = qs.order_by(self.order)
+                    pass
         return qs
 
     def get(self, request, *args, **kwargs):
