@@ -332,7 +332,7 @@ class Alert(models.Model):
         get_latest_by = 'date'
         ordering = ['-date']
         permissions = (('view_alert', 'Can view an alert'), )
-        select_related = ('user', 'contact', 'author', )
+        select_related = ('user', 'contact', 'contact__company', 'author', )
 
 
 class ContactType(models.Model):
