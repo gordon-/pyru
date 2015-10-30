@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'contacts',
     'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +47,6 @@ INSTALLED_APPS = (
     'bootstrap3',
     'datetimewidget',
     'debug_toolbar',
-    'contacts',
     'autocomplete_light',
 )
 
