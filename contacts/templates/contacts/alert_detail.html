@@ -6,19 +6,35 @@
 
 {% block content %}
 <h2>{% bootstrap_icon 'bell' %} Détail de l’alerte {{ object }}</h2>
-    <div>{{ object }}</div>
-    <dl>
-        <dt>Contact</dt>
-        <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
-    {% if object.contact.company %}
-        <dt>Société</dt>
-        <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
-    {% endif %}
-        <dt>Date</dt>
-        <dd><span class="label{% if object.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top"
-                    data-original-title="{{ object.date }}">{{ object.date | naturaltime}}</span></dd>
-    </dl>
-    <p>{{ object.comments }}</p>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel">
+            <dl class="dl-horizontal">
+                <dt>Contact</dt>
+                <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
+            {% if object.contact.company %}
+                <dt>Société</dt>
+                <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
+            {% endif %}
+                <dt>Date</dt>
+                <dd><span class="label{% if object.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top"
+                            data-original-title="{{ object.date }}">{{ object.date | naturaltime}}</span></dd>
+                <dt>Priorité</dt>
+                <dd><span class="text-{% if object.priority == 0 %}default
+        {% elif object.priority == '1' %}success
+        {% elif object.priority == '2' %}info
+        {% elif object.priority == '3' %}warning{% endif %}">{{ object.get_priority_display }}</span></dd>
+                <dt>Achevé</dt>
+                <dd>{% if object.done %}<span class="text-success" data-toggle="tooltip" data-placement="top" data-original-title="Fait">{% bootstrap_icon 'ok' %}</span>
+            {% else %}<span class="text-danger" data-toggle="tooltip" data-placement="top" data-original-title="Pas encore achevé">{% bootstrap_icon 'remove' %}</span>
+            {% endif %}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-md-8">
+        {{ object.get_comments | safe }}
+    </div>
+</div>
 
     <p>
     {% if perms.contacts.change_alert %}

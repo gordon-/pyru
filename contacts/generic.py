@@ -296,9 +296,7 @@ class SearchFormMixin(generic.edit.FormMixin):
                     except Exception as e:
                         raise e
                 else:
-                    # don’t accept to order by an unknown field anymore
-                    # qs = qs.order_by(self.order)
-                    pass
+                    qs = qs.order_by(order)
         return qs
 
     def get(self, request, *args, **kwargs):

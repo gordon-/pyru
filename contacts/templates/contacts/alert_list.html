@@ -44,6 +44,12 @@ de la société {{ company }}{% elif contact %} de {{ contact }}{% endif %}{% en
                 <a{% if order == '-title' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-title">{% bootstrap_icon 'triangle-bottom' %}</a>
                 </span>
             </th>
+            <th>Priorité
+                <span class="pull-right">
+                <a{% if order == 'priority' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=priority">{% bootstrap_icon 'triangle-top' %}</a>
+                <a{% if order == '-priority' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=-priority">{% bootstrap_icon 'triangle-bottom' %}</a>
+                </span>
+            </th>
             <th>Achevé
                 <span class="pull-right">
                 <a{% if order == 'done' %} class="text-muted disabled"{% endif %} href="?{{ querystring_without_order }}order=done">{% bootstrap_icon 'triangle-top' %}</a>
@@ -63,6 +69,10 @@ de la société {{ company }}{% elif contact %} de {{ contact }}{% endif %}{% en
                 {% endif %}</td>{% endif %}
             <td><span class="label{% if object.is_near %} label-danger{% else %} label-default{% endif %}" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}">{{ object.date | naturaltime }}</span></td>
             <td><a href="{{ object.get_absolute_url }}">{% bootstrap_icon 'bell' %} {{ object }}</a></td>
+            <td><span class="text-{% if object.priority == 0 %}default
+        {% elif object.priority == '1' %}success
+        {% elif object.priority == '2' %}info
+        {% elif object.priority == '3' %}warning{% endif %}">{{ object.get_priority_display }}</span></td>
             <td>{% if object.done %}<span class="text-success" data-toggle="tooltip" data-placement="top" data-original-title="Fait">{% bootstrap_icon 'ok' %}</span>
             {% else %}<span class="text-danger" data-toggle="tooltip" data-placement="top" data-original-title="Pas encore achevé">{% bootstrap_icon 'remove' %}</span>
             {% endif %}</td>

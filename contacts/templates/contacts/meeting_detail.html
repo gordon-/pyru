@@ -6,22 +6,28 @@
 
 {% block content %}
 <h2>{% bootstrap_icon 'comment' %} Détail de l’échange avec <a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object }}</a></h2>
-    <div>Échange du {{ object.date }}</div>
-    <dl>
-        <dt>Contact</dt>
-        <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
-    {% if object.contact.company %}
-        <dt>Société</dt>
-        <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
-    {% endif %}
-        <dt>Type</dt>
-        <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
-                {% endif %}{{ object.type }}</dd>
-        <dt>Date</dt>
-        <dd><span class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}">{{ object.date | naturaltime }}</span></dd>
-        <dt>Compte-rendu</dt>
-        <dd>{{ object.get_comments | safe }}</dd>
-    </dl>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel">
+            <dl class="dl-horizontal">
+                <dt>Contact</dt>
+                <dd><a href="{{ object.contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ object.contact }}</a></dd>
+            {% if object.contact.company %}
+                <dt>Société</dt>
+                <dd><a href="{{ object.contact.company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ object.contact.company }}</a></dd>
+            {% endif %}
+                <dt>Type</dt>
+                <dd>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
+                        {% endif %}{{ object.type }}</dd>
+                <dt>Date</dt>
+                <dd><span class="label label-default" data-toggle="tooltip" data-placement="top" data-original-title="{{ object.date }}">{{ object.date | naturaltime }}</span></dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-md-8">
+        {{ object.get_comments | safe }}
+    </div>
+</div>
 
     <p>
     {% if perms.contacts.change_meeting %}
