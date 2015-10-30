@@ -296,7 +296,7 @@ class SearchFormMixin(generic.edit.FormMixin):
                     except Exception as e:
                         raise e
                 else:
-                    qs = qs.order_by(order)
+                    qs = qs.order_by(sign + order)
         return qs
 
     def get(self, request, *args, **kwargs):
