@@ -38,20 +38,22 @@
 </div>
 <h3>{% bootstrap_icon 'fire' %} Activités</h3>
 <div class="row">
-    <ul class="list-group">
-        {% for notif in notifications %}
-        <li class="list-group-item"><span class="label label-default" data-toggle="tooltip" data-placement="top"
-                data-original-title="{{ notif.date }}">{{ notif.date | naturaltime }}</span> :
-            {% if notif.object.author == user %}Vous avez {% else %}
-            {{ notif.object.author }} a {% endif %}
-            {% if notif.type == 'creation' %}créé{% elif notif.type == 'update' %}
-            modifié{% elif notif.type == 'meeting' %}
-            rencontré{% endif %}
-            <a href="{{ notif.object.get_absolute_url }}"> {% bootstrap_icon notif.object.get_glyphicon %} {{ notif.object }}</a>.
-        </li>
-        {% empty %}
-        <li>Rien ne s’est passé récemment.</li>
-        {% endfor %}
-    </ul>
+    <div class="col-md-6">
+        <ul class="list-group">
+            {% for notif in notifications %}
+            <li class="list-group-item"><span class="label label-default" data-toggle="tooltip" data-placement="top"
+                    data-original-title="{{ notif.date }}">{{ notif.date | naturaltime }}</span> :
+                {% if notif.object.author == user %}Vous avez {% else %}
+                {{ notif.object.author }} a {% endif %}
+                {% if notif.type == 'creation' %}créé{% elif notif.type == 'update' %}
+                modifié{% elif notif.type == 'meeting' %}
+                rencontré{% endif %}
+                <a href="{{ notif.object.get_absolute_url }}"> {% bootstrap_icon notif.object.get_glyphicon %} {{ notif.object }}</a>.
+            </li>
+            {% empty %}
+            <li>Rien ne s’est passé récemment.</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}
