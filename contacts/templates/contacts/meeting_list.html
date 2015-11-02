@@ -79,7 +79,7 @@
             <td>{% if object.type.icon %}{% bootstrap_icon object.type.icon %}
                 {% endif %}{{ object.type }}</td>
             <td>{{ object.author }}</td>
-            <td>{{ object.get_comments | safe }}</td>
+            <td><div class="readmore">{{ object.get_comments | safe }}</div></td>
             <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=object.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                 {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=object.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
         </tr>
