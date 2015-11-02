@@ -81,7 +81,7 @@
                         data-original-title="{{ meeting.date }}" href="{{ meeting.get_absolute_url }}">{{ meeting.date | naturaltime }}</a></td>
                 <td>{{ meeting.type }}</td>
                 <td>{{ meeting.author }}</td>
-                <td>{{ meeting.get_comments | safe }}</td>
+                <td><div class="readmore">{{ meeting.get_comments | safe }}</span></td>
                 <td>{% if perms.contacts.change_meeting %}<a href="{% url 'contacts:meeting-update' pk=meeting.pk %}">{% bootstrap_icon 'pencil' %}</a>{% endif %}
                     {% if perms.contacts.delete_meeting %}<a href="{% url 'contacts:meeting-delete' pk=meeting.pk %}">{% bootstrap_icon 'trash' %}</a></td>{% endif %}
             </tr>
