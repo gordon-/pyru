@@ -5,16 +5,26 @@
 dans la société {{ company }}{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'bell' %} {{ verb.0 }} d’une alerte{% if company %}
-    dans la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}</h2>
-<form method="post">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-        {% bootstrap_icon verb.2 %} {{ verb.1 }}
-    </button>
-    {% endbuttons %}
-</form>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% bootstrap_icon 'bell' %} {{ verb.0 }} d’une alerte{% if company %}
+                dans la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>{% endif %}</h2>
+            </div>
+            <div class="panel-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        {% bootstrap_icon verb.2 %} {{ verb.1 }}
+                    </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
