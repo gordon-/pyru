@@ -6,17 +6,27 @@
 {% elif contact %} avec le contact {{ contact }}{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% bootstrap_icon 'comment' %} {{ verb.0 }} d’un échange
-    {% if company %} avec la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
-    {% elif contact %} avec le contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>{% endif %}</h2>
-<form method="post">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-        {% bootstrap_icon verb.2 %} {{ verb.1 }}
-    </button>
-    {% endbuttons %}
-</form>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">{% bootstrap_icon 'comment' %} {{ verb.0 }} d’un échange
+                    {% if company %} avec la société <a href="{{ company.get_absolute_url }}">{% bootstrap_icon 'briefcase' %} {{ company }}</a>
+                    {% elif contact %} avec le contact <a href="{{ contact.get_absolute_url }}">{% bootstrap_icon 'user' %} {{ contact }}</a>{% endif %}</h2>
+            </div>
+            <div class="panel-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        {% bootstrap_icon verb.2 %} {{ verb.1 }}
+                    </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
