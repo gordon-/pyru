@@ -89,11 +89,13 @@
           <li class="dropdown"><a href="#" class="dropdown-toggle {% ifstartswith 'contacts:account' %} active {% endifstartswith %}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% bootstrap_icon 'menu-hamburger' %} Bienvenue, <strong>{{ user }}</strong> <span class="caret"></span></a>
           <ul class="dropdown-menu">
             {# <li><a href="{% url 'contacts:account-detail' %}">{% bootstrap_icon 'wrench' %} Gestion du compte</a></li> #}
-            <li class="dropdown-header">Groupe par défaut</li>
-            {% for group in user.groups.all %}
-            <li><a href="{% url 'contacts:group-change' pk=group.pk %}" title="Activer ce groupe">{% if group == default_group %}{% bootstrap_icon 'ok' %} {% endif %}{{ group }}</a></li>
-            {% endfor %}
-            <li role="separator" class="divider"></li>
+            {% if user.groups.count > 1 %}
+                <li class="dropdown-header">Groupe par défaut</li>
+                {% for group in user.groups.all %}
+                <li><a href="{% url 'contacts:group-change' pk=group.pk %}" title="Activer ce groupe">{% if group == default_group %}{% bootstrap_icon 'ok' %} {% endif %}{{ group }}</a></li>
+                {% endfor %}
+                <li role="separator" class="divider"></li>
+            {% endif %}
             {% if user.is_staff %}<li><a href="{% url 'admin:index' %}">
                     {% bootstrap_icon 'cog' %} Administration</a></li>
             {% endif %}
