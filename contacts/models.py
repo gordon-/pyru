@@ -62,14 +62,18 @@ def combine_rows(data, mapping):
     The goal is to create a flat list ofrows, each one containing the Contact
     and the Meeting.
     """
+    default_mapping = {'firstname': 'firstname', 'lastname': 'lastname',
+                       'company': 'company'}
+    default_mapping.update(mapping)
+    mapping = default_mapping
     combined = []
     fk_row = {}
     for row in data:
         # is this row a header (FK-row)?
         if row[mapping['firstname']] + row[mapping['lastname']] != '':
-            fk_row = {mapping['firstname']: row[mapping['firstname']],
-                      mapping['lastname']: row[mapping['lastname']],
-                      mapping['company']: row[mapping['company']],
+            fk_row = {mapping['firstname']: row.get(mapping['firstname'], ''),
+                      mapping['lastname']: row.get(mapping['lastname'], ''),
+                      mapping['company']: row.get(mapping['company'], ''),
                       }
         else:
             row.update(fk_row)
