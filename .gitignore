@@ -1,1 +1,3 @@
 pyru/localsettings.py
+.coverage
+htmlcov
