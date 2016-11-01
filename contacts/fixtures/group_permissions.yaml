@@ -1,0 +1,2 @@
+- model: auth.permission
+  fields: {codename: view_group, content_type: [auth, permission], name: Can view a group}

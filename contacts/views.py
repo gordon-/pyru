@@ -857,6 +857,7 @@ class Import(generic.LoginRequiredMixin, generic.LatePermissionMixin,
 
 class GroupChange(generic.DetailView):
     model = Group
+    permission_name = 'auth.view_group'
 
     def get(self, request, pk):
         group = self.get_object()

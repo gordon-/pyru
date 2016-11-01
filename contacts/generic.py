@@ -65,6 +65,8 @@ class PermissionMixin():
                     model=permission_name,
                     permission=cls.permission_suffix,
                 )
+        else:
+            permission_name = cls.permission_name
         return permission_name
 
     @classmethod
